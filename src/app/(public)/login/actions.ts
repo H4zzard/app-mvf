@@ -8,19 +8,16 @@ import { normalizeEmail } from "@/lib/kiwify/rules";
 import { RateLimiter } from "@/lib/auth/rate-limit";
 import { sanitizeReturnTo } from "@/lib/auth/return-to";
 import { RETURN_TO_COOKIE } from "@/lib/auth/confirm-params";
+import { checkBuyerStatus } from "@/lib/auth/buyer-check";
+import { LOGIN_MESSAGES, stateForBuyerStatus, stateForSendResult, type LoginState } from "@/lib/auth/login-messages";
 
-export interface LoginState {
-  status: "idle" | "sent" | "error";
-  message: string | null;
-}
-
-/** Resposta SEMPRE igual para e-mail cadastrado ou não (não expõe a base de compradoras). */
-const NEUTRAL: LoginState = {
-  status: "sent",
-  message: "Se este e-mail tiver acesso ao MVF, você vai receber um link para entrar em instantes.",
-};
-
-const perEmail = new RateLimiter(3, 10 * 60_000);
+/**
+ * Pedido de link mágico.
+ * 1) valida o e-mail; 2) limita tentativas; 3) verifica NO SERVIDOR se há compra
+ * ativa (decisão D63: a tela informa quando não há); 4) só então envia o link.
+ * Sem cadastro público: `shouldCreateUser: false`.
+ */
+const perEmail = new RateLimiter(5, 10 * 60_000);
 const perIp = new RateLimiter(20, 10 * 60_000);
 
 export async function requestMagicLink(_prev: LoginState, form: FormData): Promise<LoginState> {
@@ -33,14 +30,17 @@ export async function requestMagicLink(_prev: LoginState, form: FormData): Promi
   }
 
   const email = normalizeEmail(form.get("email"));
-  if (!email) return { status: "error", message: "Digite um e-mail válido, o mesmo usado na compra." };
+  if (!email) return { status: "error", message: LOGIN_MESSAGES.invalidEmail };
 
   const h = await headers();
   const ip = (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || "local";
   const emailKey = createHash("sha256").update(email).digest("hex");
   if (!perIp.take(ip) || !perEmail.take(emailKey)) {
-    return { status: "error", message: "Muitas tentativas. Aguarde alguns minutos antes de pedir outro link." };
+    return { status: "error", message: LOGIN_MESSAGES.tooMany };
   }
+
+  const blocked = stateForBuyerStatus(await checkBuyerStatus(email));
+  if (blocked) return blocked;
 
   const returnTo = sanitizeReturnTo(form.get("returnTo"));
   (await cookies()).set(RETURN_TO_COOKIE, returnTo, {
@@ -55,18 +55,10 @@ export async function requestMagicLink(_prev: LoginState, form: FormData): Promi
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      // Sem cadastro público: só contas provisionadas a partir de compra verificada.
       shouldCreateUser: false,
       emailRedirectTo: `${config.appBaseUrl}/auth/confirm`,
     },
   });
-
-  if (error) {
-    // Conta inexistente também cai aqui; a resposta pública continua neutra.
-    // O 429 do Supabase (intervalo de 60 s por usuária) só ocorre para contas que
-    // EXISTEM: responder diferente revelaria quem é compradora. Por isso fica neutro
-    // também; o limitador local acima avisa “muitas tentativas” igual para qualquer e-mail.
-    console.warn("[login] signInWithOtp", { code: error.code ?? "sem_codigo", status: error.status ?? null });
-  }
-  return NEUTRAL;
+  if (error) console.warn("[login] signInWithOtp", { code: error.code ?? "sem_codigo", status: error.status ?? null });
+  return stateForSendResult(error ? { code: error.code ?? null, status: error.status ?? null } : null, email);
 }

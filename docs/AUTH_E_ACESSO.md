@@ -26,8 +26,12 @@ Identidade no servidor: `supabase.auth.getClaims()` (JWT verificado). Nunca `get
    enviar e-mail** (`admin.createUser`, e-mail confirmado pela compra) + direito ativo.
    Compradoras antigas: importação (`docs/KIWIFY.md`).
 2. `/login`: aluna digita o e-mail da compra → `signInWithOtp({ shouldCreateUser: false })`.
-   **Não existe cadastro público.** A resposta é sempre a mesma (“Se este e-mail tiver acesso…”),
-   exista a conta ou não.
+   **Não existe cadastro público.** Antes de enviar o link, o servidor verifica com a service role
+   se há compra ativa (D63):
+   - sem compra: “Não encontramos este e-mail em nenhuma compra”;
+   - com compra: o link é enviado e a tela confirma o envio.
+   No Vercel é preciso ter `SUPABASE_SERVICE_ROLE_KEY`. Sem ela, a tela mostra “Não foi possível
+   verificar seu e-mail agora” e nada é liberado.
 3. Link → `/auth/confirm?token_hash=…&type=email` mostra a página “Quase lá” com o botão **Entrar**.
    Abrir o link (GET) **não** consome o token, o que protege contra antivírus de e-mail que pré-abrem links.
    Só o clique (POST, Server Action) chama `verifyOtp` → cookies de sessão → `returnTo` (guardado
@@ -99,6 +103,11 @@ runtime). `APP_BASE_URL` = URL pública. HTTPS obrigatório.
 
 ## Procedimentos administrativos (sem tela de autoaprovação)
 - **Primeiro admin:** `npm run admin:role -- grant --email … --role admin --actor "Nome" --execute --create-user`.
+- **Acesso manual (teste ou exceção aprovada):**
+  `node --env-file=.env.homolog scripts/access.ts grant --email … --actor "Nome" --execute`.
+  - Cria a conta sem enviar e-mail e um direito `manual`.
+  - Para desfazer, use `revoke`.
+  - Fica registrado em `admin_audit_log`.
 - **Troca de e-mail da aluna** (após confirmar identidade pelo suporte): no Supabase Studio,
   Authentication → Users → editar e-mail da conta; depois atualizar `profiles.email` e
   `purchase_entitlements.customer_email` dos pedidos dela (SQL Editor, como service role) e

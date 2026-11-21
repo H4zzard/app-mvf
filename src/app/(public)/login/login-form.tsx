@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import { ArrowRight, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { requestMagicLink, type LoginState } from "./actions";
+import { requestMagicLink } from "./actions";
+import type { LoginState } from "@/lib/auth/login-messages";
 
 export function LoginForm({ returnTo }: { returnTo: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(requestMagicLink, { status: "idle", message: null });
@@ -14,14 +15,18 @@ export function LoginForm({ returnTo }: { returnTo: string }) {
         <span className="grid size-12 place-items-center rounded-full bg-success-soft text-success">
           <MailCheck aria-hidden className="size-6" />
         </span>
-        <h2 className="mt-4 font-serif text-xl font-semibold text-fg">Confira seu e-mail</h2>
+        <h2 className="mt-4 font-serif text-xl font-semibold text-fg">Link enviado!</h2>
         <p className="mt-2 text-sm text-muted">{state.message}</p>
+        {state.email ? <p className="mt-1 break-all text-sm font-semibold text-fg">{state.email}</p> : null}
         <ul className="mt-4 space-y-1.5 text-sm text-muted">
           <li>• O link vale por tempo limitado e só pode ser usado uma vez.</li>
           <li>• Não chegou? Veja a caixa de spam e promoções.</li>
-          <li>• Use o mesmo e-mail da compra na Kiwify.</li>
+          <li>• Abra o link neste celular ou computador e toque em “Entrar”.</li>
         </ul>
-        <p className="mt-5 text-xs text-subtle">Para pedir outro link, recarregue a página e tente de novo em 1 minuto.</p>
+        <a href="/login" className="mt-5 inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline">
+          Usar outro e-mail
+        </a>
+        <p className="mt-1 text-xs text-subtle">Para pedir outro link para o mesmo e-mail, aguarde 1 minuto.</p>
       </div>
     );
   }

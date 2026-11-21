@@ -12,6 +12,7 @@
     "plans:examples": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/print-example-plans.ts",
     "kiwify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/kiwify.ts",
     "admin:role": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/admin-role.ts",
+    "access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/access.ts",
     "preflight": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/preflight.ts"
   },
   "dependencies": {

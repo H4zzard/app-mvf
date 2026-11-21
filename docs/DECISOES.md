@@ -229,6 +229,21 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - **D62 · Copiar honesto.** Fallback para http com seleção compatível com iOS; “Copiado!” só quando
   o navegador confirma.
 
+## 21/11/2026 — Login informa se há compra (pedido do operador)
+
+- **D63 · Fim da resposta neutra no login (substitui D38).** A tela agora verifica no servidor, com
+  a service role, se o e-mail tem compra ativa ou papel de equipe:
+  - sem compra: “Não encontramos este e-mail em nenhuma compra”;
+  - conta sem compra ativa: orienta procurar o suporte;
+  - com compra: envia o link e confirma o envio;
+  - se a verificação falhar: mensagem de erro, sem liberar nada (falha fechada).
+  Trade-off aceito pelo operador: qualquer pessoa consegue checar se um e-mail comprou. Mitigação:
+  limite por e-mail e por IP (em memória, por instância) e os limites do Supabase. No Vercel,
+  recomenda-se regra de rate limit para `POST /login`.
+- **D64 · Acesso manual auditado (`npm run access`).** Para testes e exceções aprovadas: cria a
+  conta (sem e-mail) e um direito `source = manual` com pedido sintético `manual-<hash>`. Revogável;
+  registra em `admin_audit_log`.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a
