@@ -1,0 +1,247 @@
+# Decisões do projeto
+
+Registro curto de decisões técnicas e de produto. Formato: data · decisão · motivo · consequência.
+Lacunas do brief **não** são preenchidas com suposições irreversíveis: ficam em “Em aberto”.
+
+## 21/11/2026 — Fundação (Prompt 01)
+
+**D1 · Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4 + lucide-react.**
+Stack sugerida no brief, versão estável atual gerada por `create-next-app`. Mantido
+`cacheComponents: true` (padrão do template): todas as rotas atuais são estáticas e o Next preserva o
+estado das telas entre navegações com `<Activity>`.
+
+**D2 · Sem shadcn/ui ou Radix nesta fase.** Os únicos componentes complexos (drawer mobile e painel de
+detalhes) usam `<dialog>` nativo com `showModal()`, que já entrega foco preso, Esc e backdrop. Evita
+dependências enquanto não há formulários complexos. Reavaliar ao construir onboarding/admin
+(Select, Combobox, Toast etc.).
+
+**D3 · Estado do plano em memória (React Context no layout `(app)`).** Início, Meu Plano e o card de
+pontos leem a mesma fonte (`PlanProvider`). Sobrevive à navegação, reinicia ao recarregar.
+Proibido usar localStorage como falsa persistência. No Dia 2 o provider passa a ler/gravar no servidor
+mantendo a mesma interface (`statusMap`, `setTaskStatus`, `toggleComplete`).
+
+**D4 · Fixtures isoladas em `src/demo/` e contratos em `src/types/`.** A UI depende dos tipos, não das
+fixtures. Seletores puros em `src/lib/plan.ts` (próximo passo, progresso, rotina do dia) servem a
+dados reais sem mudança.
+
+**D5 · Regra do “próximo passo”.** Primeira tarefa “em andamento”; senão a primeira pendente com
+pré-requisitos cumpridos; senão a primeira pendente. Só uma tarefa “em andamento” por vez.
+Pré-requisitos são recomendação de ordem e **não bloqueiam** a aluna (andamento livre).
+
+**D6 · Trilha de exemplo com 6 etapas** (Preparação; Perfil e produto; Meu formato; Produção;
+Publicação; Primeiras análises e próximos passos) e 18 tarefas para o perfil “não aparecer + avatar
+de IA”. “Primeiras análises” e “Próximos passos” foram unidas para caber em 4–6 fases. Conteúdo
+ilustrativo, não é o catálogo real.
+
+**D7 · Uma rota por módulo futuro com `FeaturePlaceholder`.** Sem rota dinâmica genérica: cada
+pasta será substituída pela tela real. A navegação vem de `src/config/navigation.ts` (fonte única,
+com `status: "available" | "soon"`).
+
+**D8 · Menu Gestão visível só para papel demo administrativo — apenas visual.** Seletor “Visualizar
+como (demo)” no rodapé da sidebar. A rota `/admin` é acessível pela URL e diz explicitamente que a
+autorização real será no servidor.
+
+**D9 · Tokens aproximados, fontes provisórias.** Cores do brief centralizadas em `globals.css`
+(não são oficiais). Títulos em Playfair Display e texto em DM Sans (Google Fonts, licença OFL) até
+chegarem fontes oficiais licenciadas. Marca em texto (“MVF”) até haver logo oficial.
+
+**D10 · Pontos de demonstração calculados localmente** (aula = 10, ação = 15, níveis fictícios),
+rotulados “Simulação desta sessão” e “Regras de pontos em definição”. Regras reais ficam em aberto.
+
+**D11 · `/` redireciona para `/inicio`** (redirect temporário em `next.config.ts`). Com login, a raiz
+poderá levar à tela de acesso.
+
+**D12 · Node 24 LTS instalado em `~/.local/node`** nesta máquina (sem Homebrew/sudo). Recomendado
+instalar Node de forma permanente (instalador oficial ou nvm) antes de configurar CI/deploy.
+
+## 21/11/2026 — Onboarding e personalização (Prompt 02)
+
+**D13 · Motor determinístico, puro e testável.** `buildPlan(profile)` em
+`src/lib/personalization/engine.ts`, sem IA, rede ou relógio. Regras resumidas em
+`docs/PERSONALIZACAO.md`. Uma IA futura pode operar sobre os mesmos contratos.
+
+**D14 · Catálogo com IDs estáveis em `src/demo/task-catalog.ts`.** As 18 atividades originais
+mantiveram os IDs. Pré-requisitos só apontam para atividades anteriores no catálogo (sem ciclos),
+e o motor descarta os que não entram no plano. Elegibilidade e alegações de produto estão em todo
+plano e nunca são opcionais.
+
+**D15 · Trilha de exemplo gerada pelo motor.** `src/demo/plan.ts` deixou de ter a lista fixa e
+guarda um `EXAMPLE_PROFILE` (perfil 1 do prompt) + status inicial. Assim há um único caminho de
+código para exemplo e plano real.
+
+**D16 · Store único com `useReducer` (`PlanProvider`).** Modos `example` (estado inicial),
+`first_access` (sem plano) e `personalized`. A interface antiga foi preservada (`plan`,
+`statusMap`, `toggleComplete`, `setTaskStatus`, `resetDemo`); `plan` agora pode ser `null`.
+`useActivePlan()` serve aos componentes que só renderizam com plano.
+
+**D17 · Progresso por ID, preservado ao replanejar.** Ajustar respostas regenera o plano e mantém
+o `statusMap` inteiro (inclusive de atividades que saíram), além de um histórico de mudanças
+(`TaskStatusEvent`). O primeiro plano criado a partir do exemplo começa sem o progresso fictício.
+
+**D18 · Confirmação com prévia antes de recalcular** (`diffPlans`). A criação do primeiro plano
+não pede confirmação extra, porque o clique em “Criar meu plano” já é explícito.
+
+**D19 · Sem persistência, como na fase 01.** Perfil, plano e progresso ficam só em memória.
+Contratos futuros em `src/types`: `OnboardingSubmissionRecord` e `PlanProgressRecord`
+(`userId`, `onboardingVersion`, `engineVersion`, `completedTaskIds`).
+
+**D20 · “Simular primeiro acesso” é controle de demo**, na sidebar, com confirmação em dois
+cliques. Não há interceptação de rota nem redirect: o dashboard continua testável. A regra real
+(aluna sem onboarding → `/onboarding` após login e validação de compra) fica para a fase de backend.
+
+**D21 · Testes com `node --test` nativo (Node 24, type stripping)**, sem nova dependência. Os
+módulos testáveis usam imports relativos `.ts` e `import type` para `@/…`; por isso o tsconfig tem
+`allowImportingTsExtensions`.
+
+**D22 · Formulário com inputs nativos** (radio/checkbox/text) estilizados com `has-checked:`. O
+teclado, os leitores de tela e o toque funcionam sem Radix. O foco vai para o título de cada pergunta.
+
+**D23 · Nome preferido opcional, primeira pergunta.** Sem login real, o fallback de saudação é
+“parceira” (não usamos o nome da conta demo).
+
+## 21/11/2026 — Autenticação, Kiwify e persistência (Prompt 03)
+
+**D24 · Supabase (Auth + Postgres) com `@supabase/ssr` 0.12.** Identidade por `getClaims()`;
+autorização por `my_access()` no banco. Proxy (`src/proxy.ts`) só renova sessão e pré-filtra.
+Detalhes: `docs/AUTH_E_ACESSO.md`.
+
+**D25 · Sem cadastro público.** `signInWithOtp({ shouldCreateUser: false })`; contas nascem só de
+compra verificada (webhook confirmado na API ou importação). Resposta de login sempre neutra.
+
+**D26 · Acesso derivado de pedidos (`purchase_entitlements`, 1 linha por `order_id`).** Uma conta
+por e-mail de compra; vários pedidos não duplicam conta. Revogar um pedido não afeta outro ativo.
+Equipe acessa por papel (`user_roles`) atribuído só por CLI auditada.
+
+**D27 · RLS exige acesso ativo** em toda leitura/escrita da aluna: reembolso corta o acesso aos
+dados mesmo com sessão válida, sem apagar o histórico.
+
+**D28 · Webhook usa só campos documentados** (`order_id`, `webhook_event_type`, `order_status`);
+produto, e-mail e status atual vêm de `GET /sales/{id}`. Aprovação nunca é concedida sem essa
+confirmação (pendente + 503 se a API cair). Reembolso/chargeback assinados revogam na hora.
+
+**D29 · Allowlist de produtos obrigatória** (`KIWIFY_ALLOWED_PRODUCT_IDS`); vazia = nada liberado.
+
+**D30 · Importação e reconciliação por CLI, dry-run por padrão**, retomável (`import_runs`),
+idempotente, relatório sem PII. Não há endpoint público para isso.
+
+**D31 · Persistência por Server Actions + funções SQL atômicas.** O cliente envia só respostas e IDs;
+o servidor valida e gera o plano com o motor. Atualização otimista com rollback e indicador
+“Salvando… / Progresso salvo”. Concorrência: tarefas por ID (última escrita vence, por tarefa);
+plano com revisão esperada (`revision_conflict` → pedir recarga). Rascunho do onboarding salvo a
+cada pergunta.
+
+**D32 · Modo demo local isolado:** só `NODE_ENV=development` + `MVF_DEMO_MODE=true`; memória, sem
+gravação. Sem configuração → área privada fechada (inclusive em dev). `getViewer()` chama
+`connection()` para nunca congelar configuração/sessão no build.
+
+**D33 · PGlite (dev dependency) para testar RLS** sem Docker, com stub mínimo do Supabase. Não
+substitui teste no projeto real.
+
+**D34 · Nomes de variáveis Kiwify:** `KIWIFY_CLIENT_ID` + `KIWIFY_CLIENT_SECRET` + `KIWIFY_ACCOUNT_ID`
+(o OAuth documentado usa client_id/client_secret), no lugar do `KIWIFY_API_KEY` sugerido no prompt.
+Token de webhook com rotação (`KIWIFY_WEBHOOK_TOKEN_PREVIOUS`).
+
+**D35 · `/admin` sem `forbidden()`** (ainda experimental no Next 16): a página renderiza a tela 403;
+a API de gestão responde 401/403.
+
+**D36 · Correção:** diálogos `<dialog>` ignoram evento `close` atrasado (StrictMode em dev
+reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sidebar recolhida).
+
+## 21/11/2026 — Ativação e homologação (Prompt 04)
+
+- **D37 · Link mágico confirmado por POST.** `/auth/confirm` virou página com botão “Entrar”; o
+  `verifyOtp` só roda na Server Action. Motivo: filtros de e-mail corporativo pré-abrem links e
+  consumiam o token de uso único (mitigação recomendada pelo Supabase). O template continua com
+  `token_hash`.
+- **D38 · 429 do Supabase com resposta neutra.** O intervalo de 60 s só existe para contas reais;
+  responder “muitas tentativas” revelava compradoras.
+- **D39 · Paginação da Kiwify por `pagination.count`.** O máximo de `page_size` não é documentado;
+  parar em “menos que o pedido” podia truncar a importação sem aviso. Divergências vão para revisão.
+- **D40 · `kiwify probe` e `--date-style`.** O formato de `start_date`/`end_date` não é confirmado
+  pela doc; o probe testa os dois formatos em uma página e imprime só a forma da resposta (sem PII).
+- **D41 · `kiwify grant-order` para o piloto.** Libera até 10 pedidos escolhidos, confirmando cada um
+  na API (`source = manual`). Evita importar o histórico inteiro antes de validar.
+- **D42 · `npm run preflight`.** Checa presença e coerência das variáveis sem imprimir valores; com
+  `--remote`, faz só leituras: `disable_signup`, leitura anônima das 9 tabelas, chave secreta,
+  token OAuth e escopos da Kiwify, respostas do app publicado.
+- **D43 · Ambientes.** Projetos Supabase separados para homologação e produção. A Kiwify (sem
+  sandbox) fica em homologação só para leitura, `grant-order` e webhook restrito ao produto MVF.
+
+## 21/11/2026 — Front mobile-first para demonstração (Prompt 05)
+
+- **D44 · Módulos mock só no modo demo, decidido no servidor.** `DemoModule` chama `getViewer()`:
+  na demo renderiza a tela interativa; para alunas reais, o `FeaturePlaceholder` (“Em breve”).
+  Nenhum dado de exemplo é renderizado em produção.
+- **D45 · Store da demo separado do plano.** `DemoProvider` (memória, redutor puro
+  `src/lib/demo/store.ts`) guarda favoritos, comunidade, agenda, Estúdio e desafios. O plano
+  continua só no `PlanProvider`; concluir uma aula da biblioteca marca a tarefa ligada a ela.
+- **D46 · Navegação mobile.** Abaixo de 1024 px: barra inferior com Início, Plano, Aulas, Virais e
+  Mais (folha com os demais módulos e os controles da demo). O drawer lateral foi removido para não
+  duplicar a navegação.
+- **D47 · Estúdio IA determinístico.** Modelos + `buildStudioPrompt` (puro, testado). Não há IA paga
+  nem chamada ao Google Flow. Os roteiros validados entram no formato `ScriptTemplate`.
+- **D48 · XP só derivado de ações da demo.** `computeXp` (puro). Sem sequência de dias (não há
+  registro diário real) e sem ranking (não há resultados verificáveis).
+- **D49 · Cenários de gravação.** “Nova aluna”, “Aluna com plano” e “Aluna em evolução” são gerados
+  pelo motor (`src/demo/scenarios.ts`); a ação `load-scenario` do `PlanProvider` só funciona em memória.
+- **D50 · `npm run dev:lan`.** Sobe o dev no IP da rede local (`-H`), sem túnel nem
+  `allowedDevOrigins` amplo, e esconde o indicador de dev. A cópia tem fallback para http.
+
+## 21/11/2026 — Área de membros estilo streaming (Prompt 06)
+
+- **D51 · Assets oficiais em `public/area-membros/`.** Copiados de `imagens-area-membros/` com nomes
+  limpos e servidos com `next/image` (otimização automática). Mapeamento em `docs/AREA_MEMBROS.md`.
+- **D52 · Catálogo por módulos.** Capas oficiais = módulos, agrupados em 6 trilhos; aulas de exemplo
+  distribuídas por tema (demonstrativo). Tocar um módulo abre um sheet com a lista de aulas.
+- **D53 · Direção visual.** Fundo claro e quente do app + hero, “Continue assistindo” e cabeçalho da
+  aula em vinho/ink escuro, para conversar com as capas. Logo oficial da NUMI na marca.
+- **D54 · Busca recolhida.** A experiência principal é visual; a busca abre sob demanda.
+
+## 21/11/2026 — Finalização do front (Prompt 07)
+
+- **D55 · Missões com linha de base.** Participar grava o valor atual da métrica; só ações posteriores
+  contam. Cada missão/marco é resgatado uma vez (`challengesClaimed`). XP é derivado de conjuntos de
+  ações, então a mesma ação nunca soma duas vezes. “Diária/semanal” é tipo, não relógio (demo sem `Date`).
+- **D56 · Pontos da loja = XP − resgates.** XP mede engajamento e não diminui com resgates; o saldo
+  sim. Resgate simulado, único por recompensa, sem operação externa.
+- **D57 · Ranking só por XP de engajamento.** Perfis de exemplo marcados e desligáveis (estado vazio).
+  `buildRanking(perfis, você)` recebe dados externos — pronto para dados reais. Sem filtro por
+  período até haver registros com data.
+- **D58 · Materiais sem arquivo.** Nenhum arquivo real no projeto: `file: null` e aviso explícito,
+  sem botão de download. Regras/FAQ marcadas como demonstrativas pendentes de revisão.
+
+## 21/11/2026 — QA mobile e gravação (Prompt 08)
+
+- **D59 · Restauração opcional da demo — DESLIGADA por padrão.** Interruptor “Manter ao recarregar”
+  nos Controles da demo. Usa o `sessionStorage` da aba, só no `DemoProvider` e só com
+  `NODE_ENV=development`.
+  - O snapshot é versionado e validado campo a campo (`src/lib/demo/snapshot.ts`); se for inválido, é descartado.
+  - Ele só é gravado depois que o estado restaurado foi renderizado (o StrictMode regravava o padrão).
+  - Pendente de decisão do operador: a proibição 4 do `CLAUDE.md` diz que “o modo demo vive em
+    memória e reinicia ao recarregar”. A regra não foi alterada. Por isso o recurso nasce desligado
+    e só guarda dados fictícios quando o operador liga.
+- **D60 · Primeira tela priorizada.**
+  - Em `/aulas`, o hero ficou mais baixo, a busca foi para o hero e o “Continue assistindo” ficou
+    compacto. Primeiro trilho: 928 → 644 px a 390×844.
+  - No Início, botões lado a lado e textos mais curtos: Formação MVF de 825 → 703 px.
+- **D61 · `dev:lan` robusto.** Escolhe porta livre; detecta outro `next dev` na mesma pasta (o Next 16
+  só permite um) e explica em português; aquece todas as rotas e avisa falhas.
+- **D62 · Copiar honesto.** Fallback para http com seleção compatível com iOS; “Copiado!” só quando
+  o navegador confirma.
+
+## Em aberto (não decidir sem o operador/expert)
+
+- Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a
+  proibição 4 do `CLAUDE.md`) ou remover.
+
+- Nome comercial, logo, fontes e tokens oficiais.
+- Regras de pontos, níveis, recompensas e salas Elite+ / Icon.
+- Catálogo real de aulas/atividades e revisão das regras do motor pela expert (o atual é demo).
+- Migração/hospedagem das aulas hoje na Kiwify (direitos, arquivos-fonte, player).
+- Comissões NUMI e integração com TikTok Shop.
+- Fornecedor de dados de vídeos virais e custo.
+- Permissões finas por cargo (owner, admin, expert, suporte, moderação, parceiros).
+- Suporte, moderação, notificações, LGPD (consentimento, exportação/exclusão, retenção).
+- Data da primeira venda do MVF (início da importação) e lista final de produtos que dão acesso.
+- Política para `refund_requested`/`pending_refund` (hoje: mantém o acesso até `refunded`).
+- Provedor de SMTP, domínio de envio e domínio do app.

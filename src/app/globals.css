@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens do App MVF.
+ * Valores APROXIMADOS a partir das capturas da NUMI Insiders — não são cores
+ * oficiais. Ajuste aqui (fonte única) quando a marca oficial for entregue.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --mvf-canvas: #faf6f5; /* fundo principal */
+  --mvf-surface: #fefcfc; /* sidebar / superfícies */
+  --mvf-card: #ffffff;
+  --mvf-blush: #fef2f4; /* seleção / destaque suave */
+  --mvf-blush-strong: #fbe3e7;
+  --mvf-brand: #c62940; /* vermelho da marca */
+  --mvf-brand-hover: #a8213a;
+  --mvf-coral: #e04842; /* coral de ação */
+  --mvf-ink: #17172e; /* cartões especiais (índigo/bordô escuro) */
+  --mvf-ink-soft: #24243f;
+  --mvf-fg: #2b1d22; /* texto principal */
+  --mvf-muted: #77656b; /* texto secundário */
+  --mvf-subtle: #a6959a;
+  --mvf-border: #f1dfe2; /* bordas rosadas suaves */
+  --mvf-border-strong: #e6c9ce;
+  --mvf-success: #2f7d5b;
+  --mvf-success-soft: #e8f4ee;
+  --mvf-warning: #9a6412;
+  --mvf-warning-soft: #fdf3e2;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--mvf-canvas);
+  --color-surface: var(--mvf-surface);
+  --color-card: var(--mvf-card);
+  --color-blush: var(--mvf-blush);
+  --color-blush-strong: var(--mvf-blush-strong);
+  --color-brand: var(--mvf-brand);
+  --color-brand-hover: var(--mvf-brand-hover);
+  --color-coral: var(--mvf-coral);
+  --color-ink: var(--mvf-ink);
+  --color-ink-soft: var(--mvf-ink-soft);
+  --color-fg: var(--mvf-fg);
+  --color-muted: var(--mvf-muted);
+  --color-subtle: var(--mvf-subtle);
+  --color-line: var(--mvf-border);
+  --color-line-strong: var(--mvf-border-strong);
+  --color-success: var(--mvf-success);
+  --color-success-soft: var(--mvf-success-soft);
+  --color-warning: var(--mvf-warning);
+  --color-warning-soft: var(--mvf-warning-soft);
+
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+
+  --shadow-card: 0 1px 2px rgb(43 29 34 / 0.04), 0 4px 16px -6px rgb(198 41 64 / 0.08);
+  --shadow-raised: 0 2px 4px rgb(43 29 34 / 0.05), 0 12px 32px -12px rgb(198 41 64 / 0.18);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--mvf-canvas);
+  color: var(--mvf-fg);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Foco visível consistente para teclado. */
+:focus-visible {
+  outline: 2px solid var(--mvf-brand);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Âncoras não ficam escondidas atrás do header fixo. */
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+/* Destaque breve ao chegar em uma tarefa via link (#task-...). */
+.task-anchor:target {
+  box-shadow: 0 0 0 2px var(--mvf-brand);
+}
+
+/* Drawer e painéis com <dialog> nativo. */
+dialog::backdrop {
+  background: rgb(23 23 46 / 0.35);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  dialog[open].mvf-sheet {
+    animation: mvf-sheet-in 220ms ease-out;
+  }
+  dialog[open].mvf-drawer {
+    animation: mvf-drawer-in 220ms ease-out;
+  }
+  /* Troca de pergunta no onboarding: discreta e rápida. */
+  .mvf-step {
+    animation: mvf-step-in 200ms ease-out;
+  }
+}
+
+@keyframes mvf-step-in {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+
+@keyframes mvf-sheet-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+@keyframes mvf-drawer-in {
+  from {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
