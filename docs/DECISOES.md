@@ -244,6 +244,16 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   conta (sem e-mail) e um direito `source = manual` com pedido sintético `manual-<hash>`. Revogável;
   registra em `admin_audit_log`.
 
+- **D65 · Prévia dos módulos para contas reais (`MVF_PREVIEW_MODULES`).** Variável de servidor:
+  - valores: vazio (ninguém, o padrão), `all` ou uma lista de e-mails;
+  - para quem está liberado, `DemoModule` mostra as telas com dados de EXEMPLO, sempre rotulados;
+  - o `DemoProvider` fica em memória e não usa `sessionStorage` em produção;
+  - plano, onboarding e progresso continuam reais no Supabase;
+  - não muda autenticação, RLS nem acesso: só troca o “Em breve”.
+- **D66 · Onboarding começa pelo nome.** O primeiro acesso abre direto na pergunta do nome, com a
+  saudação. O nome é exigido na tela no primeiro acesso, sem “Pular” e sem “Voltar”. Ao ajustar o
+  plano depois, segue opcional. O validador do servidor não mudou.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a

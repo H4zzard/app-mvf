@@ -87,7 +87,7 @@ export function BottomNav({ onOpenMore, moreOpen }: { onOpenMore: () => void; mo
 export function MoreSheet({ onClose }: { onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
-  const { user, mode } = useSession();
+  const { user, mode, modulesPreview } = useSession();
   const demo = mode === "demo";
 
   useEffect(() => {
@@ -140,7 +140,7 @@ export function MoreSheet({ onClose }: { onClose: () => void }) {
                 {g.items.map((item) => {
                   const Icon = item.icon;
                   const active = isActivePath(pathname, item.href);
-                  const soon = isItemSoon(item, demo);
+                  const soon = isItemSoon(item, modulesPreview);
                   return (
                     <li key={item.id}>
                       <Link

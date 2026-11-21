@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Award, Bell, Mail, SlidersHorizontal, UserRound } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { usePlan } from "@/components/plan/plan-provider";
+import { useSession } from "@/components/layout/session-provider";
 import { AnswersSummary } from "@/components/onboarding/answers-summary";
 import { Badge, DemoBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -20,14 +21,16 @@ import { cn } from "@/lib/cn";
 export function ProfileView() {
   const { profile, plan, statusMap } = usePlan();
   const { xp } = useDemo();
+  const { mode } = useSession();
+  const real = mode === "member";
   const name = greetingName(profile);
-  const display = name === "parceira" ? "Aluna demo" : name;
+  const display = name === "parceira" ? (real ? "Aluna" : "Aluna demo") : name;
   const progress = plan ? computeProgress(plan, statusMap) : null;
   const [prefs, setPrefs] = useState({ lives: true, weekly: false });
 
   return (
     <div className="space-y-5">
-      <PageHeader eyebrow={<DemoBadge label="Conta de demonstração" />} title="Perfil" />
+      <PageHeader eyebrow={<DemoBadge label={real ? "Prévia · preferências ainda não são salvas" : "Conta de demonstração"} />} title="Perfil" />
 
       <Card className="flex items-center gap-4 p-5">
         <span aria-hidden className="grid size-16 shrink-0 place-items-center rounded-full bg-brand font-serif text-xl font-semibold text-white">
@@ -35,11 +38,11 @@ export function ProfileView() {
         </span>
         <div className="min-w-0">
           <p className="font-serif text-xl font-semibold text-fg">{display}</p>
-          <p className="text-sm text-muted">Aluna · dados fictícios</p>
+          <p className="text-sm text-muted">{real ? "Aluna" : "Aluna · dados fictícios"}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <Badge tone="brand">
               <Award aria-hidden className="size-3" />
-              Nível {xp.level.number} · {xp.level.name}
+              Nível {xp.level.number} · {xp.level.name}{real ? " (prévia)" : ""}
             </Badge>
             {progress ? <Badge tone="neutral">Plano {progress.percent}%</Badge> : null}
           </div>

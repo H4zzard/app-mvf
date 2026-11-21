@@ -19,8 +19,7 @@ export function SidebarNav({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const { user, mode } = useSession();
-  const demo = mode === "demo";
+  const { user, modulesPreview } = useSession();
   const [closedGroups, setClosedGroups] = useState<Partial<Record<NavGroupId, boolean>>>({});
 
   const groups = NAV_GROUPS.map((group) => ({
@@ -55,7 +54,7 @@ export function SidebarNav({
             <ul id={listId} hidden={isClosed || undefined} className="mt-1 flex flex-col gap-0.5">
               {group.items.map((item) => {
                 const active = isActivePath(pathname, item.href);
-                const soon = isItemSoon(item, demo);
+                const soon = isItemSoon(item, modulesPreview);
                 const Icon = item.icon;
                 return (
                   <li key={item.id}>

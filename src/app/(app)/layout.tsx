@@ -9,6 +9,7 @@ import { requirePrivateAccess } from "@/lib/auth/viewer";
 import { loadStudentState } from "@/lib/data/student-repo";
 import { primaryRole } from "@/lib/auth/permissions";
 import { greetingName } from "@/lib/greeting";
+import { canPreviewModules, readConfig } from "@/lib/config/env";
 
 /**
  * Área privada. A sessão e o direito de acesso são verificados NO SERVIDOR
@@ -48,12 +49,20 @@ async function PrivateApp({ children }: { children: React.ReactNode }) {
     initials: initialsOf(name),
     role: primaryRole(viewer.roles),
     roles: viewer.roles,
+    modulesPreview: canPreviewModules(readConfig(), viewer.email),
   };
 
   return (
     <SessionProvider viewer={clientViewer}>
       <PlanProvider persistence={{ kind: "server", initial: state }}>
-        <AppShell>{children}</AppShell>
+        {clientViewer.modulesPreview ? (
+          // Prévia: estado de exemplo dos módulos em memória; plano e progresso seguem no servidor.
+          <DemoProvider>
+            <AppShell>{children}</AppShell>
+          </DemoProvider>
+        ) : (
+          <AppShell>{children}</AppShell>
+        )}
       </PlanProvider>
     </SessionProvider>
   );

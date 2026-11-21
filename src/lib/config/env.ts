@@ -20,6 +20,12 @@ export interface AppConfig {
   serviceRoleKey: string | null;
   appBaseUrl: string;
   supportContactUrl: string | null;
+  /**
+   * Prévia dos módulos (dados de EXEMPLO, sempre rotulados) para contas reais.
+   * `MVF_PREVIEW_MODULES`: vazio = ninguém; "all" = todas as alunas; ou lista de e-mails.
+   * Não dá acesso a nada: só troca o “Em breve” pela tela de demonstração.
+   */
+  modulesPreview: { all: boolean; emails: string[] };
   kiwify: {
     webhookTokens: string[];
     allowedProductIds: string[];
@@ -49,6 +55,7 @@ export function readConfig(env: Env = process.env): AppConfig {
     serviceRoleKey: clean(env.SUPABASE_SERVICE_ROLE_KEY),
     appBaseUrl: (clean(env.APP_BASE_URL) ?? "http://localhost:3000").replace(/\/$/, ""),
     supportContactUrl: clean(env.MVF_SUPPORT_CONTACT_URL),
+    modulesPreview: parsePreview(env.MVF_PREVIEW_MODULES),
     kiwify: {
       webhookTokens: [clean(env.KIWIFY_WEBHOOK_TOKEN), clean(env.KIWIFY_WEBHOOK_TOKEN_PREVIOUS)].filter(
         (t): t is string => t !== null,
@@ -57,4 +64,22 @@ export function readConfig(env: Env = process.env): AppConfig {
       api: clientId && clientSecret && accountId ? { clientId, clientSecret, accountId } : null,
     },
   };
+}
+
+function parsePreview(raw: string | undefined): AppConfig["modulesPreview"] {
+  const v = clean(raw);
+  if (!v) return { all: false, emails: [] };
+  if (v.toLowerCase() === "all") return { all: true, emails: [] };
+  const emails = v
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+  return { all: false, emails };
+}
+
+/** A conta (e-mail do JWT) pode ver a prévia dos módulos? */
+export function canPreviewModules(config: Pick<AppConfig, "modulesPreview">, email: string | null | undefined): boolean {
+  if (config.modulesPreview.all) return true;
+  const e = (email ?? "").trim().toLowerCase();
+  return e !== "" && config.modulesPreview.emails.includes(e);
 }

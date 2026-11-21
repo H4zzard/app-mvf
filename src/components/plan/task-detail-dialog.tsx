@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { CalendarDays, CircleCheck, CirclePlay, Info, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { useActivePlan } from "@/components/plan/plan-provider";
+import { useOptionalDemo } from "@/components/demo/demo-provider";
 import { TaskDuration, TaskStatusBadge, TaskTypeLabel } from "@/components/plan/task-meta";
 import { Button } from "@/components/ui/button";
 import { DemoBadge } from "@/components/ui/badge";
@@ -17,7 +18,8 @@ import { cn } from "@/lib/cn";
  * Montado apenas enquanto há uma tarefa selecionada.
  */
 export function TaskDetailDialog({ taskId, onClose }: { taskId: string; onClose: () => void }) {
-  const { plan, statusMap, toggleComplete, setTaskStatus, persistence } = useActivePlan();
+  const { plan, statusMap, toggleComplete, setTaskStatus } = useActivePlan();
+  const modulesAvailable = useOptionalDemo() !== null;
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -148,7 +150,7 @@ export function TaskDetailDialog({ taskId, onClose }: { taskId: string; onClose:
               </h3>
               <p className="mt-1 text-sm text-fg">{lesson.title}</p>
               <p className="text-xs text-muted">Módulo: {lesson.module}</p>
-              {persistence === "memory" ? (
+              {modulesAvailable ? (
                 <Link
                   href={`/aulas/${lesson.id}`}
                   className="mt-3 inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-line-strong bg-card px-4 text-sm font-semibold text-fg transition-colors hover:border-brand/40 hover:bg-blush"

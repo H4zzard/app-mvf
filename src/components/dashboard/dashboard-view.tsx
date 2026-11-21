@@ -63,6 +63,8 @@ function FirstAccessDashboard({ name, demo }: { name: string; demo: boolean }) {
 
 function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersonalized: boolean; demo: boolean }) {
   const { plan, statusMap, toggleComplete } = useActivePlan();
+  // Módulos de demonstração disponíveis (modo demo local OU prévia autorizada no servidor).
+  const modules = useOptionalDemo() !== null;
 
   const progress = computeProgress(plan, statusMap);
   const next = getNextTask(plan, statusMap);
@@ -131,7 +133,7 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
                   <span className="line-clamp-2 sm:line-clamp-none">{next.whyInPlan}</span>
                 </p>
                 <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-6 sm:flex sm:flex-wrap sm:gap-3">
-                  {demo && next.lessonId ? (
+                  {modules && next.lessonId ? (
                     <ButtonLink href={`/aulas/${next.lessonId}`} size="lg" className="px-4 sm:px-6">
                       <CirclePlay aria-hidden className="size-4" />
                       Abrir aula
@@ -199,14 +201,14 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
           </ButtonLink>
         </Card>
 
-        {demo ? <MemberAreaBanner /> : null}
+        {modules ? <MemberAreaBanner /> : null}
 
         {/* Acesso rápido */}
         <div className="lg:col-span-3 lg:order-last">
           <QuickAccess />
         </div>
 
-        {demo ? <ChallengesCard /> : null}
+        {modules ? <ChallengesCard /> : null}
 
         {/* Sugestão de rotina do dia */}
         <Card className="p-5 sm:p-6" aria-labelledby="today-title">
@@ -241,7 +243,7 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
         </Card>
 
         {/* Sua jornada (no celular, o Meu Plano cumpre este papel) */}
-        <Card className={cn("hidden p-6 lg:block", demo ? "lg:col-span-1" : "lg:col-span-2")} aria-labelledby="journey-title">
+        <Card className={cn("hidden p-6 lg:block", modules ? "lg:col-span-1" : "lg:col-span-2")} aria-labelledby="journey-title">
           <CardHeader
             titleId="journey-title"
             title="Sua jornada"

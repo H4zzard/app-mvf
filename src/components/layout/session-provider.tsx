@@ -14,12 +14,14 @@ import { DEMO_USER } from "@/demo/session";
 
 export type ClientViewer =
   | { mode: "demo" }
-  | { mode: "member"; displayName: string; initials: string; role: UserRole; roles: UserRole[] };
+  | { mode: "member"; displayName: string; initials: string; role: UserRole; roles: UserRole[]; modulesPreview?: boolean };
 
 interface SessionContextValue {
   user: User;
   roles: UserRole[];
   mode: ClientViewer["mode"];
+  /** Módulos com tela de demonstração liberados (modo demo ou prévia autorizada no servidor). */
+  modulesPreview: boolean;
   /** Somente modo demo; no modo real é um no-op. */
   setDemoRole: (role: UserRole) => void;
 }
@@ -38,6 +40,7 @@ export function SessionProvider({
     if (viewer.mode === "member") {
       return {
         mode: "member",
+        modulesPreview: viewer.modulesPreview === true,
         roles: viewer.roles,
         user: { id: "me", displayName: viewer.displayName, initials: viewer.initials, role: viewer.role, isDemo: false },
         setDemoRole: () => {},
@@ -45,6 +48,7 @@ export function SessionProvider({
     }
     return {
       mode: "demo",
+      modulesPreview: true,
       roles: [demoRole],
       user: { ...DEMO_USER, role: demoRole },
       setDemoRole: setDemoRoleState,

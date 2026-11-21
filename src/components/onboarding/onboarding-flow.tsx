@@ -50,10 +50,15 @@ const SAVE_ERRORS: Record<string, string> = {
   server: "Não foi possível salvar agora. Tente de novo em instantes.",
 };
 
-/** Sem plano: começa na intro ou retoma o rascunho salvo na primeira pergunta pendente. */
+/**
+ * Sem plano: abre DIRETO na primeira pergunta (o nome), com a saudação acima,
+ * ou retoma o rascunho salvo na primeira pergunta pendente.
+ */
 function initialFromDraft(revision: number, draft: OnboardingAnswers | null): FlowState {
   const answers = draft ?? {};
-  if (Object.keys(answers).length === 0) return { baseRevision: revision, step: { kind: "intro" }, answers: {}, editing: false };
+  if (Object.keys(answers).length === 0) {
+    return { baseRevision: revision, step: { kind: "question", id: getVisibleQuestions({})[0].id, fromReview: false }, answers: {}, editing: false };
+  }
   const pending = getVisibleQuestions(answers).find((q) => validateQuestion(q, answers) !== null);
   return {
     baseRevision: revision,
@@ -152,7 +157,8 @@ export function OnboardingFlow() {
     if (step.fromReview) return go({ step: { kind: "review" } });
     const index = visible.findIndex((q) => q.id === step.id);
     if (index > 0) go({ step: { kind: "question", id: visible[index - 1].id, fromReview: false } });
-    else go({ step: editing ? { kind: "review" } : { kind: "intro" } });
+    else if (editing) go({ step: { kind: "review" } });
+    // Primeiro acesso: a primeira pergunta é o começo (não há tela anterior).
   }
 
   /** Grava no servidor (modo real) e só então mostra a confirmação. */
@@ -275,6 +281,7 @@ export function OnboardingFlow() {
             }
             headingRef={headingRef}
             fromReview={step.fromReview}
+            firstStep={!editing && !step.fromReview && questionIndex === 0}
             onChange={setAnswer}
             onBack={back}
             onNext={() => advance(answers)}
@@ -335,6 +342,7 @@ function QuestionStep({
   previousAnswer,
   headingRef,
   fromReview,
+  firstStep,
   onChange,
   onBack,
   onNext,
@@ -345,12 +353,16 @@ function QuestionStep({
   previousAnswer?: string;
   headingRef: React.Ref<HTMLHeadingElement>;
   fromReview: boolean;
+  /** Primeira pergunta do primeiro acesso: mostra a saudação, exige o nome e não tem “Voltar”. */
+  firstStep: boolean;
   onChange: (value: unknown) => void;
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
 }) {
   const question = getQuestion(questionId);
+  // No primeiro acesso o nome é pedido de cara (decisão do operador); ao ajustar depois, segue opcional.
+  const optional = Boolean(question.optional) && !(firstStep && question.id === "nome");
   const error = validateQuestion(question, answers);
   const titleId = `question-${question.id}`;
   const empty =
@@ -362,34 +374,51 @@ function QuestionStep({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (!error) onNext();
+        if (!error && (optional || !empty)) onNext();
       }}
       className="space-y-6"
     >
+      {firstStep ? (
+        <div className="space-y-2">
+          <AssistantMessage title={ONBOARDING_GREETING} compact />
+          <p className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted sm:ml-12">
+            <span className="inline-flex items-center gap-1">
+              <ListChecks aria-hidden className="size-3.5 text-brand" /> Até 11 perguntas, uma por vez
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Clock aria-hidden className="size-3.5 text-brand" /> Cerca de 2 minutos
+            </span>
+          </p>
+        </div>
+      ) : null}
       {previousAnswer ? <UserReply>{previousAnswer}</UserReply> : null}
       <AssistantMessage
         ref={headingRef}
         titleId={titleId}
         lead={question.lead?.(answers)}
-        title={question.prompt}
-        helper={question.helper}
+        title={firstStep && question.id === "nome" ? "Para começar: como você quer ser chamada?" : question.prompt}
+        helper={firstStep && question.id === "nome" ? "Vamos usar o seu nome no app e no seu plano." : question.helper}
       />
       <div className="sm:ml-12">
         <QuestionField question={question} answers={answers} onChange={onChange} labelledBy={titleId} />
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 sm:ml-12">
-        <Button variant="secondary" onClick={onBack}>
-          <ArrowLeft aria-hidden className="size-4" />
-          {fromReview ? "Voltar ao resumo" : "Voltar"}
-        </Button>
+        {firstStep ? (
+          <span />
+        ) : (
+          <Button variant="secondary" onClick={onBack}>
+            <ArrowLeft aria-hidden className="size-4" />
+            {fromReview ? "Voltar ao resumo" : "Voltar"}
+          </Button>
+        )}
         <div className="flex flex-wrap items-center gap-2">
-          {question.optional ? (
+          {optional ? (
             <Button variant="ghost" onClick={onSkip}>
               <SkipForward aria-hidden className="size-4" />
               Pular
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(error) || (question.optional ? false : empty)}>
+          <Button type="submit" disabled={Boolean(error) || (optional ? false : empty)}>
             {fromReview ? "Salvar resposta" : "Continuar"}
             <ArrowRight aria-hidden className="size-4" />
           </Button>
@@ -399,8 +428,8 @@ function QuestionStep({
         <p role="alert" className="text-sm text-brand sm:ml-12">
           {error}
         </p>
-      ) : !question.optional && empty ? (
-        <p className="text-sm text-muted sm:ml-12">Escolha uma opção para continuar.</p>
+      ) : !optional && empty ? (
+        <p className="text-sm text-muted sm:ml-12">{question.kind === "text" ? "Digite seu nome para continuar." : "Escolha uma opção para continuar."}</p>
       ) : null}
     </form>
   );

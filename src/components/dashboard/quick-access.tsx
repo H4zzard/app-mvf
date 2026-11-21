@@ -13,8 +13,7 @@ const QUICK_IDS = ["aulas", "videos-virais", "estudio-ia", "comunidade"];
  * a partir de 640 px, cards com descrição. Módulos sem tela mostram “Em breve”.
  */
 export function QuickAccess() {
-  const { mode } = useSession();
-  const demo = mode === "demo";
+  const { modulesPreview } = useSession();
   return (
     <section aria-labelledby="quick-access-title">
       <h2 id="quick-access-title" className="font-serif text-lg font-semibold text-fg">
@@ -24,7 +23,7 @@ export function QuickAccess() {
         {QUICK_IDS.map((id) => {
           const item = getNavItem(id);
           const Icon = item.icon;
-          const soon = isItemSoon(item, demo);
+          const soon = isItemSoon(item, modulesPreview);
           return (
             <li key={id}>
               <Link

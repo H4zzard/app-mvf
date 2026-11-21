@@ -138,6 +138,18 @@ export function checkEnv(env: Env, target: PreflightTarget): Finding[] {
   if (support && !/^https:\/\//.test(support)) add("warn", "MVF_SUPPORT_CONTACT_URL", "Use um link https.");
   if (!support && remote) add("warn", "MVF_SUPPORT_CONTACT_URL", "Vazio: a tela “Acesso indisponível” fica sem contato de suporte.");
 
+  // --- Prévia de módulos (dados de exemplo para contas reais) ---
+  const preview = val(env, "MVF_PREVIEW_MODULES");
+  if (preview) {
+    const all = preview.toLowerCase() === "all";
+    const count = preview.split(",").filter((e) => e.includes("@")).length;
+    add(
+      target === "producao" && all ? "warn" : "ok",
+      "MVF_PREVIEW_MODULES",
+      all ? "Prévia ligada para TODAS as alunas (telas com dados de exemplo rotulados)." : `Prévia ligada para ${count} conta(s) (e-mails não exibidos).`,
+    );
+  }
+
   // --- Kiwify ---
   const creds = ["KIWIFY_ACCOUNT_ID", "KIWIFY_CLIENT_ID", "KIWIFY_CLIENT_SECRET"].map((k) => [k, val(env, k)] as const);
   const present = creds.filter(([, v]) => v).length;
