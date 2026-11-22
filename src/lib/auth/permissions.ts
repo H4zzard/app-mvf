@@ -7,7 +7,14 @@ import type { UserRole } from "@/types";
 
 export const STAFF_ROLES: UserRole[] = ["admin", "expert", "support", "moderator"];
 
-export type Permission = "admin:access" | "integration:read" | "community:moderate" | "support:assign";
+export type Permission =
+  | "admin:access"
+  | "integration:read"
+  | "community:moderate"
+  | "support:assign"
+  | "content:edit"
+  | "content:review"
+  | "content:publish";
 
 const MATRIX: Record<Permission, UserRole[]> = {
   /** Entrar em /admin. */
@@ -18,7 +25,18 @@ const MATRIX: Record<Permission, UserRole[]> = {
   "community:moderate": ["admin", "moderator"],
   /** Atribuir e responder solicitações de suporte (futuro backend). */
   "support:assign": ["admin", "support"],
+  /** Criar e editar rascunhos de conteúdo (aulas, produtos, roteiros). */
+  "content:edit": ["admin", "expert"],
+  /** Revisar: aprovar ou devolver conteúdo em revisão. */
+  "content:review": ["admin", "expert"],
+  /** Publicar conteúdo aprovado. */
+  "content:publish": ["admin"],
 };
+
+/** Permissões de um papel (para telas de explicação; a checagem continua em `can`). */
+export function permissionsOf(roles: readonly UserRole[]): Permission[] {
+  return (Object.keys(MATRIX) as Permission[]).filter((p) => can(roles, p));
+}
 
 export function can(roles: readonly UserRole[], permission: Permission): boolean {
   return roles.some((r) => MATRIX[permission].includes(r));

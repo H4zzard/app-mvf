@@ -133,6 +133,11 @@ export function checkEnv(env: Env, target: PreflightTarget): Finding[] {
     add(remote ? "error" : "ok", "MVF_DEMO_MODE", remote ? "Deve ser false/vazio fora do desenvolvimento (já é ignorado, mas não deixe ligado)." : "Demo local ligado (somente npm run dev).");
   }
 
+  // --- Painel administrativo demonstrativo (/gestao) ---
+  if (val(env, "MVF_ADMIN_DEMO") === "true") {
+    add(remote ? "error" : "ok", "MVF_ADMIN_DEMO", remote ? "Nunca ligue fora do desenvolvimento (o painel já é negado no servidor, mas não deixe ligado)." : "Painel demonstrativo local ligado (somente npm run dev com MVF_DEMO_MODE=true).");
+  }
+
   // --- Suporte ---
   const support = val(env, "MVF_SUPPORT_CONTACT_URL");
   if (support && !/^https:\/\//.test(support)) add("warn", "MVF_SUPPORT_CONTACT_URL", "Use um link https.");

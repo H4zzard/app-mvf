@@ -97,9 +97,10 @@ export function productsFromCsv(text: string): { rows: Row[]; errors: string[] }
     }
     if (has("link_produto")) r.productUrl = get("link_produto");
     if (has("imagens"))
+      // “caminho|texto alternativo” ou “caminho|texto|capa-oficial” (arte oficial, não foto de catálogo).
       r.images = listOf(get("imagens")).map((x) => {
-        const [src, alt] = x.split("|").map((s) => s.trim());
-        return { src, alt: alt ?? "", kind: "foto" };
+        const [src, alt, kind] = x.split("|").map((s) => s.trim());
+        return { src, alt: alt ?? "", kind: kind === "capa-oficial" ? "capa-oficial" : "foto" };
       });
     if (has("materiais")) r.materialIds = listOf(get("materiais"));
     if (has("aulas")) r.lessonIds = listOf(get("aulas"));

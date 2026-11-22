@@ -1,9 +1,9 @@
 /**
  * Modelos de estrutura de roteiro do Estúdio IA.
  *
- * Os itens abaixo são EXEMPLOS (`source: "exemplo"`). Os roteiros validados
- * pela equipe (100+) serão importados no MESMO formato, com
- * `source: "validado"` — ver docs/GRAVACAO_MOBILE.md (seção “Importar roteiros”).
+ * Os itens abaixo são EXEMPLOS (`source: "exemplo"`). Roteiros próprios ou
+ * autorizados da equipe entram por `src/content/roteiros-oficiais.json`
+ * (contrato em src/lib/studio/library.ts; fluxo em docs/PAINEL_ADMIN.md).
  * `{produto}` é substituído pelo nome informado no formulário.
  */
 

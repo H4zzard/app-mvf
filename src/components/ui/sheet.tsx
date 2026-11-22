@@ -18,6 +18,7 @@ export function Sheet({
   footer,
   size = "md",
   labelledBy,
+  onRequestClose,
 }: {
   title: React.ReactNode;
   eyebrow?: React.ReactNode;
@@ -26,10 +27,19 @@ export function Sheet({
   footer?: React.ReactNode;
   size?: "md" | "lg";
   labelledBy?: string;
+  /**
+   * Opcional: chamado antes de fechar (Esc, clique fora, botão X). Retorne `false`
+   * para manter aberto (ex.: confirmar antes de descartar edições não salvas).
+   */
+  onRequestClose?: () => boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const autoId = useId();
   const titleId = labelledBy ?? `sheet-${autoId}`;
+  const requestClose = () => {
+    if (onRequestClose && onRequestClose() === false) return;
+    ref.current?.close();
+  };
 
   useEffect(() => {
     const dialog = ref.current;
@@ -45,8 +55,12 @@ export function Sheet({
         // StrictMode/reaberturas: um "close" atrasado chega com o diálogo aberto de novo — ignorar.
         if (!ref.current?.open) onClose();
       }}
+      onCancel={(e) => {
+        // Esc: respeita o veto de onRequestClose.
+        if (onRequestClose && onRequestClose() === false) e.preventDefault();
+      }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) ref.current?.close();
+        if (e.target === e.currentTarget) requestClose();
       }}
       className={cn(
         "mvf-sheet fixed m-0 max-w-none bg-card p-0 text-fg shadow-raised",
@@ -66,7 +80,7 @@ export function Sheet({
           </div>
           <button
             type="button"
-            onClick={() => ref.current?.close()}
+            onClick={requestClose}
             aria-label="Fechar"
             className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-muted hover:bg-blush hover:text-fg"
           >

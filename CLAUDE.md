@@ -24,6 +24,7 @@ npm run kiwify -- import|reconcile   # CLI Kiwify (dry-run por padrão; ver docs
 npm run admin:role -- grant|revoke   # papéis de equipe (dry-run por padrão; auditado)
 npm run preflight -- --target development|homologacao|producao [--remote]  # checa env sem imprimir valores
 npm run kiwify -- probe|grant-order  # contrato real (só leitura) / piloto por pedido (dry-run padrão)
+MVF_DEMO_MODE=true MVF_ADMIN_DEMO=true npm run dev  # painel demonstrativo /gestao (só local; docs/PAINEL_ADMIN.md)
 node --env-file=.env.homolog scripts/<cli>.ts …   # rodar CLIs contra homologação
 MVF_DEMO_MODE=true npm run dev        # modo demo local (memória), só development
 npm run dev:lan                       # demo no IP da rede local para gravar no celular (docs/GRAVACAO_MOBILE.md)
@@ -124,6 +125,15 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - Evento demonstrativo nunca tem data, link ou gravação; agenda oficial em `src/content/agenda-oficial.json`.
 - Tickets bloqueiam senha, código, CPF e cartão; tickets e denúncias nunca vão para o armazenamento local.
 - XP da comunidade só por `participationCounts` + tetos de `XP_RULES` (sem pontos repetidos).
+
+## Painel administrativo (Prompt 13A)
+
+- `/gestao` é DEMONSTRATIVO e LOCAL: só com NODE_ENV=development + MVF_DEMO_MODE=true + MVF_ADMIN_DEMO=true
+  (`MVF_DEMO_MODE=true MVF_ADMIN_DEMO=true npm run dev`). Nunca liberar em produção; negar no servidor (Proxy + layout).
+- O painel não grava arquivos, banco nem navegador: edita em memória e exporta JSON/CSV validados
+  pelos mesmos validadores (`parseCatalogFile`, `parseProduct`, `parseScriptsFile`). Importar só pelos CLIs, com prévia.
+- “Aprovado”/“Publicado localmente” no painel não são aprovação/publicação reais. Regras em `docs/PAINEL_ADMIN.md`.
+- Permissões só em `permissions.ts`; perfis do painel são simulação. Roteiros do Animador vêm de `src/lib/studio/library.ts`.
 
 ## Gamificação da demo (Prompt 07)
 

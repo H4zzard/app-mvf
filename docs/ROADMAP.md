@@ -41,6 +41,14 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
   intacta) e Roteiros para Gravar Aparecendo (10 roteiros), com modelo local e sem rede.
 - **Pendente:** integração DeepSeek no servidor (texto) e roteiros próprios da equipe. Ver `docs/ESTUDIO_IA.md`.
 
+## ✅ Painel administrativo — estrutura e conteúdo (Prompt 13A, demonstrativo local)
+- `/gestao` só no desenvolvimento (três condições, 404 no servidor fora disso): visão geral com
+  números reais, cursos e aulas, produtos NUMI, roteiros e presets, fluxo editorial, revisão e
+  exportação JSON/CSV validada. Ver `docs/PAINEL_ADMIN.md`.
+- **Próximo (13B):** Lives, Comunidade, Suporte, Gamificação e Configurações no painel.
+- **Pendente:** validar o 404 autenticado em build de produção; papéis de editor/revisor no banco;
+  persistência real do painel (fase de backend).
+
 ## ✅ Comunidade, Lives e Suporte (Prompt 12)
 - Comunidade com modelos de publicação, vínculo com aula/desafio, busca, denúncia, fila de moderação
   simulada, salas Elite+/Icon com simulação rotulada e XP sem duplicação.

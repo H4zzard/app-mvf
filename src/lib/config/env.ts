@@ -16,6 +16,12 @@ export interface AppConfig {
   authMode: AuthMode;
   /** true quando MVF_DEMO_MODE=true foi pedido fora de development (ignorado). */
   demoFlagIgnored: boolean;
+  /**
+   * Painel administrativo DEMONSTRATIVO (/gestao). Só com as TRÊS condições:
+   * NODE_ENV=development + MVF_DEMO_MODE=true + MVF_ADMIN_DEMO=true. Em produção,
+   * homologação ou modo Supabase é sempre false (nada de chave na URL nem login fictício).
+   */
+  adminDemo: boolean;
   supabase: { url: string; publishableKey: string } | null;
   serviceRoleKey: string | null;
   appBaseUrl: string;
@@ -51,6 +57,7 @@ export function readConfig(env: Env = process.env): AppConfig {
   return {
     authMode: isDev && demoRequested ? "demo" : supabase ? "supabase" : "unconfigured",
     demoFlagIgnored: demoRequested && !isDev,
+    adminDemo: isDev && demoRequested && env.MVF_ADMIN_DEMO === "true",
     supabase,
     serviceRoleKey: clean(env.SUPABASE_SERVICE_ROLE_KEY),
     appBaseUrl: (clean(env.APP_BASE_URL) ?? "http://localhost:3000").replace(/\/$/, ""),

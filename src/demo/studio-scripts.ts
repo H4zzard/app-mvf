@@ -1,13 +1,14 @@
 /**
- * Biblioteca de roteiros do Animador (EXEMPLOS MVF).
- *
- * Derivada dos modelos de exemplo do Estúdio (`studio-templates.ts`), reaproveitando
- * as falas já existentes: primeira parte → Gancho, partes do meio →
- * Desenvolvimento, última → CTA. Roteiros próprios/licenciados da equipe NUMI
- * entrarão aqui no MESMO formato, com `source: "validado"`. Nunca importar
- * roteiros de terceiros.
+ * Biblioteca de roteiros do Animador, montada a partir do contrato CENTRAL
+ * (`src/lib/studio/library.ts`):
+ * - roteiros da EQUIPE com status “aprovado” (`src/content/roteiros-oficiais.json`);
+ * - modelos de EXEMPLO do MVF (`studio-templates.ts`): primeira parte → Gancho,
+ *   partes do meio → Desenvolvimento, última → CTA.
+ * Nunca importar roteiros de terceiros.
  */
+import raw from "../content/roteiros-oficiais.json" with { type: "json" };
 import type { ScriptParts } from "../lib/studio/contracts.ts";
+import { parseScriptsFile, type StudioScript } from "../lib/studio/library.ts";
 import { STUDIO_TEMPLATES, type ScriptTemplate } from "./studio-templates.ts";
 
 export interface LibraryScript {
@@ -15,7 +16,8 @@ export interface LibraryScript {
   title: string;
   category: string;
   summary: string;
-  source: "exemplo" | "validado";
+  /** “exemplo” = modelo MVF; “equipe” = roteiro próprio/autorizado aprovado pela equipe. */
+  source: "exemplo" | "equipe";
   /** `{produto}` é trocado pelo nome do produto informado (ou “produto”). */
   parts: ScriptParts;
 }
@@ -28,19 +30,45 @@ const CATEGORY: Record<string, string> = {
   "tpl-unboxing": "Unboxing",
 };
 
-function fromTemplate(t: ScriptTemplate): LibraryScript {
+/** Modelos de exemplo no formato central (`StudioScript`). */
+export function templateToScript(t: ScriptTemplate): StudioScript {
   const lines = t.beats.map((b) => b.line.pt);
   return {
     id: t.id,
     title: t.title.pt,
     category: CATEGORY[t.id] ?? "Outros",
     summary: t.summary,
-    source: t.source,
+    format: "avatar_ia",
+    language: "pt-BR",
+    estimatedSeconds: null,
+    tags: [],
+    productId: null,
     parts: { hook: lines[0] ?? "", body: lines.slice(1, -1).join(" "), cta: lines.length > 1 ? lines[lines.length - 1] : "" },
+    origin: "demonstrativo",
+    authorization: { source: "Modelo de exemplo do App MVF", authorized: true },
+    status: "aprovado",
   };
 }
 
-export const SCRIPT_LIBRARY: LibraryScript[] = STUDIO_TEMPLATES.map(fromTemplate);
+const parsed = parseScriptsFile(raw);
+if (!parsed.ok) throw new Error(`Roteiros oficiais inválidos (src/content/roteiros-oficiais.json):\n- ${parsed.errors.join("\n- ")}`);
+
+/** Roteiros da equipe gravados no arquivo oficial (todos os status). */
+export const OFFICIAL_SCRIPTS: StudioScript[] = parsed.scripts;
+/** Modelos de exemplo no formato central. */
+export const DEMO_SCRIPTS: StudioScript[] = STUDIO_TEMPLATES.map(templateToScript);
+
+const toLibrary = (s: StudioScript): LibraryScript => ({
+  id: s.id,
+  title: s.title,
+  category: s.category,
+  summary: s.summary,
+  source: s.origin === "equipe" ? "equipe" : "exemplo",
+  parts: s.parts,
+});
+
+/** O que o Animador mostra: roteiros da equipe APROVADOS + exemplos. */
+export const SCRIPT_LIBRARY: LibraryScript[] = [...OFFICIAL_SCRIPTS.filter((s) => s.status === "aprovado"), ...DEMO_SCRIPTS].map(toLibrary);
 export const SCRIPT_CATEGORIES = [...new Set(SCRIPT_LIBRARY.map((s) => s.category))];
 
 export function fillProduct(parts: ScriptParts, productName: string): ScriptParts {

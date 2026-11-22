@@ -292,7 +292,7 @@ export function AnimationTool() {
                           >
                             <span className="flex flex-wrap items-center gap-2">
                               <span className="text-sm font-semibold text-fg">{s.title}</span>
-                              <Badge tone="neutral">{s.source === "exemplo" ? "Exemplo MVF" : "Validado"}</Badge>
+                              <Badge tone="neutral">{s.source === "exemplo" ? "Exemplo MVF" : "Roteiro da equipe"}</Badge>
                               <span className="text-xs text-muted">{s.category}</span>
                             </span>
                             <span className="mt-0.5 block text-xs text-muted">{s.summary}</span>

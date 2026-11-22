@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { readConfig } from "@/lib/config/env";
 import { isPrivatePath } from "@/lib/auth/return-to";
 import { NOT_FOUND_REWRITE, isUnknownDetailPath } from "@/lib/routing/unknown-detail";
+import { denyAdminDemoRequest } from "@/lib/admin/access";
 
 /** Aula/produto inexistente → 404 real (reescrita para um caminho sem rota). */
 function notFoundResponse(request: NextRequest, base?: NextResponse): NextResponse {
@@ -21,6 +22,8 @@ function notFoundResponse(request: NextRequest, base?: NextResponse): NextRespon
  */
 export async function proxy(request: NextRequest) {
   const config = readConfig();
+  // Painel demonstrativo (/gestao): fora do ambiente local permitido, não existe (404), em qualquer modo.
+  if (denyAdminDemoRequest(request.nextUrl.pathname, config)) return notFoundResponse(request);
   if (config.authMode !== "supabase" || !config.supabase) {
     return isUnknownDetailPath(request.nextUrl.pathname) ? notFoundResponse(request) : NextResponse.next({ request });
   }

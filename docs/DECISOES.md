@@ -342,6 +342,34 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - **D93 · `Segmented`** para 2–4 abas em uma linha (Marketplace, Lives). O botão “Publicar” da
   Comunidade usa `sticky`, porque o shell cria um bloco de contenção que quebra `position: fixed`.
 
+### Painel administrativo demonstrativo (Prompt 13A)
+
+- **D94 · Painel em `/gestao`, só local.** Liberado apenas com NODE_ENV=development + MVF_DEMO_MODE=true +
+  MVF_ADMIN_DEMO=true (`readConfig().adminDemo`). Proxy responde 404 antes de renderizar em qualquer
+  outro caso; o layout repete a checagem; o preflight acusa a flag em homologação/produção. Sem chave
+  na URL e sem login fictício. O `/admin` real (Kiwify) não mudou.
+- **D95 · Shell próprio** (sem a barra inferior das alunas): barra lateral no desktop, menu em painel
+  no celular. Módulos do 13B aparecem como “Não implementado”, sem link.
+- **D96 · Permissões de conteúdo na matriz única:** `content:edit` e `content:review` (admin, expert),
+  `content:publish` (admin). “Editor de conteúdo” e “Revisor” são conceitos sem papel no banco
+  (decisão e migration futuras). Perfil escolhido no painel é simulação.
+- **D97 · Fluxo editorial** (`src/lib/content/editorial.ts`): rascunho → em revisão → aprovado
+  (demonstração) → publicado localmente, mais arquivado. Validação obrigatória antes de avançar;
+  aprovar exige conteúdo completo; editar algo aprovado volta a rascunho.
+- **D98 · Edição só em memória + exportação validada.** Nada grava arquivos; JSON/CSV exportados usam
+  os mesmos validadores e colunas dos CLIs (`catalog`, `products`). Importação continua manual, com
+  prévia.
+- **D99 · Aula oficial que substitui exemplo usa o MESMO ID** (progresso e tarefas preservados;
+  nada do texto de exemplo é copiado). Aliases existentes são preservados e nunca viram ID de aula.
+  Excluir mostra o impacto e exige confirmação.
+- **D100 · Roteiros: contrato central `StudioScript`** + `src/content/roteiros-oficiais.json`
+  (vazio). O Animador lê os da equipe “aprovados” + exemplos. Rótulo “Validado” trocado por “Roteiro
+  da equipe”; “validado comercialmente” é recusado; aprovar exige autorização de uso.
+- **D101 · Prévias dentro do painel.** Edições não aparecem nas telas das alunas (o catálogo é
+  carregado dos arquivos); torná-lo reativo seria mudança estrutural arriscada.
+- **D102 · CSV de produtos** aceita `caminho|texto|capa-oficial` (retrocompatível), para a
+  reimportação não trocar o tipo da imagem.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a
@@ -350,6 +378,7 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - Nome comercial, logo, fontes e tokens oficiais.
 - Regras de pontos, níveis, recompensas e salas Elite+ / Icon (Icon inclui Elite+?).
 - Regras de convivência, moderação, agenda real de lives, política de gravações e canais oficiais de suporte.
+- Criar os papéis “Editor de conteúdo” e “Revisor” no banco (ou mapear para `expert`)?
 - Catálogo real de aulas/atividades e revisão das regras do motor pela expert (o atual é demo).
 - Migração/hospedagem das aulas hoje na Kiwify (direitos, arquivos-fonte, player).
 - Comissões NUMI e integração com TikTok Shop.
