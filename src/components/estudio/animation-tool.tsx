@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Chip, ChipGroup, SearchField } from "@/components/ui/chips";
 import { CopyButton } from "@/components/ui/copy-button";
-import { DEMO_PRODUCTS } from "@/demo/products";
+import { productCatalog } from "@/lib/products";
+import { animationFieldsFrom, dialogueMentions, studioProductSeed } from "@/lib/products/studio-bridge";
 import { SCRIPT_CATEGORIES, fillProduct, searchLibrary } from "@/demo/studio-scripts";
 import {
   ANIMATION_LIMITS,
@@ -52,7 +53,8 @@ const LABEL: Record<AnimationPresetKey, string> = {
 
 const PARTS: PartKey[] = ["hook", "body", "cta"];
 const initialDraft = (): AnimatorDraft => ({ brief: defaultAnimationBrief(), characterId: null, source: "biblioteca", libraryId: null, pasted: "", output: null, outputKey: null });
-const productName = (name: string) => name.replace(" (demonstrativo)", "");
+/** Mesma fonte do Marketplace (oficiais + demonstrativos), sem os indisponíveis. */
+const STUDIO_PRODUCTS = productCatalog.all().filter((p) => p.availability !== "indisponivel");
 
 /** Menu 2 — gera TEXTO (prompts por take) para produzir o vídeo no Google Flow. */
 export function AnimationTool() {
@@ -83,7 +85,11 @@ export function AnimationTool() {
     if (s) {
       setDraft((d) => ({ ...d, characterId: s.id, brief: { ...d.brief, readyImage: false, characterAppearance: s.appearance, characterName: s.name } }));
     }
-    if (seed.productName) setDraft((d) => ({ ...d, brief: { ...d.brief, productName: seed.productName ?? "" } }));
+    // Produto do Marketplace: só nome e características. A ficha e a fala ficam como estão.
+    if (seed.product) {
+      const fields = animationFieldsFrom(seed.product);
+      setDraft((d) => ({ ...d, brief: { ...d.brief, ...fields } }));
+    } else if (seed.productName) setDraft((d) => ({ ...d, brief: { ...d.brief, productName: seed.productName ?? "" } }));
     if (seed.hook || (!seed.characterId && seed.from)) setInspiration(seed);
   });
 
@@ -146,8 +152,14 @@ export function AnimationTool() {
           <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-brand" />
           <div className="min-w-0 flex-1">
             <p>
-              Inspirado em: <strong className="font-semibold">{inspiration.from}</strong>
+              {inspiration.product ? "Produto do Marketplace:" : "Inspirado em:"} <strong className="font-semibold">{inspiration.from}</strong>
             </p>
+            {inspiration.product ? (
+              <p className="mt-1 text-xs text-muted">
+                Nome e características entraram em “2. Produto”. Sua ficha e sua fala não foram alteradas.
+                {inspiration.product.origin === "demonstrativo" ? " Produto demonstrativo: textos de exemplo." : ""}
+              </p>
+            ) : null}
             {inspiration.hook ? <p className="mt-1 text-xs text-muted">Referência de gancho (não copie literalmente; escreva a sua fala): “{inspiration.hook}”</p> : null}
           </div>
           <button type="button" onClick={() => setInspiration(null)} aria-label="Dispensar aviso" className="grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-white">
@@ -221,13 +233,19 @@ export function AnimationTool() {
             </p>
           </Section>
 
-          <Section title="2. Produto (opcional)" defaultOpen={false} hint="Só informações reais e verificadas.">
+          <Section title="2. Produto (opcional)" defaultOpen={Boolean(brief.productName)} hint="Só informações reais e verificadas.">
             <div className="sm:col-span-2">
-              <p className="mb-2 text-xs text-muted">Toque em um produto demonstrativo ou escreva o nome:</p>
+              <p className="mb-2 text-xs text-muted">Toque em um produto do Marketplace (traz as características cadastradas) ou escreva o nome:</p>
               <div className="flex flex-wrap gap-1.5">
-                {DEMO_PRODUCTS.slice(0, 4).map((p) => (
-                  <Chip key={p.id} active={brief.productName === productName(p.name)} onClick={() => set("productName", productName(p.name))} className="min-h-9 px-3 text-xs">
-                    {productName(p.name)}
+                {STUDIO_PRODUCTS.slice(0, 5).map((p) => (
+                  <Chip
+                    key={p.id}
+                    active={brief.productName === p.name}
+                    onClick={() => setDraft((d) => ({ ...d, brief: { ...d.brief, ...animationFieldsFrom(studioProductSeed(p)) } }))}
+                    className="min-h-9 px-3 text-xs"
+                  >
+                    {p.name}
+                    {p.origin === "demonstrativo" ? <span className="text-[0.65rem] opacity-70">exemplo</span> : null}
                   </Chip>
                 ))}
               </div>
@@ -343,6 +361,11 @@ export function AnimationTool() {
               ) : (
                 <p className="rounded-xl border border-dashed border-line p-3 text-sm text-muted">Escolha um roteiro ou cole o seu.</p>
               )}
+              {dialogue && brief.productName.trim() && !dialogueMentions(dialogue, brief.productName) ? (
+                <p className="text-xs text-muted">
+                  A fala não cita “{brief.productName.trim()}”. Ela não foi alterada; se quiser, edite as partes acima.
+                </p>
+              ) : null}
               {errors.dialogue ? (
                 <p role="alert" className="text-sm text-brand">
                   {errors.dialogue}

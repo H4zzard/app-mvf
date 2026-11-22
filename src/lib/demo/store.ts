@@ -7,9 +7,14 @@
  * O progresso do PLANO continua no PlanProvider (store único do plano).
  */
 import type { CommunityPost, SpaceId } from "../../demo/community.ts";
-import { COMMUNITY_LIMITS, SEED_POSTS, SPACES } from "../../demo/community.ts";
+import type { PostKind, PostLink } from "../../demo/community.ts";
+import { COMMUNITY_LIMITS, SEED_POSTS } from "../../demo/community.ts";
+import { canPostInSpace, isReportReason, type CommunityReport, type CommunityViewAs, type MemberTier, type ReportReason } from "../community/rules.ts";
+import { TICKET_LIMITS, isTicketCategory, validateTicket, type SupportTicket, type TicketDraft } from "../support/tickets.ts";
 import type { CharacterSheet } from "../studio/contracts.ts";
 import type { StudioDrafts, StudioTool } from "../studio/drafts.ts";
+import type { RecordingStyle } from "../studio/contracts.ts";
+import type { StudioProductSeed } from "../products/studio-bridge.ts";
 
 export type FavoriteKind = "virals" | "products" | "templates" | "materials";
 
@@ -32,6 +37,10 @@ export interface StudioSeed {
   productCategory?: string;
   characterId?: string;
   format?: "avatar" | "maos_produto";
+  /** Produto do catálogo (Marketplace): só o que está cadastrado, nada comercial. */
+  product?: StudioProductSeed;
+  /** Estilo de vídeo escolhido antes de abrir os Roteiros (a aluna pode trocar). */
+  style?: RecordingStyle;
 }
 
 export interface DemoState {
@@ -50,6 +59,21 @@ export interface DemoState {
   /** Histórico de resgates (XP de desafios e recompensas), mais recente primeiro. */
   history: HistoryEntry[];
   supportRequests: number;
+  /**
+   * Comunidade — SIMULAÇÃO da demo (nunca autorização): plano para as salas
+   * exclusivas e papel visualizado (aluna ou moderação). O real vem do servidor.
+   */
+  communitySim: { tier: MemberTier; viewAs: CommunityViewAs };
+  /** Denúncias registradas só nesta sessão (nada é enviado à equipe). */
+  reports: CommunityReport[];
+  /** Solicitações de suporte: rascunho ou simulação (nada é enviado). */
+  supportTickets: SupportTicket[];
+  /**
+   * “Meus produtos”: produtos que a aluna QUER DIVULGAR (lista pessoal na demo).
+   * Não significa afiliação efetivada no TikTok Shop. Mais recente primeiro.
+   * Os SALVOS (coração) continuam em `favorites.products`.
+   */
+  productsPromoting: string[];
   studioSeed: StudioSeed | null;
   /** Fichas de personagem salvas no Estúdio (demo, em memória). */
   studioCharacters: CharacterSheet[];
@@ -68,6 +92,8 @@ export interface HistoryEntry {
 }
 
 export const STUDIO_MAX_CHARACTERS = 20;
+/** Limite de “Meus produtos” na demo. */
+export const MY_PRODUCTS_MAX = 30;
 
 export const ME = { name: "Você", initials: "EU", isMe: true } as const;
 
@@ -84,6 +110,10 @@ export function initialDemoState(overrides: Partial<DemoState> = {}): DemoState 
     rewardsRedeemed: [],
     history: [],
     supportRequests: 0,
+    communitySim: { tier: "padrao", viewAs: "aluna" },
+    reports: [],
+    supportTickets: [],
+    productsPromoting: [],
     studioSeed: null,
     studioCharacters: [],
     studioDrafts: {},
@@ -95,8 +125,8 @@ export function initialDemoState(overrides: Partial<DemoState> = {}): DemoState 
 export type DemoAction =
   | { type: "lesson/set"; lessonId: string; done: boolean }
   | { type: "favorite/toggle"; kind: FavoriteKind; id: string }
-  | { type: "post/add"; spaceId: SpaceId; body: string }
-  | { type: "post/edit"; postId: string; body: string }
+  | { type: "post/add"; spaceId: SpaceId; body: string; kind?: PostKind; link?: PostLink | null }
+  | { type: "post/edit"; postId: string; body: string; link?: PostLink | null }
   | { type: "post/delete"; postId: string }
   | { type: "post/like"; postId: string }
   | { type: "comment/add"; postId: string; body: string }
@@ -110,6 +140,13 @@ export type DemoAction =
   | { type: "mission/join"; missionId: string; baseline: number }
   | { type: "reward/redeem"; rewardId: string; label: string; cost: number; balance: number }
   | { type: "support/send" }
+  | { type: "community/sim"; tier?: MemberTier; viewAs?: CommunityViewAs }
+  | { type: "report/add"; target: { postId: string; commentId?: string }; reason: ReportReason; note: string }
+  | { type: "report/resolve"; reportId: string; decision: "manter" | "ocultar" }
+  | { type: "ticket/save"; id?: string; draft: TicketDraft }
+  | { type: "ticket/simulate"; id: string }
+  | { type: "ticket/delete"; id: string }
+  | { type: "product/promote"; id: string; on: boolean }
   | { type: "studio/seed"; seed: StudioSeed | null }
   | { type: "studio/draft"; draft: StudioDrafts }
   | { type: "studio/character-save"; sheet: CharacterSheet }
@@ -123,9 +160,21 @@ export function cleanText(raw: string, max: number): string | null {
   return text.length === 0 || text.length > max ? null : text;
 }
 
-export function canPostIn(spaceId: SpaceId): boolean {
-  return SPACES.find((s) => s.id === spaceId)?.studentsCanPost === true;
+/** Pode publicar neste espaço? (salas exclusivas dependem do plano — na demo, simulado). */
+export function canPostIn(spaceId: SpaceId, tier: MemberTier = "padrao"): boolean {
+  return canPostInSpace(spaceId, tier);
 }
+
+const normBody = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+const LINK_ID = /^[a-z0-9-]{1,60}$/;
+const validLink = (l: PostLink | null | undefined): PostLink | undefined =>
+  l && (l.kind === "aula" || l.kind === "desafio") && LINK_ID.test(l.id) ? { kind: l.kind, id: l.id } : undefined;
 
 export function demoReducer(state: DemoState, action: DemoAction): DemoState {
   switch (action.type) {
@@ -139,21 +188,40 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
     }
     case "favorite/toggle":
       return { ...state, favorites: { ...state.favorites, [action.kind]: toggle(state.favorites[action.kind], action.id) } };
+    case "product/promote": {
+      const has = state.productsPromoting.includes(action.id);
+      if (has === action.on || !/^[a-z0-9-]{1,60}$/.test(action.id)) return state;
+      if (action.on && state.productsPromoting.length >= MY_PRODUCTS_MAX) return state;
+      return {
+        ...state,
+        productsPromoting: action.on ? [action.id, ...state.productsPromoting] : state.productsPromoting.filter((x) => x !== action.id),
+      };
+    }
     case "post/add": {
       const body = cleanText(action.body, COMMUNITY_LIMITS.maxPostLength);
-      if (!body || !canPostIn(action.spaceId)) return state;
+      if (!body || body.length < COMMUNITY_LIMITS.minPostLength || !canPostIn(action.spaceId, state.communitySim.tier)) return state;
+      // Mesmo texto publicado de novo não vira outra publicação (nem outro XP).
+      if (state.posts.some((p) => p.author.isMe && normBody(p.body) === normBody(body))) return state;
       const seq = state.seq + 1;
-      const post: CommunityPost = { id: `meu-post-${seq}`, spaceId: action.spaceId, author: { ...ME }, body, baseLikes: 0, comments: [] };
+      const link = validLink(action.link);
+      const kind = action.kind && action.kind !== "conversa" ? action.kind : undefined;
+      const post: CommunityPost = { id: `meu-post-${seq}`, spaceId: action.spaceId, author: { ...ME }, body, baseLikes: 0, comments: [], ...(kind ? { kind } : {}), ...(link ? { link } : {}) };
       return { ...state, seq, posts: [post, ...state.posts] };
     }
     case "post/edit": {
       const body = cleanText(action.body, COMMUNITY_LIMITS.maxPostLength);
-      if (!body) return state;
+      if (!body || body.length < COMMUNITY_LIMITS.minPostLength) return state;
       let changed = false;
       const posts = state.posts.map((p) => {
-        if (p.id !== action.postId || !p.author.isMe || p.body === body) return p;
+        if (p.id !== action.postId || !p.author.isMe) return p;
+        const link = action.link === undefined ? p.link : validLink(action.link);
+        if (p.body === body && JSON.stringify(link) === JSON.stringify(p.link)) return p;
+        // Editar para um texto igual a outra publicação sua não é permitido (anti-duplicação).
+        if (state.posts.some((o) => o.id !== p.id && o.author.isMe && normBody(o.body) === normBody(body))) return p;
         changed = true;
-        return { ...p, body, edited: true };
+        const { link: _old, ...rest } = p;
+        void _old;
+        return { ...rest, body, edited: true, ...(link ? { link } : {}) };
       });
       return changed ? { ...state, posts } : state;
     }
@@ -167,7 +235,8 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
       return { ...state, likes: toggle(state.likes, action.postId) };
     case "comment/add": {
       const body = cleanText(action.body, COMMUNITY_LIMITS.maxCommentLength);
-      if (!body || !state.posts.some((p) => p.id === action.postId)) return state;
+      const target = state.posts.find((p) => p.id === action.postId);
+      if (!body || body.length < COMMUNITY_LIMITS.minCommentLength || !target || (target.status === "oculta" && !target.author.isMe)) return state;
       const seq = state.seq + 1;
       return {
         ...state,
@@ -228,6 +297,71 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
     }
     case "support/send":
       return { ...state, supportRequests: state.supportRequests + 1 };
+    case "community/sim": {
+      const tier = action.tier ?? state.communitySim.tier;
+      const viewAs = action.viewAs ?? state.communitySim.viewAs;
+      if (tier === state.communitySim.tier && viewAs === state.communitySim.viewAs) return state;
+      return { ...state, communitySim: { tier, viewAs } };
+    }
+    case "report/add": {
+      const { postId, commentId } = action.target;
+      const post = state.posts.find((p) => p.id === postId);
+      if (!post || !isReportReason(action.reason)) return state;
+      const comment = commentId ? post.comments.find((c) => c.id === commentId) : undefined;
+      if (commentId ? !comment || comment.author.isMe : post.author.isMe) return state; // não denuncia o próprio conteúdo
+      if (state.reports.some((r) => r.target.postId === postId && r.target.commentId === commentId)) return state; // uma vez por item
+      const note = action.note.trim() ? cleanText(action.note, COMMUNITY_LIMITS.maxReportNote) : "";
+      if (note === null) return state;
+      if (action.reason === "outro" && !note) return state;
+      const seq = state.seq + 1;
+      const report: CommunityReport = { id: `denuncia-${seq}`, target: commentId ? { postId, commentId } : { postId }, reason: action.reason, note, status: "pendente" };
+      return { ...state, seq, reports: [report, ...state.reports] };
+    }
+    case "report/resolve": {
+      // Só no papel de moderação (SIMULADO na demo; no real, permissão community:moderate no servidor).
+      if (state.communitySim.viewAs !== "moderacao") return state;
+      const report = state.reports.find((r) => r.id === action.reportId && r.status === "pendente");
+      if (!report) return state;
+      const status: CommunityReport["status"] = action.decision === "ocultar" ? "ocultada" : "mantida";
+      const reports = state.reports.map((r) => (r.id === report.id ? { ...r, status } : r));
+      if (action.decision === "manter") return { ...state, reports };
+      const posts = state.posts.map((p) => {
+        if (p.id !== report.target.postId) return p;
+        if (!report.target.commentId) return { ...p, status: "oculta" as const };
+        return { ...p, comments: p.comments.map((c) => (c.id === report.target.commentId ? { ...c, hidden: true } : c)) };
+      });
+      return { ...state, reports, posts };
+    }
+    case "ticket/save": {
+      const d = action.draft;
+      const subject = d.subject.replace(/\s+/g, " ").trim();
+      const description = d.description.replace(/\r\n/g, "\n").trim();
+      // Rascunho aceita texto incompleto, mas nunca dados sensíveis nem tamanho acima do limite.
+      const errs = validateTicket({ subject, category: d.category, description });
+      const blocking = [errs.subject, errs.description].some((m) => m?.startsWith("Remova") || m?.startsWith("Use até"));
+      if (blocking || !isTicketCategory(d.category) || (!subject && !description)) return state;
+      if (action.id) {
+        const current = state.supportTickets.find((t) => t.id === action.id);
+        if (!current || current.status !== "rascunho") return state;
+        return { ...state, supportTickets: state.supportTickets.map((t) => (t.id === action.id ? { ...t, subject, category: d.category as SupportTicket["category"], description } : t)) };
+      }
+      if (state.supportTickets.length >= TICKET_LIMITS.maxTickets) return state;
+      const seq = state.seq + 1;
+      const ticket: SupportTicket = { id: `ticket-${seq}`, subject, category: d.category, description, status: "rascunho", assignee: null };
+      return { ...state, seq, supportTickets: [ticket, ...state.supportTickets] };
+    }
+    case "ticket/simulate": {
+      const t = state.supportTickets.find((x) => x.id === action.id);
+      // Só um rascunho COMPLETO e válido vira simulação de envio.
+      if (!t || t.status !== "rascunho" || Object.keys(validateTicket(t)).length) return state;
+      return {
+        ...state,
+        supportRequests: state.supportRequests + 1,
+        supportTickets: state.supportTickets.map((x) => (x.id === t.id ? { ...x, status: "simulado" } : x)),
+      };
+    }
+    case "ticket/delete":
+      return { ...state, supportTickets: state.supportTickets.filter((t) => t.id !== action.id) };
     case "studio/seed":
       return { ...state, studioSeed: action.seed };
     case "studio/draft":

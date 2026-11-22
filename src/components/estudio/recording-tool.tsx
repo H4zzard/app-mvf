@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Chip, ChipGroup } from "@/components/ui/chips";
 import { CopyButton } from "@/components/ui/copy-button";
-import { DEMO_PRODUCTS, PRODUCT_CATEGORY_LABEL } from "@/demo/products";
+import { productCatalog } from "@/lib/products";
+import { missingForRecording, recordingFieldsFrom, studioProductSeed } from "@/lib/products/studio-bridge";
 import type { RecordingScript, RecordingScriptBrief } from "@/lib/studio/contracts";
 import type { RecordingDraft } from "@/lib/studio/drafts";
 import { RECORDING_LOCATIONS } from "@/lib/studio/presets";
@@ -32,7 +33,8 @@ import { ChoiceSelect, Note, Section, StickyActions, TextArea, TextField, Toggle
 
 const initialDraft = (): RecordingDraft => ({ brief: defaultRecordingBrief(), scripts: null, warnings: [], favorites: [], resultKey: null });
 const opts = <T extends string>(labels: Record<T, string>) => (Object.keys(labels) as T[]).map((value) => ({ value, label: labels[value] }));
-const productName = (name: string) => name.replace(" (demonstrativo)", "");
+/** Mesma fonte do Marketplace (oficiais + demonstrativos), sem os indisponíveis. */
+const STUDIO_PRODUCTS = productCatalog.all().filter((p) => p.availability !== "indisponivel");
 
 /** Menu 3 — dez roteiros ESCRITOS para a aluna gravar com o próprio celular. Sem Flow, sem avatar. */
 export function RecordingTool() {
@@ -52,15 +54,21 @@ export function RecordingTool() {
   };
 
   useStudioSeed("roteiros", (seed) => {
-    if (seed.productName) setDraft((d) => ({ ...d, brief: { ...d.brief, productName: seed.productName ?? "", category: seed.productCategory ?? d.brief.category } }));
+    if (seed.product) {
+      // Marketplace: briefing preenchido só com o que está cadastrado (editável). Estilo opcional.
+      const fields = recordingFieldsFrom(seed.product);
+      setDraft((d) => ({ ...d, brief: { ...d.brief, ...fields, ...(seed.style ? { style: seed.style } : {}) } }));
+      setErrors({});
+    } else if (seed.productName) setDraft((d) => ({ ...d, brief: { ...d.brief, productName: seed.productName ?? "", category: seed.productCategory ?? d.brief.category } }));
     setInspiration(seed);
   });
 
+  /** Escolher um produto troca SÓ os campos de produto (estilo, tom e local ficam). */
   function selectProduct(id: string) {
-    const p = DEMO_PRODUCTS.find((x) => x.id === id);
+    const p = productCatalog.get(id);
     if (!p) return;
-    setDraft((d) => ({ ...d, brief: { ...d.brief, productName: productName(p.name), category: PRODUCT_CATEGORY_LABEL[p.category] } }));
-    setErrors((e) => ({ ...e, productName: undefined }));
+    setDraft((d) => ({ ...d, brief: { ...d.brief, ...recordingFieldsFrom(studioProductSeed(p)) } }));
+    setErrors((e) => ({ ...e, productName: undefined, description: undefined, howToUse: undefined }));
   }
 
   async function generate() {
@@ -94,10 +102,24 @@ export function RecordingTool() {
           <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-brand" />
           <div className="min-w-0 flex-1">
             <p>
-              Inspirado em: <strong className="font-semibold">{inspiration.from}</strong>
+              {inspiration.product ? "Produto do Marketplace:" : "Inspirado em:"} <strong className="font-semibold">{inspiration.from}</strong>
             </p>
             {inspiration.hook ? <p className="mt-1 text-xs text-muted">Referência de gancho (não copie literalmente): “{inspiration.hook}”</p> : null}
-            {inspiration.productName ? <p className="mt-1 text-xs text-muted">Produto demonstrativo: descreva abaixo só características reais.</p> : null}
+            {inspiration.product ? (
+              <>
+                <p className="mt-1 text-xs text-muted">
+                  {inspiration.product.origin === "demonstrativo"
+                    ? "Produto demonstrativo: os textos são exemplos. Troque pelas informações reais do seu produto."
+                    : "Dados do cadastro oficial preenchidos abaixo. Revise antes de gerar."}
+                </p>
+                {missingForRecording(inspiration.product).length ? (
+                  <p className="mt-1 text-xs font-medium text-fg">Falta no cadastro: {missingForRecording(inspiration.product).join(" e ")}. Complete com as informações reais.</p>
+                ) : null}
+                {inspiration.product.omitted ? <p className="mt-1 text-xs text-muted">Alguns itens do cadastro não couberam no limite do campo e ficaram de fora.</p> : null}
+              </>
+            ) : inspiration.productName ? (
+              <p className="mt-1 text-xs text-muted">Produto demonstrativo: descreva abaixo só características reais.</p>
+            ) : null}
           </div>
           <button type="button" onClick={() => setInspiration(null)} aria-label="Dispensar aviso" className="grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-white">
             <X aria-hidden className="size-4" />
@@ -109,11 +131,12 @@ export function RecordingTool() {
         <div ref={formRef} className="min-w-0 space-y-4">
           <Section title="1. Qual produto você vai mostrar?" hint="Obrigatório: produto, descrição e modo de uso.">
             <div className="sm:col-span-2">
-              <p className="mb-2 text-xs text-muted">Escolha no Marketplace (demonstrativo) ou escreva:</p>
+              <p className="mb-2 text-xs text-muted">Escolha um produto do Marketplace (preenche descrição e modo de uso cadastrados) ou escreva:</p>
               <div className="flex flex-wrap gap-1.5">
-                {DEMO_PRODUCTS.slice(0, 6).map((p) => (
-                  <Chip key={p.id} active={brief.productName === productName(p.name)} onClick={() => selectProduct(p.id)} className="min-h-9 px-3 text-xs">
-                    {productName(p.name)}
+                {STUDIO_PRODUCTS.slice(0, 7).map((p) => (
+                  <Chip key={p.id} active={brief.productName === p.name} onClick={() => selectProduct(p.id)} className="min-h-9 px-3 text-xs">
+                    {p.name}
+                    {p.origin === "demonstrativo" ? <span className="text-[0.65rem] opacity-70">exemplo</span> : null}
                   </Chip>
                 ))}
               </div>

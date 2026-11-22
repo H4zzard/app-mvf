@@ -2,6 +2,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { readConfig } from "@/lib/config/env";
 import { isPrivatePath } from "@/lib/auth/return-to";
+import { NOT_FOUND_REWRITE, isUnknownDetailPath } from "@/lib/routing/unknown-detail";
+
+/** Aula/produto inexistente → 404 real (reescrita para um caminho sem rota). */
+function notFoundResponse(request: NextRequest, base?: NextResponse): NextResponse {
+  const url = request.nextUrl.clone();
+  url.pathname = NOT_FOUND_REWRITE;
+  url.search = "";
+  const res = NextResponse.rewrite(url, { status: 404 });
+  if (base) for (const c of base.cookies.getAll()) res.cookies.set(c);
+  return res;
+}
 
 /**
  * Proxy (Next 16): renova a sessão Supabase e faz a PRÉ-FILTRAGEM otimista
@@ -10,7 +21,9 @@ import { isPrivatePath } from "@/lib/auth/return-to";
  */
 export async function proxy(request: NextRequest) {
   const config = readConfig();
-  if (config.authMode !== "supabase" || !config.supabase) return NextResponse.next({ request });
+  if (config.authMode !== "supabase" || !config.supabase) {
+    return isUnknownDetailPath(request.nextUrl.pathname) ? notFoundResponse(request) : NextResponse.next({ request });
+  }
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(config.supabase.url, config.supabase.publishableKey, {
@@ -46,6 +59,8 @@ export async function proxy(request: NextRequest) {
     }
     return redirect;
   }
+  // Só depois da pré-filtragem: quem não entrou continua indo para /login.
+  if (isUnknownDetailPath(pathname)) return notFoundResponse(request, response);
   return response;
 }
 

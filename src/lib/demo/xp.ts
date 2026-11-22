@@ -30,6 +30,13 @@ export const XP_RULES = {
   extraLesson: 10,
   post: 5,
   comment: 2,
+  /**
+   * Tetos da comunidade: participação vale XP até aqui (além disso, só missões).
+   * Textos repetidos, curtos ou ocultos pela moderação já não contam
+   * (`participationCounts` em src/lib/community/rules.ts).
+   */
+  postCap: 4,
+  commentCap: 10,
   /** Só as 5 primeiras cópias contam (evita “farmar” XP). */
   promptCopied: 4,
   promptCopiedCap: 5,
@@ -174,7 +181,7 @@ export function computeXp(s: DemoStats): XpSummary {
     { label: "Aulas do plano", xp: s.planLessons * XP_RULES.planLesson },
     { label: "Atividades práticas", xp: s.planActions * XP_RULES.planAction },
     { label: "Aulas extras", xp: s.extraLessons * XP_RULES.extraLesson },
-    { label: "Comunidade", xp: s.posts * XP_RULES.post + s.comments * XP_RULES.comment },
+    { label: "Comunidade", xp: Math.min(s.posts, XP_RULES.postCap) * XP_RULES.post + Math.min(s.comments, XP_RULES.commentCap) * XP_RULES.comment },
     { label: "Estúdio IA", xp: Math.min(s.promptsCopied, XP_RULES.promptCopiedCap) * XP_RULES.promptCopied },
     { label: "Marcos de conquistas", xp: claimed.reduce((sum, c) => sum + c.xp, 0) },
     { label: "Missões de desafios", xp: missionsXp },

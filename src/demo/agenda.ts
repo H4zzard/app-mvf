@@ -1,41 +1,95 @@
 /**
  * DEMONSTRAÇÃO — agenda de lives e central de ajuda.
  *
- * Eventos de EXEMPLO, sem data, horário ou link reais e sem atribuir
- * presença a nenhuma pessoa. FAQ só sobre o uso do app (não traz regras
+ * Eventos de EXEMPLO, sem data, horário, link ou gravação reais e sem
+ * atribuir presença a nenhuma pessoa. FAQ só sobre o uso do app (não traz regras
  * do TikTok Shop, preços ou comissões).
  */
 
-export interface DemoEvent {
-  id: string;
-  title: string;
-  host: string;
-  description: string;
-  format: "Ao vivo" | "Plantão";
-}
+import type { CommunityEvent } from "../lib/events/schedule.ts";
 
-export const DEMO_EVENTS: DemoEvent[] = [
-  {
+const demoEvent = (e: Omit<CommunityEvent, "schedule" | "streamUrl" | "replay" | "replayAuthorized" | "origin" | "audience"> & Partial<Pick<CommunityEvent, "audience">>): CommunityEvent => ({
+  schedule: { status: "a_confirmar" },
+  streamUrl: null,
+  replay: null,
+  replayAuthorized: false,
+  origin: "demonstrativo",
+  audience: "todas",
+  ...e,
+});
+
+/**
+ * Eventos de EXEMPLO: nenhum tem data, horário, link ou gravação (o schema
+ * recusa). Os IDs dos três primeiros são estáveis (lista de lembrete da demo).
+ */
+export const DEMO_EVENTS: CommunityEvent[] = [
+  demoEvent({
     id: "ev-roteiros-avatar",
     title: "Roteiros para vídeos com avatar",
+    kind: "live",
     host: "Equipe MVF",
     description: "Exemplo de live: montando um roteiro do zero e transformando em cenas.",
-    format: "Ao vivo",
-  },
-  {
+    topics: ["Roteiro em 3 partes", "Ficha da personagem", "Takes no Google Flow"],
+    ended: false,
+    materialIds: ["m-roteiro", "m-cenas"],
+    lessonIds: ["l-roteiro", "l-flow"],
+  }),
+  demoEvent({
     id: "ev-plantao-duvidas",
     title: "Plantão de dúvidas",
+    kind: "plantao",
     host: "Equipe MVF",
     description: "Exemplo de encontro para tirar dúvidas sobre o plano e as atividades.",
-    format: "Plantão",
-  },
-  {
+    topics: ["Meu Plano", "Primeiros passos"],
+    ended: false,
+    materialIds: [],
+    lessonIds: [],
+  }),
+  demoEvent({
     id: "ev-bastidores-maos",
     title: "Bastidores: gravando só com as mãos",
+    kind: "live",
     host: "Equipe MVF",
     description: "Exemplo de live mostrando luz, fundo e closes de produto.",
-    format: "Ao vivo",
-  },
+    topics: ["Luz e fundo", "Closes de textura"],
+    ended: false,
+    materialIds: ["m-luz", "m-closes"],
+    lessonIds: ["l-maos-enquadramento", "l-close-produto"],
+  }),
+  demoEvent({
+    id: "ev-elite-mentoria",
+    title: "Encontro da Sala Elite+",
+    kind: "encontro",
+    host: "Equipe MVF",
+    description: "Exemplo de encontro exclusivo. O formato real será definido pela equipe.",
+    topics: ["Formato a definir pela equipe"],
+    ended: false,
+    materialIds: [],
+    lessonIds: [],
+    audience: "Elite+",
+  }),
+  demoEvent({
+    id: "ev-anterior-boas-vindas",
+    title: "Boas-vindas à turma",
+    kind: "encontro",
+    host: "Equipe MVF",
+    description: "Exemplo de encontro anterior. A gravação aparece aqui quando for cadastrada e autorizada.",
+    topics: ["Como usar o app", "Primeiros passos"],
+    ended: true,
+    materialIds: ["m-mapa"],
+    lessonIds: ["l-boas-vindas"],
+  }),
+  demoEvent({
+    id: "ev-anterior-estudio",
+    title: "Tirando dúvidas do Estúdio IA",
+    kind: "plantao",
+    host: "Equipe MVF",
+    description: "Exemplo de plantão anterior sobre o Estúdio IA.",
+    topics: ["Estúdio IA", "Google Flow"],
+    ended: true,
+    materialIds: ["m-ia"],
+    lessonIds: ["l-ia-primeiros-passos"],
+  }),
 ];
 
 export interface FaqItem {

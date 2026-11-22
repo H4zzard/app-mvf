@@ -72,8 +72,9 @@ Tudo some ao recarregar a página ou reiniciar a demo, e nada disso entra na res
 Conexões entre telas:
 - **Virais → Estúdio:** abre Animar (formato avatar) ou Roteiros (outros formatos), com o banner
   “Inspirado em”. O gancho do viral aparece só como referência e nunca vira fala sozinho.
-- **Marketplace → Roteiros:** preenche nome e categoria. O produto é demonstrativo; a aluna descreve
-  as características reais.
+- **Marketplace → Roteiros / Animador (Prompt 11):** os dados cadastrados do produto chegam pela ponte
+  `src/lib/products/studio-bridge.ts`, sem nada comercial, sem cortar frases e sem alterar a ficha ou a
+  fala. Os chips de produto das duas ferramentas leem o mesmo `productCatalog`. Ver `docs/MARKETPLACE.md`.
 - **Ficha → Animador:** a ficha chega selecionada, com a aparência em inglês editável.
 
 ## Regras garantidas por teste

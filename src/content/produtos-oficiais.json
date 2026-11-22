@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-22",
+  "review": [
+    "Nenhuma ficha oficial de produto foi entregue pela equipe até esta data.",
+    "O único produto registrado foi identificado pela capa OFICIAL do módulo “NUMI: o produto exclusivo” (public/area-membros/numi-produto-exclusivo.png), cuja embalagem mostra “NUMI creme Multifuncional 3 em 1”.",
+    "Tudo o que não aparece na capa ficou em branco: descrição, modo de uso, características, benefícios, restrições, preço, comissão, afiliação e links. Preencha com a equipe NUMI (modelo: docs/catalogo/modelo-produtos.csv) e valide com: npm run products -- check."
+  ],
+  "products": [
+    {
+      "id": "numi-creme-multifuncional-3em1",
+      "brand": "NUMI",
+      "name": "Creme Multifuncional 3 em 1",
+      "category": null,
+      "origin": "oficial",
+      "approval": "rascunho",
+      "availability": "a_confirmar",
+      "isNew": false,
+      "images": [
+        {
+          "src": "/area-membros/numi-produto-exclusivo.png",
+          "alt": "Capa oficial do módulo NUMI: mão segurando o frasco vermelho do creme multifuncional 3 em 1",
+          "kind": "capa-oficial"
+        }
+      ],
+      "shortDescription": "",
+      "description": "",
+      "howToUse": "",
+      "characteristics": [],
+      "approvedBenefits": [],
+      "restrictions": [],
+      "price": null,
+      "commission": null,
+      "affiliation": { "status": "a_confirmar", "conditions": "", "affiliateUrl": null },
+      "productUrl": null,
+      "materialIds": ["mat-numi-apresentacao", "mat-numi-alegacoes"],
+      "lessonIds": [],
+      "contentTags": [],
+      "formats": [],
+      "review": [
+        "Na embalagem da capa aparecem “200 g” e válvula pump: confirmar com a equipe antes de cadastrar como característica.",
+        "Categoria não informada.",
+        "Enviar fotos oficiais do produto (a capa atual é arte do módulo, não foto de catálogo)."
+      ]
+    }
+  ]
+}

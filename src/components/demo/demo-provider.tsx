@@ -11,6 +11,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { usePlan } from "@/components/plan/plan-provider";
 import { demoReducer, initialDemoState, type DemoAction, type DemoState } from "@/lib/demo/store";
+import { participationCounts } from "@/lib/community/rules";
 import { computeXp, type DemoStats, type XpSummary } from "@/lib/demo/xp";
 import { pointsBalance } from "@/lib/demo/economy";
 import { DEMO_REWARDS } from "@/demo/rewards";
@@ -117,15 +118,15 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       ...state.lessonsDone,
       ...completed.filter((t) => t.lessonId).map((t) => catalog.resolveLessonId(t.lessonId as string)),
     ]).size;
-    const mine = state.posts.filter((p) => p.author.isMe);
-    const myComments = state.posts.reduce((n, p) => n + p.comments.filter((c) => c.author.isMe).length, 0);
+    // Participação que vale XP/missões: sem textos repetidos, curtos ou ocultos (regra única).
+    const participation = participationCounts(state.posts);
     return {
       planLessons: completed.filter((t) => t.type === "lesson").length,
       planActions: completed.filter((t) => t.type === "action").length,
       extraLessons: state.lessonsDone.filter((id) => !planLessonIds.has(id)).length,
       lessonsTotal,
-      posts: mine.length,
-      comments: myComments,
+      posts: participation.posts,
+      comments: participation.comments,
       promptsCopied: state.prompts.copied,
       favorites: state.favorites.virals.length + state.favorites.products.length + state.favorites.templates.length + state.favorites.materials.length,
       rsvps: state.rsvps.length,

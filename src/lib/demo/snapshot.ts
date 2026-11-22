@@ -27,7 +27,13 @@ export interface DemoSnapshot {
 }
 
 export function serializeSnapshot(s: Omit<DemoSnapshot, "v">): string {
-  return JSON.stringify({ v: DEMO_SNAPSHOT_VERSION, ...s, demo: { ...s.demo, studioSeed: null, studioCharacters: [], studioDrafts: {} } });
+  // Fora do armazenamento: rascunhos do Estúdio, denúncias (observação livre) e tickets
+  // (descrição livre), além da simulação de plano/papel da Comunidade.
+  return JSON.stringify({
+    v: DEMO_SNAPSHOT_VERSION,
+    ...s,
+    demo: { ...s.demo, studioSeed: null, studioCharacters: [], studioDrafts: {}, reports: [], supportTickets: [], communitySim: { tier: "padrao", viewAs: "aluna" } },
+  });
 }
 
 /* ------------------------------- validação ------------------------------- */
@@ -40,6 +46,7 @@ const strArray = (v: unknown, max = 500): v is string[] => Array.isArray(v) && v
 const TASK_ID = /^t-[a-z0-9-]{1,60}$/;
 const STATUSES = new Set(["pending", "in_progress", "completed"]);
 const SPACE_IDS = new Set(SPACES.map((s) => s.id));
+const KINDS = new Set(["conversa", "duvida", "conquista", "aprendizado", "experiencia"]);
 
 function author(v: unknown): CommunityAuthor | null {
   if (!isObj(v) || !isStr(v.name, 80) || !isStr(v.initials, 4)) return null;
@@ -51,7 +58,8 @@ function author(v: unknown): CommunityAuthor | null {
 function comment(v: unknown): CommunityComment | null {
   if (!isObj(v) || !isStr(v.id, 80) || !isStr(v.body, COMMUNITY_LIMITS.maxCommentLength)) return null;
   const a = author(v.author);
-  return a ? { id: v.id, author: a, body: v.body } : null;
+  if (v.hidden !== undefined && typeof v.hidden !== "boolean") return null;
+  return a ? { id: v.id, author: a, body: v.body, ...(v.hidden ? { hidden: true } : {}) } : null;
 }
 
 function post(v: unknown): CommunityPost | null {
@@ -62,7 +70,26 @@ function post(v: unknown): CommunityPost | null {
   const comments = v.comments.map(comment);
   if (comments.some((c) => c === null)) return null;
   if (v.edited !== undefined && typeof v.edited !== "boolean") return null;
-  return { id: v.id, spaceId: v.spaceId as CommunityPost["spaceId"], author: a, body: v.body, baseLikes: v.baseLikes, comments: comments as CommunityComment[], ...(v.edited ? { edited: true } : {}) };
+  if (v.kind !== undefined && !KINDS.has(v.kind as string)) return null;
+  if (v.status !== undefined && v.status !== "publicada" && v.status !== "oculta") return null;
+  let link: CommunityPost["link"];
+  if (v.link !== undefined) {
+    const l = v.link;
+    if (!isObj(l) || (l.kind !== "aula" && l.kind !== "desafio") || typeof l.id !== "string" || !/^[a-z0-9-]{1,60}$/.test(l.id)) return null;
+    link = { kind: l.kind, id: l.id };
+  }
+  return {
+    id: v.id,
+    spaceId: v.spaceId as CommunityPost["spaceId"],
+    author: a,
+    body: v.body,
+    baseLikes: v.baseLikes,
+    comments: comments as CommunityComment[],
+    ...(v.edited ? { edited: true } : {}),
+    ...(v.kind ? { kind: v.kind as CommunityPost["kind"] } : {}),
+    ...(link ? { link } : {}),
+    ...(v.status === "oculta" ? { status: "oculta" as const } : {}),
+  };
 }
 
 function statusMap(v: unknown): TaskStatusMap | null {
@@ -106,6 +133,12 @@ function demoState(v: unknown): DemoState | null {
     rewardsRedeemed: v.rewardsRedeemed,
     history,
     supportRequests: v.supportRequests,
+    // Snapshots antigos não têm a lista: começa vazia.
+    productsPromoting: strArray(v.productsPromoting) ? v.productsPromoting.slice(0, 30) : [],
+    // Nunca restaurados (ver serializeSnapshot).
+    communitySim: { tier: "padrao", viewAs: "aluna" },
+    reports: [],
+    supportTickets: [],
     studioSeed: null,
     // Fichas e rascunhos do Estúdio não entram na restauração opcional.
     studioCharacters: [],

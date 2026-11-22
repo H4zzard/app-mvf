@@ -294,13 +294,62 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   100 roteiros do material de referência de terceiros **não** foram importados. `prompt-builder.ts`
   ficou preservado com os testes, mas não é mais usado pela interface.
 
+### Marketplace NUMI (Prompt 11)
+
+- **D79 · Catálogo de produtos tipado e único** (`src/lib/products/`, puro). O arquivo oficial é
+  `src/content/produtos-oficiais.json`, validado no carregamento (inválido → build/testes falham). Os
+  demonstrativos ficam em `src/demo/products.ts`. Marketplace, Animador e Roteiros leem a mesma API
+  `productCatalog`: não há segundo cadastro.
+- **D80 · Dado comercial só com aprovação.** Preço, comissão, afiliação, links e benefícios só aparecem
+  com produto `oficial` + `approval: "aprovado"`; comissão exige fonte e data, preço exige data. Fora
+  disso, “A confirmar”. Produto demonstrativo não aceita nenhum desses campos nem a marca NUMI (schema).
+- **D81 · Único produto oficial registrado:** “Creme Multifuncional 3 em 1” (NUMI), identificado pela
+  capa oficial do módulo. Ficou como `rascunho`, com todo o resto em branco. A capa é rotulada como arte
+  da área de membros, não foto de catálogo.
+- **D82 · Ponte Marketplace → Estúdio** (`studio-bridge.ts`). Roteiros recebem nome, categoria,
+  descrição + características, modo de uso, restrições e (só se aprovado) benefícios, além do estilo
+  escolhido. O Animador recebe nome e características. Nada comercial, nenhum corte no meio de frase, e a
+  ficha e a fala do Animador nunca são alteradas (só um aviso se a fala não citar o produto).
+- **D83 · Salvos ≠ Meus produtos.** Coração = `favorites.products`; “Quero divulgar” =
+  `productsPromoting` (máx. 30, em memória). A interface diz que a lista não faz a afiliação no TikTok Shop.
+- **D84 · Recomendações pelo onboarding** (`recommend.ts`): formato de gravação, nível, acesso ao
+  NUMI e completude do cadastro. Nunca usa preço, comissão ou promessa de venda; indisponível e
+  “em breve” ficam de fora.
+- **D85 · Importação futura** por CSV/JSON (`npm run products -- import`), com prévia. Célula vazia não
+  apaga, e mudar um dado oficial já cadastrado exige `--overwrite`. Modelo: `docs/catalogo/modelo-produtos.csv`.
+
+### Comunidade, Lives e Suporte (Prompt 12)
+
+- **D86 · Salas exclusivas por simulação rotulada.** Elite+ e Icon ficam bloqueadas, e a demo permite
+  simular o plano (`communitySim`), nunca restaurado e sempre marcado como “não é autorização real”.
+  Planos não têm hierarquia presumida. O acesso real virá do servidor e da RLS.
+- **D87 · Moderação na matriz única.** Novas permissões `community:moderate` (admin, moderator) e
+  `support:assign` (admin, support) em `permissions.ts`. O papel “Moderação” da demo é só visualização
+  simulada; o redutor recusa decisões fora dele. Nenhuma rota administrativa nova.
+- **D88 · Denúncias locais.** Uma por item, nunca do próprio conteúdo, “outro” exige observação. A
+  interface diz que nada foi enviado. Ficam fora do snapshot.
+- **D89 · XP da comunidade sem duplicar.** Regra única `participationCounts` (publicado, texto mínimo,
+  sem repetição) e teto em `computeXp` (4 publicações e 10 comentários). Curtir e denunciar não dão XP.
+- **D90 · Agenda com honestidade de datas.** Agenda oficial (`agenda-oficial.json`) vazia; exemplos
+  nunca têm data, link ou gravação (validados). Fases calculadas com o relógio passado como parâmetro.
+  Replay só com mídia + autorização, reaproveitando o player das aulas. Lembrete simulado.
+- **D91 · Central de ajuda sem respostas inventadas.** Busca com radical simples, sinônimos e
+  aproximação; recomendações só do catálogo; canais oficiais vazios até a equipe informar. Tickets
+  ficam como rascunho ou simulado, com bloqueio de dados sensíveis, e não vão para o snapshot.
+- **D92 · 404 real no Proxy.** Detalhes de aula e produto com ID inexistente são reescritos para um
+  caminho sem rota (HTTP 404) antes da renderização, depois da pré-filtragem de sessão. A página
+  mantém `notFound()` como segunda defesa.
+- **D93 · `Segmented`** para 2–4 abas em uma linha (Marketplace, Lives). O botão “Publicar” da
+  Comunidade usa `sticky`, porque o shell cria um bloco de contenção que quebra `position: fixed`.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a
   proibição 4 do `CLAUDE.md`) ou remover.
 
 - Nome comercial, logo, fontes e tokens oficiais.
-- Regras de pontos, níveis, recompensas e salas Elite+ / Icon.
+- Regras de pontos, níveis, recompensas e salas Elite+ / Icon (Icon inclui Elite+?).
+- Regras de convivência, moderação, agenda real de lives, política de gravações e canais oficiais de suporte.
 - Catálogo real de aulas/atividades e revisão das regras do motor pela expert (o atual é demo).
 - Migração/hospedagem das aulas hoje na Kiwify (direitos, arquivos-fonte, player).
 - Comissões NUMI e integração com TikTok Shop.

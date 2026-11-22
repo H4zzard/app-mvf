@@ -7,13 +7,17 @@ import type { UserRole } from "@/types";
 
 export const STAFF_ROLES: UserRole[] = ["admin", "expert", "support", "moderator"];
 
-export type Permission = "admin:access" | "integration:read";
+export type Permission = "admin:access" | "integration:read" | "community:moderate" | "support:assign";
 
 const MATRIX: Record<Permission, UserRole[]> = {
   /** Entrar em /admin. */
   "admin:access": ["admin", "expert", "support", "moderator"],
   /** Ver saúde da integração Kiwify (eventos, importações). */
   "integration:read": ["admin", "support"],
+  /** Fila de denúncias da Comunidade: ocultar ou manter publicações e comentários. */
+  "community:moderate": ["admin", "moderator"],
+  /** Atribuir e responder solicitações de suporte (futuro backend). */
+  "support:assign": ["admin", "support"],
 };
 
 export function can(roles: readonly UserRole[], permission: Permission): boolean {

@@ -1,84 +1,123 @@
 /**
- * DEMONSTRAÇÃO — vitrine do Marketplace.
+ * DEMONSTRAÇÃO — produtos para treinar no Marketplace e no Estúdio IA.
  *
- * Nenhum catálogo oficial da NUMI foi fornecido: todos os itens são
- * PRODUTOS DEMONSTRATIVOS, sem preço, sem comissão e sem foto real.
- * Substitua por nomes, imagens e regras oficiais quando forem entregues.
+ * NÃO são produtos NUMI nem de marca parceira: marca “Exemplo”, sem foto, sem
+ * preço, sem comissão, sem link e sem benefícios (o schema recusa esses dados
+ * em produto demonstrativo). Descrição e modo de uso são textos neutros de
+ * exemplo, para a aluna ensaiar o fluxo Marketplace → Estúdio.
+ *
+ * Os IDs são estáveis (favoritos, cenários e “Meus produtos” dependem deles).
+ * O catálogo oficial fica em src/content/produtos-oficiais.json.
  */
+import type { Product } from "../lib/products/types.ts";
+import { CATEGORY_LABEL } from "../lib/products/display.ts";
 
-export type ProductCategory = "skincare" | "maquiagem" | "cabelos" | "corpo";
+export type { ProductCategory } from "../lib/products/types.ts";
+/** Compatibilidade com telas/testes antigos. */
+export type DemoProduct = Product;
+export const PRODUCT_CATEGORY_LABEL = CATEGORY_LABEL;
 
-export interface DemoProduct {
-  id: string;
-  name: string;
-  category: ProductCategory;
-  description: string;
-  highlights: string[];
-  /** Ideias de ângulo de conteúdo (exemplos, não promessas). */
-  contentAngles: string[];
-  suggestedFormats: ("avatar_ia" | "maos_produto" | "narracao")[];
-}
+const demo = (p: Pick<Product, "id" | "name" | "category" | "shortDescription" | "description" | "howToUse" | "characteristics" | "restrictions" | "materialIds" | "lessonIds" | "contentTags" | "formats"> & Partial<Pick<Product, "availability" | "isNew">>): Product => ({
+  brand: "Exemplo",
+  origin: "demonstrativo",
+  approval: "aprovado",
+  availability: "disponivel",
+  isNew: false,
+  images: [],
+  approvedBenefits: [],
+  price: null,
+  commission: null,
+  affiliation: { status: "a_confirmar", conditions: "", affiliateUrl: null },
+  productUrl: null,
+  ...p,
+});
 
-export const PRODUCT_CATEGORY_LABEL: Record<ProductCategory, string> = {
-  skincare: "Skincare",
-  maquiagem: "Maquiagem",
-  cabelos: "Cabelos",
-  corpo: "Corpo e banho",
-};
-
-export const DEMO_PRODUCTS: DemoProduct[] = [
-  {
+export const DEMO_PRODUCTS: Product[] = [
+  demo({
     id: "p-hidratante",
-    name: "Hidratante facial (demonstrativo)",
+    name: "Hidratante facial",
     category: "skincare",
-    description: "Item de exemplo para ensaiar roteiros de rotina de cuidados.",
-    highlights: ["Textura fácil de mostrar em close", "Bom para vídeos de rotina"],
-    contentAngles: ["Rotina da noite em 3 passos", "Textura sem fala", "Responder dúvida de comentário"],
-    suggestedFormats: ["maos_produto", "avatar_ia"],
-  },
-  {
+    shortDescription: "Exemplo para ensaiar roteiros de rotina de cuidados.",
+    description: "Hidratante facial em creme, de exemplo, para treinar vídeos de rotina.",
+    howToUse: "Aplique uma pequena quantidade no rosto limpo. Espalhe com movimentos suaves.",
+    characteristics: ["Pote com tampa de rosca", "Textura cremosa, fácil de mostrar em close"],
+    restrictions: ["Não fale em resultado ou tratamento: use só as informações oficiais do produto real"],
+    materialIds: ["m-closes", "m-alegacoes"],
+    lessonIds: ["l-close-produto", "l-alegacoes"],
+    contentTags: ["rotina", "textura", "passo-a-passo"],
+    formats: ["aparecendo", "maos_produto", "avatar_ia"],
+  }),
+  demo({
     id: "p-serum",
-    name: "Sérum (demonstrativo)",
+    name: "Sérum",
     category: "skincare",
-    description: "Item de exemplo para demonstrar aplicação com conta-gotas.",
-    highlights: ["Visual elegante na bancada", "Aplicação rápida de filmar"],
-    contentAngles: ["Unboxing com som ambiente", "Como eu encaixo na rotina"],
-    suggestedFormats: ["maos_produto", "narracao"],
-  },
-  {
+    shortDescription: "Exemplo para demonstrar aplicação com conta-gotas.",
+    description: "Sérum de exemplo em frasco com conta-gotas, para treinar demonstração de aplicação.",
+    howToUse: "Pingue duas gotas na ponta dos dedos. Espalhe no rosto limpo e espere secar.",
+    characteristics: ["Frasco de vidro com conta-gotas", "Textura líquida e leve"],
+    restrictions: ["Evite contato com os olhos"],
+    materialIds: ["m-demo", "m-alegacoes"],
+    lessonIds: ["l-demonstracao"],
+    contentTags: ["textura", "unboxing", "passo-a-passo"],
+    formats: ["maos_produto", "narracao_imagens", "aparecendo"],
+    isNew: true,
+  }),
+  demo({
     id: "p-batom",
-    name: "Batom (demonstrativo)",
+    name: "Batom",
     category: "maquiagem",
-    description: "Item de exemplo para vídeos de cor e acabamento.",
-    highlights: ["Swatch no braço funciona bem em close", "Combina com formato de lista"],
-    contentAngles: ["Três formas de usar", "Look rápido para o trabalho"],
-    suggestedFormats: ["maos_produto", "avatar_ia"],
-  },
-  {
+    shortDescription: "Exemplo para vídeos de cor e acabamento.",
+    description: "Batom em bastão, de exemplo, para treinar vídeos de cor e acabamento.",
+    howToUse: "Aplique direto nos lábios, do centro para os cantos.",
+    characteristics: ["Bastão com tampa", "Swatch no braço aparece bem em close"],
+    restrictions: [],
+    materialIds: ["m-closes"],
+    lessonIds: ["l-close-produto"],
+    contentTags: ["apresentacao", "duvidas"],
+    formats: ["aparecendo", "maos_produto", "avatar_ia"],
+  }),
+  demo({
     id: "p-base",
-    name: "Base (demonstrativo)",
+    name: "Base",
     category: "maquiagem",
-    description: "Item de exemplo para demonstrações de aplicação.",
-    highlights: ["Demonstração em tempo real", "Bom para formato problema → uso"],
-    contentAngles: ["Aplicação em 30 segundos", "Avatar explica como escolher o tom"],
-    suggestedFormats: ["avatar_ia", "narracao"],
-  },
-  {
+    shortDescription: "Exemplo para demonstrações de aplicação.",
+    description: "Base líquida de exemplo, para treinar demonstrações de aplicação.",
+    howToUse: "Espalhe pequenas porções no rosto com esponja ou pincel.",
+    characteristics: ["Frasco com válvula"],
+    restrictions: [],
+    materialIds: ["m-demo"],
+    lessonIds: ["l-demonstracao"],
+    contentTags: ["passo-a-passo", "duvidas"],
+    formats: ["aparecendo", "avatar_ia", "narracao_imagens"],
+    availability: "em_breve",
+  }),
+  demo({
     id: "p-mascara-capilar",
-    name: "Máscara capilar (demonstrativo)",
+    name: "Máscara capilar",
     category: "cabelos",
-    description: "Item de exemplo para rotinas de cuidado com os cabelos.",
-    highlights: ["Textura cremosa em close", "Rotina de domingo"],
-    contentAngles: ["Ritual de domingo", "Passo a passo com as mãos"],
-    suggestedFormats: ["maos_produto"],
-  },
-  {
+    shortDescription: "Exemplo para rotinas de cuidado com os cabelos.",
+    description: "Máscara capilar em creme, de exemplo, para treinar vídeos de rotina com as mãos.",
+    howToUse: "Aplique nos fios úmidos, do comprimento às pontas. Enxágue depois.",
+    characteristics: ["Pote grande", "Textura cremosa"],
+    restrictions: [],
+    materialIds: ["m-closes", "m-luz"],
+    lessonIds: ["l-maos-enquadramento"],
+    contentTags: ["rotina", "textura", "sem-fala"],
+    formats: ["maos_produto"],
+  }),
+  demo({
     id: "p-oleo-corporal",
-    name: "Óleo corporal (demonstrativo)",
+    name: "Óleo corporal",
     category: "corpo",
-    description: "Item de exemplo para vídeos sensoriais.",
-    highlights: ["Brilho e textura chamam atenção", "Ótimo para vídeos sem fala"],
-    contentAngles: ["Momento de autocuidado", "Close de textura com luz natural"],
-    suggestedFormats: ["maos_produto", "narracao"],
-  },
+    shortDescription: "Exemplo para vídeos sensoriais.",
+    description: "Óleo corporal de exemplo, para treinar vídeos sensoriais com luz natural.",
+    howToUse: "Aplique algumas gotas na pele e espalhe com as mãos.",
+    characteristics: ["Frasco transparente", "Brilho aparece bem com luz natural"],
+    restrictions: [],
+    materialIds: ["m-luz"],
+    lessonIds: ["l-maos-enquadramento"],
+    contentTags: ["textura", "sem-fala"],
+    formats: ["maos_produto", "narracao_imagens"],
+    availability: "indisponivel",
+  }),
 ];

@@ -41,6 +41,22 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
   intacta) e Roteiros para Gravar Aparecendo (10 roteiros), com modelo local e sem rede.
 - **Pendente:** integração DeepSeek no servidor (texto) e roteiros próprios da equipe. Ver `docs/ESTUDIO_IA.md`.
 
+## ✅ Comunidade, Lives e Suporte (Prompt 12)
+- Comunidade com modelos de publicação, vínculo com aula/desafio, busca, denúncia, fila de moderação
+  simulada, salas Elite+/Icon com simulação rotulada e XP sem duplicação.
+- Lives e encontros com agenda (próximas, anteriores, minha agenda), detalhes, replays autorizados e
+  lembrete simulado. Central de ajuda com busca tolerante, atalhos, recomendações do catálogo e tickets
+  em rascunho/simulação. 404 real para aulas e produtos inexistentes. Ver `docs/COMUNIDADE_LIVES_SUPORTE.md`.
+- **Pendente (equipe):** regras de convivência, moderadoras, agenda real, política de gravações,
+  canais de suporte e FAQ aprovado.
+
+## ✅ Marketplace NUMI (Prompt 11)
+- Catálogo tipado único (oficial + demonstrativo), vitrine com Produtos NUMI, categorias, recomendados,
+  novidades, salvos, Meus produtos e Marcas parceiras em breve; página de detalhes por produto; envio
+  ao Estúdio (Roteiros e Animador) com os dados cadastrados. Ver `docs/MARKETPLACE.md`.
+- **Pendente (dados da equipe NUMI):** ficha completa do creme, fotos, preço, comissão (fonte e data),
+  condições e link de afiliação, benefícios aprovados e restrições; demais produtos NUMI.
+
 ## ✅ Finalização do front para demonstração (Prompt 07)
 - Desafios (missões diárias, semanais e especiais), Ranking, Recompensas, Materiais e Regras & FAQ.
 - Gamificação integrada: mesmo XP em Início, Conquistas, Desafios, Ranking e Recompensas.
@@ -64,7 +80,7 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 | Comunidade | Recriar espaços (Boas-vindas, Avisos NUMI, Mural, Dúvidas & dicas, Bastidores, Elite+/Icon) sem importar posts; moderação e denúncias. |
 | Estúdio IA | Três geradores de TEXTO prontos no mock (Prompt 09B, `docs/ESTUDIO_IA.md`). Próximo: provedor DeepSeek (só linguagem) no servidor, com autenticação, limite e custo; biblioteca de roteiros próprios da NUMI. Imagem e vídeo continuam no Google Flow. |
 | Vídeos Virais | Fonte licenciada (pesquisar TokConnect, FastMoss, Kalodata, Creative Center, Meta Ads Library); métricas estimadas sempre rotuladas. |
-| Marketplace | Produtos NUMI, regras de comissão, materiais; parceiras só “em breve”. |
+| Marketplace | Catálogo tipado e vitrine prontos no mock (Prompt 11, `docs/MARKETPLACE.md`). Próximo: dados oficiais NUMI, painel admin/banco para o catálogo, comissões verificadas, links do TikTok Shop e marcas parceiras. |
 | Minhas Vendas | Somente de fonte verificável; separar verificado × autodeclarado. |
 | Gamificação | Pontos por ações verificáveis, níveis, desafios, conquistas, ranking, loja com estoque. |
 | Lives, Materiais, Perfil, Suporte, Regras & FAQ | Integrar ao novo fluxo. |

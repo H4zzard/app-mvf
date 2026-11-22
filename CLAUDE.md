@@ -106,6 +106,25 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - Nunca alterar a fala aprovada ao dividir em takes. Nunca inventar fatos, preços, depoimentos ou alegações nos roteiros.
 - Resultado local sempre rotulado “modelo local (sem IA)”. Sem `fetch`, chave ou `NEXT_PUBLIC_*` no Estúdio (há teste).
 
+## Marketplace (Prompt 11)
+
+- Fonte única de produtos: `src/content/produtos-oficiais.json` (oficial) + `src/demo/products.ts`
+  (demonstrativo), só pela API `productCatalog` (`src/lib/products`). Regras em `docs/MARKETPLACE.md`.
+- Nunca inventar produto, preço, comissão, benefício ou condição de afiliação. Dado comercial só aparece
+  com produto oficial aprovado e verificado; senão “A confirmar”. Demonstrativo não usa a marca NUMI.
+- Marketplace → Estúdio só leva o que está cadastrado (nada comercial) e nunca altera ficha ou fala.
+- “Meus produtos” não é afiliação. Depois de editar o catálogo: `npm run products -- check`.
+
+## Comunidade, Lives e Suporte (Prompt 12)
+
+- Regras em `docs/COMUNIDADE_LIVES_SUPORTE.md`. Puro: `src/lib/community`, `src/lib/events`, `src/lib/support`.
+- Nunca dizer que denúncia, lembrete ou ticket foi enviado/recebido: na demo é registro local ou simulação.
+- Salas Elite+/Icon e o papel de moderação na demo são SIMULAÇÃO rotulada; permissões reais só em
+  `permissions.ts` (sem segunda estrutura de papéis) e verificadas no servidor.
+- Evento demonstrativo nunca tem data, link ou gravação; agenda oficial em `src/content/agenda-oficial.json`.
+- Tickets bloqueiam senha, código, CPF e cartão; tickets e denúncias nunca vão para o armazenamento local.
+- XP da comunidade só por `participationCounts` + tetos de `XP_RULES` (sem pontos repetidos).
+
 ## Gamificação da demo (Prompt 07)
 
 - Fonte única: `src/lib/demo/xp.ts` (XP, níveis, marcos, missões) e `src/lib/demo/economy.ts`

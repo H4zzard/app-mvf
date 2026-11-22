@@ -11,11 +11,26 @@ export interface CommunitySpace {
   id: SpaceId;
   label: string;
   description: string;
-  /** Alunas podem publicar aqui? (Avisos: só equipe.) */
+  /** Alunas podem publicar aqui? (Avisos: só equipe.) Em salas restritas, só quem tem acesso. */
   studentsCanPost: boolean;
-  /** Sala com acesso restrito (Elite+ / Icon). Na demo, sempre bloqueada. */
+  /**
+   * Sala com acesso restrito (Elite+ / Icon). Na demo fica bloqueada, a não ser na
+   * SIMULAÇÃO de plano (que não é autorização). O acesso real será verificado no servidor.
+   */
   restricted?: "Elite+" | "Icon";
 }
+
+/** Tipo da publicação (modelos do “Nova publicação”). Ausente = conversa livre. */
+export type PostKind = "conversa" | "duvida" | "conquista" | "aprendizado" | "experiencia";
+
+/** Vínculo opcional com uma aula do catálogo ou um desafio/missão. */
+export interface PostLink {
+  kind: "aula" | "desafio";
+  id: string;
+}
+
+/** Estado de moderação. Ausente = publicada. (Futuro: “em_analise”, “removida”.) */
+export type ModerationStatus = "publicada" | "oculta";
 
 export const SPACES: CommunitySpace[] = [
   { id: "boas-vindas", label: "Boas-vindas", description: "Apresente-se e conheça outras alunas.", studentsCanPost: true },
@@ -23,8 +38,8 @@ export const SPACES: CommunitySpace[] = [
   { id: "mural", label: "Mural de conquistas", description: "Marcos da sua jornada: primeiro vídeo, primeira rotina…", studentsCanPost: true },
   { id: "duvidas", label: "Dúvidas & dicas", description: "Pergunte e ajude outras alunas.", studentsCanPost: true },
   { id: "bastidores", label: "Bastidores", description: "Como você grava, edita e se organiza.", studentsCanPost: true },
-  { id: "elite", label: "Sala Elite+", description: "Sala exclusiva para alunas Elite+.", studentsCanPost: false, restricted: "Elite+" },
-  { id: "icon", label: "Sala Icon", description: "Sala exclusiva para alunas Icon.", studentsCanPost: false, restricted: "Icon" },
+  { id: "elite", label: "Sala Elite+", description: "Sala exclusiva para alunas Elite+.", studentsCanPost: true, restricted: "Elite+" },
+  { id: "icon", label: "Sala Icon", description: "Sala exclusiva para alunas Icon.", studentsCanPost: true, restricted: "Icon" },
 ];
 
 export interface CommunityAuthor {
@@ -38,6 +53,8 @@ export interface CommunityComment {
   id: string;
   author: CommunityAuthor;
   body: string;
+  /** Oculto pela moderação (simulação). */
+  hidden?: boolean;
 }
 
 export interface CommunityPost {
@@ -49,6 +66,9 @@ export interface CommunityPost {
   baseLikes: number;
   comments: CommunityComment[];
   edited?: boolean;
+  kind?: PostKind;
+  link?: PostLink;
+  status?: ModerationStatus;
 }
 
 const TEAM: CommunityAuthor = { name: "Equipe MVF (exemplo)", initials: "MV", isTeam: true };
@@ -92,6 +112,32 @@ export const SEED_POSTS: CommunityPost[] = [
     comments: [],
   },
   {
+    id: "post-elite-boas-vindas",
+    spaceId: "elite",
+    author: TEAM,
+    body: "Exemplo de conteúdo da Sala Elite+. Os encontros e materiais desta sala serão definidos pela equipe.",
+    baseLikes: 2,
+    comments: [],
+  },
+  {
+    id: "post-icon-boas-vindas",
+    spaceId: "icon",
+    author: TEAM,
+    body: "Exemplo de conteúdo da Sala Icon. O que acontece aqui será definido pela equipe.",
+    baseLikes: 1,
+    comments: [],
+  },
+  {
+    id: "post-duvida-avatar",
+    spaceId: "duvidas",
+    kind: "duvida",
+    link: { kind: "aula", id: "l-consistencia" },
+    author: { name: "Bianca (exemplo)", initials: "BI" },
+    body: "Minha personagem muda de rosto entre uma cena e outra. Vocês usam a mesma imagem de referência em todas?",
+    baseLikes: 2,
+    comments: [{ id: "c-4", author: { name: "Júlia (exemplo)", initials: "JU" }, body: "Uso sempre a mesma imagem e repito a descrição da ficha em todos os prompts." }],
+  },
+  {
     id: "post-bastidores-cantinho",
     spaceId: "bastidores",
     author: { name: "Paula (exemplo)", initials: "PA" },
@@ -101,4 +147,12 @@ export const SEED_POSTS: CommunityPost[] = [
   },
 ];
 
-export const COMMUNITY_LIMITS = { maxPostLength: 600, maxCommentLength: 300 } as const;
+export const COMMUNITY_LIMITS = {
+  maxPostLength: 600,
+  maxCommentLength: 300,
+  /** Publicação curta demais não vale como participação (evita “oi” repetido). */
+  minPostLength: 10,
+  minCommentLength: 2,
+  /** Denúncia: observação opcional. */
+  maxReportNote: 300,
+} as const;

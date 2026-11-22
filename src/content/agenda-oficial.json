@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-22",
+  "review": [
+    "Nenhuma data oficial de live ou encontro foi informada pela equipe até esta data.",
+    "Cada evento oficial precisa de: título, apresentadora, descrição, data e hora com fuso (startsAt + timeZone), duração, link de transmissão (https, quando houver) e, depois do encontro, a gravação autorizada (provedor + ID) e os materiais/aulas relacionados. Ver docs/COMUNIDADE_LIVES_SUPORTE.md."
+  ],
+  "events": []
+}

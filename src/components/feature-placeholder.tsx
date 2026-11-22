@@ -35,8 +35,9 @@ const PLANNED_SCOPE: Record<string, { points: string[]; note?: string }> = {
   },
   marketplace: {
     points: [
-      "Produtos NUMI com fotos, descrição, regras de comissão e materiais.",
-      "Roteiros relacionados a cada produto.",
+      "Produtos NUMI com fotos, descrição, modo de uso e materiais oficiais.",
+      "Preço, comissão e afiliação só quando confirmados pela equipe.",
+      "Atalho para criar roteiros e prompts no Estúdio IA a partir do produto.",
       "Espaço para marcas parceiras quando houver parcerias confirmadas.",
     ],
   },
@@ -54,7 +55,7 @@ const PLANNED_SCOPE: Record<string, { points: string[]; note?: string }> = {
       "Moderação e denúncias desde o lançamento.",
     ],
   },
-  lives: { points: ["Agenda de lives, lembretes e gravações."] },
+  lives: { points: ["Agenda de lives e encontros com data, horário e link oficiais.", "Gravações autorizadas e materiais de cada encontro."] },
   desafios: { points: ["Desafios com critérios claros, baseados em ações verificáveis."] },
   ranking: {
     points: ["Ranking que distingue resultados verificados de autodeclarados, sem incentivar spam."],
@@ -62,7 +63,7 @@ const PLANNED_SCOPE: Record<string, { points: string[]; note?: string }> = {
   conquistas: { points: ["Níveis, selos e marcos da jornada."] },
   recompensas: { points: ["Loja de recompensas com estoque, regras de resgate e histórico."] },
   perfil: { points: ["Dados da conta, preferências e edição das respostas do onboarding."] },
-  suporte: { points: ["Atendimento individual com a equipe."] },
+  suporte: { points: ["Central de ajuda com busca e perguntas frequentes.", "Solicitações ao suporte com acompanhamento de status."] },
   "regras-faq": { points: ["Regras da comunidade e perguntas frequentes."] },
   admin: {
     points: [
