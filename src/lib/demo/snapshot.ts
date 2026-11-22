@@ -27,7 +27,7 @@ export interface DemoSnapshot {
 }
 
 export function serializeSnapshot(s: Omit<DemoSnapshot, "v">): string {
-  return JSON.stringify({ v: DEMO_SNAPSHOT_VERSION, ...s, demo: { ...s.demo, studioSeed: null } });
+  return JSON.stringify({ v: DEMO_SNAPSHOT_VERSION, ...s, demo: { ...s.demo, studioSeed: null, studioCharacters: [], studioDrafts: {} } });
 }
 
 /* ------------------------------- validação ------------------------------- */
@@ -107,6 +107,9 @@ function demoState(v: unknown): DemoState | null {
     history,
     supportRequests: v.supportRequests,
     studioSeed: null,
+    // Fichas e rascunhos do Estúdio não entram na restauração opcional.
+    studioCharacters: [],
+    studioDrafts: {},
     seq: v.seq,
   };
 }

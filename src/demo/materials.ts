@@ -4,13 +4,13 @@
  * Nenhum arquivo real de material existe no projeto (inspecionado: só imagens
  * em public/area-membros). Por isso TODO material tem `file: null` e a tela
  * informa “Arquivo ainda não disponível” — sem download falso.
- * Os materiais de aula vêm de src/demo/library.ts; a capa usada é a capa
- * OFICIAL do módulo da aula (src/demo/member-area.ts).
+ * Os materiais de aula vêm do CATÁLOGO (src/lib/catalog); a capa usada é a capa
+ * OFICIAL do módulo da aula.
  */
-import { LIBRARY_LESSONS, getLessonDetail, type LessonMaterial } from "./library.ts";
-import { moduleOfLesson } from "./member-area.ts";
+import type { MaterialCategory as CatalogMaterialCategory, MaterialKind } from "@/types/catalog";
+import { catalog } from "../lib/catalog/index.ts";
 
-export type MaterialCategory = "tiktok-shop" | "roteiros" | "ia" | "produtos" | "numi";
+export type MaterialCategory = CatalogMaterialCategory;
 
 export const MATERIAL_CATEGORY_LABEL: Record<MaterialCategory, string> = {
   "tiktok-shop": "TikTok Shop",
@@ -23,49 +23,35 @@ export const MATERIAL_CATEGORY_LABEL: Record<MaterialCategory, string> = {
 export interface Material {
   id: string;
   title: string;
-  kind: LessonMaterial["kind"];
+  kind: MaterialKind;
   category: MaterialCategory;
   description: string;
   lessonId: string | null;
   cover: string | null;
-  /** URL do arquivo REAL quando existir. `null` = ainda não disponível. */
+  /** Sempre `null` na tela: arquivos vêm por referência e só serão servidos pelo servidor. */
   file: string | null;
 }
 
-const CATEGORY_BY_MODULE: Record<string, MaterialCategory> = {
-  "Comece por aqui": "tiktok-shop",
-  Fundamentos: "tiktok-shop",
-  Conformidade: "tiktok-shop",
-  Publicação: "tiktok-shop",
-  Análise: "tiktok-shop",
-  Produto: "produtos",
-  Roteiros: "roteiros",
-  Formatos: "roteiros",
-  Aparecendo: "roteiros",
-  "Mãos e produto": "roteiros",
-  "Narração e imagens": "roteiros",
-  Edição: "roteiros",
-  "Avatar de IA": "ia",
-};
-
-const KIND_DESCRIPTION: Record<LessonMaterial["kind"], string> = {
+const KIND_DESCRIPTION: Record<MaterialKind, string> = {
   checklist: "Lista para conferir item a item.",
   modelo: "Modelo para preencher com as suas informações.",
   guia: "Guia de consulta rápida.",
 };
 
-const fromLessons: Material[] = LIBRARY_LESSONS.flatMap((lesson) =>
-  getLessonDetail(lesson.id).materials.map((m) => ({
+/** Materiais do CATÁLOGO (oficiais ou de exemplo), com a capa oficial do módulo da aula. */
+const fromCatalog: Material[] = catalog.materials().map((m) => {
+  const lesson = m.lessonId ? catalog.getLesson(m.lessonId) : undefined;
+  return {
     id: m.id,
     title: m.title,
     kind: m.kind,
-    category: CATEGORY_BY_MODULE[lesson.module] ?? "tiktok-shop",
-    description: `${KIND_DESCRIPTION[m.kind]} Acompanha a aula “${lesson.title}”.`,
-    lessonId: lesson.id,
-    cover: moduleOfLesson(lesson.id)?.cover ?? null,
+    category: m.category,
+    description: m.description || `${KIND_DESCRIPTION[m.kind]}${lesson ? ` Acompanha a aula “${lesson.title}”.` : ""}`,
+    lessonId: lesson?.id ?? null,
+    cover: lesson ? (catalog.getModule(lesson.moduleId)?.cover ?? null) : null,
     file: null,
-  })),
-);
+  };
+});
 
 const NUMI_MATERIALS: Material[] = [
   {
@@ -90,4 +76,4 @@ const NUMI_MATERIALS: Material[] = [
   },
 ];
 
-export const DEMO_MATERIALS: Material[] = [...fromLessons, ...NUMI_MATERIALS];
+export const DEMO_MATERIALS: Material[] = [...fromCatalog, ...NUMI_MATERIALS.filter((n) => !fromCatalog.some((m) => m.id === n.id))];

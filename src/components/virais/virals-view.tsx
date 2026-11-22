@@ -46,14 +46,16 @@ export function ViralsView() {
   function sendToStudio(v: ViralReference) {
     dispatch({
       type: "studio/seed",
+      // Só INSPIRAÇÃO: o gancho aparece como referência e nunca vira fala sozinho.
       seed: {
         from: v.title,
+        target: v.format === "avatar_ia" ? "animar" : "roteiros",
         hook: v.country === "BR" ? v.hook : undefined,
         format: v.format === "avatar_ia" ? "avatar" : v.format === "maos_produto" ? "maos_produto" : undefined,
       },
     });
     setOpenId(null);
-    router.push("/estudio-ia");
+    router.push(v.format === "avatar_ia" ? "/estudio-ia/animar" : "/estudio-ia/roteiros");
   }
 
   return (

@@ -36,6 +36,11 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 - **Pendente (ativos reais):** logo, fotos, catálogo NUMI, vídeos das aulas, roteiros validados,
   agenda de lives, links e canais de suporte.
 
+## ✅ Estúdio IA em três ferramentas de texto (Prompt 09B)
+- Criar Personagem (prompt de imagem + JSON + ficha), Animar Personagem (prompts por take com a fala
+  intacta) e Roteiros para Gravar Aparecendo (10 roteiros), com modelo local e sem rede.
+- **Pendente:** integração DeepSeek no servidor (texto) e roteiros próprios da equipe. Ver `docs/ESTUDIO_IA.md`.
+
 ## ✅ Finalização do front para demonstração (Prompt 07)
 - Desafios (missões diárias, semanais e especiais), Ranking, Recompensas, Materiais e Regras & FAQ.
 - Gamificação integrada: mesmo XP em Início, Conquistas, Desafios, Ranking e Recompensas.
@@ -57,7 +62,7 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 |---|---|
 | Aulas | Biblioteca completa sempre disponível; depende da decisão sobre vídeos da Kiwify. |
 | Comunidade | Recriar espaços (Boas-vindas, Avisos NUMI, Mural, Dúvidas & dicas, Bastidores, Elite+/Icon) sem importar posts; moderação e denúncias. |
-| Estúdio IA | Prompts, roteiros, personagens, cenas e consistência para Google Flow (PT/EN); base de 100+ roteiros validados. Sem geração de vídeo na v1. |
+| Estúdio IA | Três geradores de TEXTO prontos no mock (Prompt 09B, `docs/ESTUDIO_IA.md`). Próximo: provedor DeepSeek (só linguagem) no servidor, com autenticação, limite e custo; biblioteca de roteiros próprios da NUMI. Imagem e vídeo continuam no Google Flow. |
 | Vídeos Virais | Fonte licenciada (pesquisar TokConnect, FastMoss, Kalodata, Creative Center, Meta Ads Library); métricas estimadas sempre rotuladas. |
 | Marketplace | Produtos NUMI, regras de comissão, materiais; parceiras só “em breve”. |
 | Minhas Vendas | Somente de fonte verificável; separar verificado × autodeclarado. |

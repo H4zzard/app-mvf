@@ -38,10 +38,10 @@ export function MarketplaceView() {
   function createScript(p: DemoProduct) {
     dispatch({
       type: "studio/seed",
-      seed: { from: p.name, productName: p.name.replace(" (demonstrativo)", ""), format: p.suggestedFormats.includes("avatar_ia") ? "avatar" : "maos_produto" },
+      seed: { from: p.name, target: "roteiros", productName: p.name.replace(" (demonstrativo)", ""), productCategory: PRODUCT_CATEGORY_LABEL[p.category] },
     });
     setOpenId(null);
-    router.push("/estudio-ia");
+    router.push("/estudio-ia/roteiros");
   }
 
   return (

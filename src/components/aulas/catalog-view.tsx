@@ -6,15 +6,16 @@ import { useLayoutEffect, useMemo, useState } from "react";
 import { ArrowDown, CircleCheck, CirclePlay, Clock, Play, Search, SearchX, Sparkles, X } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { usePlan } from "@/components/plan/plan-provider";
-import { LEVEL_LABEL, ModuleCard, ModuleSheet, Rail } from "@/components/aulas/catalog-parts";
+import { LEVEL_LABEL, ModuleCard, ModuleSheet, Rail, formatDuration } from "@/components/aulas/catalog-parts";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
 import { Badge, DemoBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { LIBRARY_LESSONS } from "@/demo/library";
-import { MEMBER_ASSETS, MEMBER_MODULES, MEMBER_RAILS, getModule, moduleOfLesson, modulesOfRail, recommendModules } from "@/demo/member-area";
-import { filterLessons, type LessonStatusFilter } from "@/lib/demo/filters";
-import { formatMinutes, getStatus, orderedTasks } from "@/lib/plan";
+import { MEMBER_ASSETS, MEMBER_RAILS, getModule, moduleOfLesson, modulesOfRail, recommendModules } from "@/demo/member-area";
+import { normalizeSearch, type LessonStatusFilter } from "@/lib/demo/filters";
+import { catalog } from "@/lib/catalog";
+import type { CatalogLesson } from "@/types/catalog";
+import { getStatus, orderedTasks } from "@/lib/plan";
 
 /**
  * Área de membros (DEMONSTRAÇÃO) em formato de catálogo de streaming:
@@ -30,30 +31,29 @@ export function CatalogView() {
   const [status, setStatus] = useState<LessonStatusFilter>("todas");
   useLayoutEffect(() => () => setOpenModuleId(null), []);
 
-  const progressOf = (moduleId: string) => {
-    const m = getModule(moduleId);
-    const total = m?.lessonIds.length ?? 0;
-    return { total, done: m ? m.lessonIds.filter((id) => isLessonDone(id)).length : 0 };
-  };
+  const progressOf = (moduleId: string) => catalog.moduleProgress(moduleId, isLessonDone);
 
-  const doneCount = LIBRARY_LESSONS.filter((l) => isLessonDone(l.id)).length;
+  const allLessons = catalog.lessons();
+  const doneCount = allLessons.filter((l) => isLessonDone(l.id)).length;
   const started = doneCount > 0;
 
-  // Próxima aula: a do próximo passo do plano; senão, a primeira pendente na ordem do catálogo.
+  // Próxima aula: a do próximo passo do plano (ordem do plano); senão, a primeira pendente do catálogo.
   const nextLesson = useMemo(() => {
-    const fromPlan = plan
-      ? orderedTasks(plan).find((t) => t.lessonId && getStatus(statusMap, t.id) !== "completed" && !isLessonDone(t.lessonId))
-      : undefined;
-    const catalogOrder = MEMBER_MODULES.flatMap((m) => m.lessonIds);
-    const id = fromPlan?.lessonId ?? catalogOrder.find((lid) => !isLessonDone(lid));
-    return LIBRARY_LESSONS.find((l) => l.id === id);
+    const preferred = plan
+      ? orderedTasks(plan)
+          .filter((t) => t.lessonId && getStatus(statusMap, t.id) !== "completed")
+          .map((t) => t.lessonId as string)
+      : [];
+    return catalog.nextLesson({ preferred, isDone: isLessonDone });
   }, [plan, statusMap, isLessonDone]);
   const nextModule = nextLesson ? moduleOfLesson(nextLesson.id) : undefined;
 
   const recommendation = recommendModules(plan?.profile ?? null);
   const recommendedIds = new Set(recommendation.modules.map((m) => m.id));
   const searching = searchOpen && (query.trim() !== "" || status !== "todas");
-  const results = filterLessons(LIBRARY_LESSONS, { query, category: "todas", status, isDone: isLessonDone });
+  const results = catalog
+    .searchLessons(query, normalizeSearch)
+    .filter((l) => status === "todas" || (status === "concluidas") === isLessonDone(l.id));
   const openModule = openModuleId ? getModule(openModuleId) : undefined;
   const toggleSearch = () => {
     if (searchOpen) {
@@ -105,11 +105,10 @@ export function CatalogView() {
               <span className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/80">Área de membros</span>
             </div>
             <h1 id="catalog-hero-title" className="mt-2.5 font-serif text-[2.25rem] font-semibold leading-[1.02] tracking-tight sm:mt-3 sm:text-5xl lg:text-6xl">
-              Formação MVF
+              {catalog.course.title}
             </h1>
             <p className="mt-1.5 max-w-md text-[0.95rem] leading-relaxed text-white/80 sm:mt-2 sm:text-base">
-              <span className="sm:hidden">Do primeiro acesso à escala, em um só lugar.</span>
-              <span className="hidden sm:inline">Todos os módulos do método em um só lugar, do primeiro acesso à escala.</span>
+              {catalog.course.subtitle}
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
               {nextLesson ? (
@@ -146,8 +145,8 @@ export function CatalogView() {
           cover={nextModule.cover}
           progress={progressOf(nextModule.id)}
           started={started}
-          inPlan={!!plan?.tasks.some((t) => t.lessonId === nextLesson.id)}
-          overall={{ done: doneCount, total: LIBRARY_LESSONS.length }}
+          inPlan={!!plan?.tasks.some((t) => t.lessonId && catalog.resolveLessonId(t.lessonId) === nextLesson.id)}
+          overall={{ done: doneCount, total: allLessons.length }}
         />
       ) : (
         <p className="flex items-center gap-2 rounded-2xl bg-success-soft p-4 text-sm font-medium text-success">
@@ -218,7 +217,7 @@ function ContinueCard({
 }: {
   lessonId: string;
   title: string;
-  minutes: number;
+  minutes: number | null;
   moduleTitle: string;
   cover: string;
   progress: { done: number; total: number };
@@ -250,7 +249,7 @@ function ContinueCard({
           </span>
           <span className="flex items-center gap-1.5 text-xs text-white/70">
             <Clock aria-hidden className="size-3.5" />
-            {formatMinutes(minutes)} · módulo {progress.done}/{progress.total}
+            {formatDuration(minutes)} · módulo {progress.done}/{progress.total}
           </span>
           <span aria-hidden className="h-1 w-full overflow-hidden rounded-full bg-white/20">
             <span className="block h-full rounded-full bg-white" style={{ width: `${pct}%` }} />
@@ -279,7 +278,7 @@ function SearchResults({
   isLessonDone,
   onClear,
 }: {
-  results: typeof LIBRARY_LESSONS;
+  results: CatalogLesson[];
   isLessonDone: (id: string) => boolean;
   onClear: () => void;
 }) {
@@ -304,8 +303,8 @@ function SearchResults({
                   <span className="min-w-0 flex-1">
                     <span className="line-clamp-2 text-[0.95rem] font-medium leading-snug text-fg">{l.title}</span>
                     <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-                      <span>{m?.title ?? l.module}</span>
-                      <span>· {formatMinutes(l.durationMinutes)}</span>
+                      <span>{m?.title ?? ""}</span>
+                      <span>· {formatDuration(l.durationMinutes)}</span>
                       <span>· {LEVEL_LABEL[l.level]}</span>
                       {done ? <Badge tone="success"><CircleCheck aria-hidden className="size-3" />Concluída</Badge> : null}
                     </span>

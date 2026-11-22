@@ -1,0 +1,2 @@
+id,modulo_id,ordem,titulo,duracao_min,nivel,tags,prerequisitos,resumo,pratica,video_provedor,video_ref,materiais,disponibilidade,substitui_id
+l-exemplo-1,m-primeiros-passos,1,EXEMPLO — apague esta linha e escreva o título real da aula,15,fundamento,iniciante;tiktok-shop,,Resumo curto da aula (opcional),O que a aluna pratica depois (opcional),kiwify,ID-DA-AULA-NA-KIWIFY,,em_breve,l-fundamentos-shop

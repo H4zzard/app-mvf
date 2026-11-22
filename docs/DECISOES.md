@@ -254,6 +254,46 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   saudação. O nome é exigido na tela no primeiro acesso, sem “Pular” e sem “Voltar”. Ao ajustar o
   plano depois, segue opcional. O validador do servidor não mudou.
 
+## 21/11/2026 — Catálogo de conteúdo (Prompt 09)
+
+- **D67 · Catálogo central e tipado.** O oficial (`src/content/catalogo-oficial.json`, validado por
+  `parseCatalogFile`) e o de exemplo (`src/demo/catalog-demo.ts`) são separados por `origin`.
+  - As telas, o checklist e as recomendações usam a API `catalog` (`src/lib/catalog`).
+  - `src/demo/member-area.ts` virou fachada de compatibilidade.
+- **D68 · Mídia por referência.** O catálogo guarda provedor e ID, nunca URL; links são recusados na
+  validação.
+  - YouTube e Vimeo incorporam pelo ID.
+  - Kiwify e arquivo próprio ficam em “integração pendente” até haver link assinado no servidor.
+- **D69 · Aliases de ID.** `lessonAliases` preserva o progresso e o checklist quando uma aula oficial
+  substitui a de exemplo. A rota antiga redireciona para a nova.
+- **D70 · Recomendação por dados.** `recommendedFor` por módulo + `profileTags` do onboarding
+  substituem a lista fixa; o comportamento anterior ficou preservado nos testes.
+- **D71 · Importação por CSV** (`npm run catalog -- import-csv`), com prévia por padrão e gravação
+  só com `--write`. Linhas de exemplo do modelo são recusadas.
+
+## 22/11/2026 — Estúdio IA em três geradores de texto (Prompt 09B)
+
+- **D72 · Três ferramentas independentes** em rotas próprias: `/estudio-ia/personagem`,
+  `/estudio-ia/animar` e `/estudio-ia/roteiros`. A entrada `/estudio-ia` mostra exatamente três cards.
+  A tela única anterior (`studio-view.tsx`) saiu.
+- **D73 · O app só produz TEXTO.** O DeepSeek será apenas o provedor de linguagem, e imagem e vídeo
+  ficam no Google Flow. Nenhum contrato carrega mídia, e “tenho imagem de referência” só muda o texto.
+- **D74 · Porta `TextGenerationProvider`** (`src/lib/studio/contracts.ts`) com as operações
+  `generateCharacterPrompt`, `generateAnimationPrompts` e `generateTenRecordingScripts`.
+  - Hoje só existe o `localDemoTextGenerator`, determinístico e sem rede.
+  - `getTextProvider()` devolve sempre o local; o remoto fica bloqueado.
+  - O DeepSeek só entra no servidor, em etapa futura (`docs/ESTUDIO_IA.md`).
+- **D75 · A fala aprovada é intocável.** Os takes são trechos literais do texto (teste token a token).
+  A reescrita fica desabilitada até existir IA real com prévia e confirmação.
+- **D76 · Roteiros só com fatos da aluna.** Ângulos aplicáveis aos dados informados, experiência
+  pessoal entre colchetes e alegações avisadas (`claims.ts`). Oferta só entra com confirmação.
+- **D77 · Rascunhos e fichas em memória** (`studioDrafts` e `studioCharacters` no `DemoProvider`).
+  Ficam fora da restauração opcional (D59). Virais e Marketplace abrem a ferramenta certa, e o gancho
+  do viral é só inspiração exibida, nunca fala.
+- **D78 · Biblioteca do Animador** derivada dos modelos de exemplo (`studio-templates.ts`). Os
+  100 roteiros do material de referência de terceiros **não** foram importados. `prompt-builder.ts`
+  ficou preservado com os testes, mas não é mais usado pela interface.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a

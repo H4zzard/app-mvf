@@ -17,6 +17,7 @@ import { DEMO_REWARDS } from "@/demo/rewards";
 import { DEMO_PERSIST_KEY, DEMO_SNAPSHOT_KEY, parseSnapshot, serializeSnapshot } from "@/lib/demo/snapshot";
 import { buildScenario, type ScenarioId } from "@/demo/scenarios";
 import { getStatus } from "@/lib/plan";
+import { catalog } from "@/lib/catalog";
 
 interface DemoContextValue {
   state: DemoState;
@@ -82,21 +83,28 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const planLessonTasks = useMemo(() => (plan?.tasks ?? []).filter((t) => t.lessonId), [plan]);
-  const planLessonIds = useMemo(() => new Set(planLessonTasks.map((t) => t.lessonId as string)), [planLessonTasks]);
+  // Tarefas do plano com aula, já com o ID da aula RESOLVIDO no catálogo (aliases de compatibilidade).
+  const planLessonTasks = useMemo(
+    () =>
+      (plan?.tasks ?? [])
+        .filter((t) => t.lessonId)
+        .map((t) => ({ ...t, lessonId: catalog.resolveLessonId(t.lessonId as string) })),
+    [plan],
+  );
+  const planLessonIds = useMemo(() => new Set(planLessonTasks.map((t) => t.lessonId)), [planLessonTasks]);
 
   const isLessonDone = useCallback(
     (lessonId: string) =>
       state.lessonsDone.includes(lessonId) ||
-      planLessonTasks.some((t) => t.lessonId === lessonId && getStatus(statusMap, t.id) === "completed"),
+      planLessonTasks.some((t) => t.lessonId === catalog.resolveLessonId(lessonId) && getStatus(statusMap, t.id) === "completed"),
     [state.lessonsDone, planLessonTasks, statusMap],
   );
 
   const setLessonDone = useCallback(
     (lessonId: string, done: boolean) => {
-      dispatch({ type: "lesson/set", lessonId, done });
+      dispatch({ type: "lesson/set", lessonId: catalog.resolveLessonId(lessonId), done });
       for (const t of planLessonTasks) {
-        if (t.lessonId === lessonId) setTaskStatus(t.id, done ? "completed" : "pending");
+        if (t.lessonId === catalog.resolveLessonId(lessonId)) setTaskStatus(t.id, done ? "completed" : "pending");
       }
     },
     [planLessonTasks, setTaskStatus],
@@ -107,7 +115,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     const completed = tasks.filter((t) => getStatus(statusMap, t.id) === "completed");
     const lessonsTotal = new Set([
       ...state.lessonsDone,
-      ...completed.filter((t) => t.lessonId).map((t) => t.lessonId as string),
+      ...completed.filter((t) => t.lessonId).map((t) => catalog.resolveLessonId(t.lessonId as string)),
     ]).size;
     const mine = state.posts.filter((p) => p.author.isMe);
     const myComments = state.posts.reduce((n, p) => n + p.comments.filter((c) => c.author.isMe).length, 0);

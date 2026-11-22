@@ -1,0 +1,372 @@
+{
+  "version": 1,
+  "review": [
+    "Títulos e capas dos módulos: oficiais (texto impresso nos pôsteres de imagens-area-membros/).",
+    "A CONFIRMAR pela equipe: nome do curso, trilhos (agrupamento), ordem dos módulos e perfis recomendados.",
+    "Aulas e materiais oficiais: ainda não fornecidos (listas vazias). O app usa aulas de exemplo enquanto isso."
+  ],
+  "course": {
+    "id": "mvf",
+    "title": "Formação MVF",
+    "subtitle": "Do primeiro acesso à escala, em um só lugar.",
+    "origin": "oficial"
+  },
+  "rails": [
+    {
+      "id": "primeiros-passos",
+      "title": "Primeiros passos",
+      "subtitle": "Comece por aqui e prepare sua base.",
+      "order": 1
+    },
+    {
+      "id": "formacao",
+      "title": "Formação MVF",
+      "subtitle": "O método para vender no TikTok Shop.",
+      "order": 2
+    },
+    {
+      "id": "avatar",
+      "title": "Avatar de IA · sem aparecer",
+      "subtitle": "Crie conteúdo sem precisar gravar o rosto.",
+      "order": 3
+    },
+    {
+      "id": "escala",
+      "title": "Estratégia e escala",
+      "subtitle": "Ajustes de rota e próximos níveis.",
+      "order": 4
+    },
+    {
+      "id": "suporte",
+      "title": "Suporte e acompanhamento",
+      "subtitle": "Ao vivo, mentoria e atendimento.",
+      "order": 5
+    },
+    {
+      "id": "high-wealth",
+      "title": "Desafio High Wealth e bônus",
+      "subtitle": "Mentalidade, rotina e organização.",
+      "order": 6
+    }
+  ],
+  "modules": [
+    {
+      "id": "m-primeiro-acesso",
+      "courseId": "mvf",
+      "railId": "primeiros-passos",
+      "title": "Primeiro acesso",
+      "tagline": "Comece aqui",
+      "cover": "/area-membros/primeiro-acesso.png",
+      "order": 1,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "iniciante"
+      ]
+    },
+    {
+      "id": "m-primeiros-passos",
+      "courseId": "mvf",
+      "railId": "primeiros-passos",
+      "title": "Primeiros passos",
+      "tagline": "Onboarding",
+      "cover": "/area-membros/primeiros-passos.png",
+      "order": 2,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "iniciante"
+      ]
+    },
+    {
+      "id": "m-configuracoes-essenciais",
+      "courseId": "mvf",
+      "railId": "primeiros-passos",
+      "title": "Configurações essenciais",
+      "tagline": "E escolha do produto",
+      "cover": "/area-membros/configuracoes-essenciais.png",
+      "order": 3,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "iniciante",
+        "bloqueio_produto"
+      ]
+    },
+    {
+      "id": "m-protocolo",
+      "courseId": "mvf",
+      "railId": "primeiros-passos",
+      "title": "Protocolo pré-postagem",
+      "tagline": "",
+      "cover": "/area-membros/protocolo-pre-postagem.png",
+      "order": 4,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "todos"
+      ]
+    },
+    {
+      "id": "m-virando-creator",
+      "courseId": "mvf",
+      "railId": "formacao",
+      "title": "Virando creator do TikTok Shop",
+      "tagline": "",
+      "cover": "/area-membros/virando-creator-do-tiktok-shop.png",
+      "order": 1,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "bloqueio_tiktok_shop"
+      ]
+    },
+    {
+      "id": "m-venda-sua-imagem",
+      "courseId": "mvf",
+      "railId": "formacao",
+      "title": "Venda no TikTok usando sua imagem",
+      "tagline": "",
+      "cover": "/area-membros/venda-no-tiktok-usando-sua-imagem.png",
+      "order": 2,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "aparecer",
+        "bloqueio_gravar"
+      ]
+    },
+    {
+      "id": "m-venda-sem-aparecer",
+      "courseId": "mvf",
+      "railId": "formacao",
+      "title": "Venda no TikTok sem aparecer",
+      "tagline": "",
+      "cover": "/area-membros/venda-no-tiktok-sem-aparecer.png",
+      "order": 3,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "sem_aparecer",
+        "maos_produto",
+        "narracao"
+      ]
+    },
+    {
+      "id": "m-vitrine-viral",
+      "courseId": "mvf",
+      "railId": "formacao",
+      "title": "Sua vitrine viral do zero",
+      "tagline": "",
+      "cover": "/area-membros/sua-vitrine-viral-do-zero.png",
+      "order": 4,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": []
+    },
+    {
+      "id": "m-live-shop",
+      "courseId": "mvf",
+      "railId": "formacao",
+      "title": "Live Shop",
+      "tagline": "",
+      "cover": "/area-membros/live-shop.png",
+      "order": 5,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": []
+    },
+    {
+      "id": "m-numi-produto",
+      "courseId": "mvf",
+      "railId": "formacao",
+      "title": "NUMI: o produto exclusivo",
+      "tagline": "",
+      "cover": "/area-membros/numi-produto-exclusivo.png",
+      "order": 6,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "bloqueio_produto"
+      ]
+    },
+    {
+      "id": "m-influenciador-digital",
+      "courseId": "mvf",
+      "railId": "avatar",
+      "title": "Crie seu influenciador digital e gere",
+      "tagline": "Vídeos prontos para vender, sem precisar gravar",
+      "cover": "/area-membros/crie-seu-influenciador-digital.png",
+      "order": 1,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "avatar_ia",
+        "explorar"
+      ]
+    },
+    {
+      "id": "m-laboratorio-avatares",
+      "courseId": "mvf",
+      "railId": "avatar",
+      "title": "Laboratório de avatares",
+      "tagline": "",
+      "cover": "/area-membros/laboratorio-de-avatares.png",
+      "order": 2,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "avatar_ia",
+        "explorar"
+      ]
+    },
+    {
+      "id": "m-roteirista-invisivel",
+      "courseId": "mvf",
+      "railId": "avatar",
+      "title": "Roteirista invisível",
+      "tagline": "",
+      "cover": "/area-membros/roteirista-invisivel.png",
+      "order": 3,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "todos",
+        "bloqueio_roteiro"
+      ]
+    },
+    {
+      "id": "m-ajuste-de-rota",
+      "courseId": "mvf",
+      "railId": "escala",
+      "title": "Ajuste de rota e escala",
+      "tagline": "Onde está o erro?",
+      "cover": "/area-membros/ajuste-de-rota-e-escala.png",
+      "order": 1,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "experiente"
+      ]
+    },
+    {
+      "id": "m-estrategias-secretas",
+      "courseId": "mvf",
+      "railId": "escala",
+      "title": "Estratégias secretas de escala",
+      "tagline": "",
+      "cover": "/area-membros/estrategias-secretas-de-escala.png",
+      "order": 2,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "experiente"
+      ]
+    },
+    {
+      "id": "m-seja-reconhecida",
+      "courseId": "mvf",
+      "railId": "escala",
+      "title": "Seja reconhecida",
+      "tagline": "",
+      "cover": "/area-membros/seja-reconhecida.png",
+      "order": 3,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": []
+    },
+    {
+      "id": "m-suporte-individual",
+      "courseId": "mvf",
+      "railId": "suporte",
+      "title": "Suporte individual",
+      "tagline": "Club VIP e suporte",
+      "cover": "/area-membros/suporte-individual.png",
+      "order": 1,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [],
+      "href": "/suporte"
+    },
+    {
+      "id": "m-aulas-ao-vivo",
+      "courseId": "mvf",
+      "railId": "suporte",
+      "title": "Aulas ao vivo",
+      "tagline": "Acesse aqui",
+      "cover": "/area-membros/aulas-ao-vivo.png",
+      "order": 2,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [],
+      "href": "/lives"
+    },
+    {
+      "id": "m-acompanhamento-scale",
+      "courseId": "mvf",
+      "railId": "suporte",
+      "title": "Acompanhamento MVF Scale",
+      "tagline": "Mentoria MVF Scale",
+      "cover": "/area-membros/acompanhamento-mvf-scale.png",
+      "order": 3,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": []
+    },
+    {
+      "id": "m-desafio-21-dias",
+      "courseId": "mvf",
+      "railId": "high-wealth",
+      "title": "21 dias Desafio High Wealth",
+      "tagline": "",
+      "cover": "/area-membros/desafio-21-dias-high-wealth.png",
+      "order": 1,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": []
+    },
+    {
+      "id": "m-frequencias",
+      "courseId": "mvf",
+      "railId": "high-wealth",
+      "title": "Frequências da prosperidade",
+      "tagline": "",
+      "cover": "/area-membros/frequencias-da-prosperidade.png",
+      "order": 2,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": []
+    },
+    {
+      "id": "m-audios-autoafirmacao",
+      "courseId": "mvf",
+      "railId": "high-wealth",
+      "title": "Áudios de autoafirmação",
+      "tagline": "",
+      "cover": "/area-membros/audios-de-autoafirmacao.png",
+      "order": 3,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "bloqueio_organizacao"
+      ]
+    },
+    {
+      "id": "m-planilha-financeira",
+      "courseId": "mvf",
+      "railId": "high-wealth",
+      "title": "Planilha da organização financeira",
+      "tagline": "",
+      "cover": "/area-membros/planilha-de-organizacao-financeira.png",
+      "order": 4,
+      "origin": "oficial",
+      "availability": "disponivel",
+      "recommendedFor": [
+        "bloqueio_organizacao"
+      ]
+    }
+  ],
+  "lessons": [],
+  "materials": [],
+  "lessonAliases": {}
+}

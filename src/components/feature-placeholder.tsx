@@ -27,11 +27,11 @@ const PLANNED_SCOPE: Record<string, { points: string[]; note?: string }> = {
   },
   "estudio-ia": {
     points: [
-      "Geração de prompts, roteiros, personagens, cenas e movimentos.",
-      "Consistência de personagem para uso no Google Flow (português e inglês).",
-      "Base com roteiros validados pela equipe.",
+      "Criar Personagem: prompt de texto para criar a imagem no Google Flow.",
+      "Animar Personagem: prompts de vídeo por take, com a sua fala intacta, para o Google Flow.",
+      "Roteiros para Gravar Aparecendo: dez roteiros escritos para gravar com o celular.",
     ],
-    note: "Na primeira fase o app não gera vídeos — prepara o material para uso externo.",
+    note: "O app escreve só texto. Imagens e vídeos são feitos fora do app, no Google Flow.",
   },
   marketplace: {
     points: [

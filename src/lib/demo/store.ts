@@ -8,7 +8,8 @@
  */
 import type { CommunityPost, SpaceId } from "../../demo/community.ts";
 import { COMMUNITY_LIMITS, SEED_POSTS, SPACES } from "../../demo/community.ts";
-import type { StudioInput } from "../studio/prompt-builder.ts";
+import type { CharacterSheet } from "../studio/contracts.ts";
+import type { StudioDrafts, StudioTool } from "../studio/drafts.ts";
 
 export type FavoriteKind = "virals" | "products" | "templates" | "materials";
 
@@ -18,8 +19,20 @@ export interface SavedPrompt {
   text: string;
 }
 
-/** Semente para o Estúdio IA (ex.: “Usar no Estúdio” a partir de Virais/Marketplace). */
-export type StudioSeed = Partial<Pick<StudioInput, "hook" | "productName" | "templateId" | "format">> & { from: string };
+/**
+ * Semente para o Estúdio IA (ex.: “Usar no Estúdio” a partir de Virais/Marketplace,
+ * ou “Usar no Animador” a partir de uma ficha). Consumida uma vez pela ferramenta
+ * indicada em `target`. `hook` é só INSPIRAÇÃO exibida: nunca vira fala sozinho.
+ */
+export interface StudioSeed {
+  from: string;
+  target?: StudioTool;
+  hook?: string;
+  productName?: string;
+  productCategory?: string;
+  characterId?: string;
+  format?: "avatar" | "maos_produto";
+}
 
 export interface DemoState {
   /** Aulas marcadas como concluídas na biblioteca (as do plano também refletem no plano). */
@@ -38,6 +51,10 @@ export interface DemoState {
   history: HistoryEntry[];
   supportRequests: number;
   studioSeed: StudioSeed | null;
+  /** Fichas de personagem salvas no Estúdio (demo, em memória). */
+  studioCharacters: CharacterSheet[];
+  /** Rascunhos das três ferramentas do Estúdio (demo, em memória). */
+  studioDrafts: StudioDrafts;
   /** Contador para IDs determinísticos de itens criados na sessão. */
   seq: number;
 }
@@ -49,6 +66,8 @@ export interface HistoryEntry {
   /** XP ganho (desafio) ou pontos usados (recompensa). */
   points: number;
 }
+
+export const STUDIO_MAX_CHARACTERS = 20;
 
 export const ME = { name: "Você", initials: "EU", isMe: true } as const;
 
@@ -66,6 +85,8 @@ export function initialDemoState(overrides: Partial<DemoState> = {}): DemoState 
     history: [],
     supportRequests: 0,
     studioSeed: null,
+    studioCharacters: [],
+    studioDrafts: {},
     seq: 0,
     ...overrides,
   };
@@ -90,6 +111,9 @@ export type DemoAction =
   | { type: "reward/redeem"; rewardId: string; label: string; cost: number; balance: number }
   | { type: "support/send" }
   | { type: "studio/seed"; seed: StudioSeed | null }
+  | { type: "studio/draft"; draft: StudioDrafts }
+  | { type: "studio/character-save"; sheet: CharacterSheet }
+  | { type: "studio/character-remove"; id: string }
   | { type: "reset"; state: DemoState };
 
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -206,6 +230,15 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
       return { ...state, supportRequests: state.supportRequests + 1 };
     case "studio/seed":
       return { ...state, studioSeed: action.seed };
+    case "studio/draft":
+      return { ...state, studioDrafts: { ...state.studioDrafts, ...action.draft } };
+    case "studio/character-save": {
+      if (state.studioCharacters.length >= STUDIO_MAX_CHARACTERS && !state.studioCharacters.some((c) => c.id === action.sheet.id)) return state;
+      const rest = state.studioCharacters.filter((c) => c.id !== action.sheet.id);
+      return { ...state, studioCharacters: [action.sheet, ...rest] };
+    }
+    case "studio/character-remove":
+      return { ...state, studioCharacters: state.studioCharacters.filter((c) => c.id !== action.id) };
     case "reset":
       return action.state;
   }

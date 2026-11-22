@@ -91,6 +91,21 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
   aleatórias: módulo sem capa usa fallback visual, nunca foto inventada.
 - Logo oficial: `BRAND.logoSrc` (`/area-membros/logo-numi.jpg`).
 
+## Catálogo de conteúdo (Prompt 09)
+
+- Fonte única: `src/content/catalogo-oficial.json` (oficial) + `src/demo/catalog-demo.ts` (exemplo),
+  acessados só pela API `catalog` (`src/lib/catalog`). Regras e preenchimento em `docs/CATALOGO.md`.
+- Nunca inventar aula ou material oficial; nunca colocar URL de vídeo ou arquivo no catálogo (só referência).
+- Nunca renomear ID de aula publicada; para substituir, use `lessonAliases`.
+- Depois de editar o catálogo: `npm run catalog -- check`.
+
+## Estúdio IA (Prompt 09B)
+
+- Três ferramentas de TEXTO: `src/lib/studio/` (puro) + `src/components/estudio/`. Regras em `docs/ESTUDIO_IA.md`.
+- O app nunca gera imagem, voz ou vídeo; tudo isso é feito no Google Flow. DeepSeek = só linguagem, só no servidor, ainda não conectado.
+- Nunca alterar a fala aprovada ao dividir em takes. Nunca inventar fatos, preços, depoimentos ou alegações nos roteiros.
+- Resultado local sempre rotulado “modelo local (sem IA)”. Sem `fetch`, chave ou `NEXT_PUBLIC_*` no Estúdio (há teste).
+
 ## Gamificação da demo (Prompt 07)
 
 - Fonte única: `src/lib/demo/xp.ts` (XP, níveis, marcos, missões) e `src/lib/demo/economy.ts`

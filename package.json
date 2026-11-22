@@ -10,6 +10,7 @@
     "lint": "eslint",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.ts\" \"supabase/tests/*.test.ts\"",
     "plans:examples": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/print-example-plans.ts",
+    "catalog": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/catalog.ts",
     "kiwify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/kiwify.ts",
     "admin:role": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/admin-role.ts",
     "access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/access.ts",

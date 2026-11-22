@@ -4,19 +4,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, CirclePlay, Clock, Sparkles } from "lucide-react";
-import type { Lesson } from "@/types";
+import type { CatalogLesson, LessonLevel } from "@/types/catalog";
 import type { MemberModule } from "@/demo/member-area";
-import { LIBRARY_LESSONS } from "@/demo/library";
+import { catalog } from "@/lib/catalog";
 import { Sheet } from "@/components/ui/sheet";
 import { DemoBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { formatMinutes } from "@/lib/plan";
 import { cn } from "@/lib/cn";
 
-export const LEVEL_LABEL: Record<Lesson["level"], string> = { fundamento: "Fundamento", intermediario: "Intermediário", avancado: "Avançado" };
+export const LEVEL_LABEL: Record<LessonLevel, string> = { fundamento: "Fundamento", intermediario: "Intermediário", avancado: "Avançado" };
 
-export function lessonsOfModule(m: MemberModule): Lesson[] {
-  return m.lessonIds.map((id) => LIBRARY_LESSONS.find((l) => l.id === id)).filter((l): l is Lesson => l !== undefined);
+/** Duração conhecida ou “a definir” (o catálogo aceita `null`). */
+export function formatDuration(minutes: number | null): string {
+  return minutes === null ? "Duração a definir" : formatMinutes(minutes);
+}
+
+/** Aulas visíveis do módulo, na ordem do catálogo (oficiais ou de exemplo). */
+export function lessonsOfModule(m: Pick<MemberModule, "id">): CatalogLesson[] {
+  return catalog.lessonsOfModule(m.id);
 }
 
 /* --------------------------------- Trilho --------------------------------- */
@@ -152,8 +158,10 @@ export function ModuleSheet({
   onClose: () => void;
 }) {
   const lessons = lessonsOfModule(module);
-  const next = lessons.find((l) => !isLessonDone(l.id)) ?? lessons[0];
+  const playable = lessons.filter((l) => l.availability === "disponivel");
+  const next = playable.find((l) => !isLessonDone(l.id)) ?? playable[0];
   const doneCount = lessons.filter((l) => isLessonDone(l.id)).length;
+  const official = lessons.length > 0 && lessons.every((l) => l.origin === "oficial");
 
   return (
     <Sheet
@@ -179,7 +187,7 @@ export function ModuleSheet({
           <Image src={module.cover} alt={`Capa do módulo ${module.title}`} fill sizes="112px" className="object-cover" />
         </span>
         <div className="min-w-0 space-y-2">
-          <DemoBadge label="Organização de exemplo" />
+          {official ? null : <DemoBadge label={lessons.length > 0 ? "Aulas de exemplo" : "Organização de exemplo"} />}
           {lessons.length > 0 ? (
             <p className="text-sm text-muted">
               {lessons.length} {lessons.length === 1 ? "aula" : "aulas"} · {doneCount} concluída{doneCount === 1 ? "" : "s"}
@@ -197,6 +205,17 @@ export function ModuleSheet({
         <ol className="mt-5 space-y-2">
           {lessons.map((l, i) => {
             const done = isLessonDone(l.id);
+            if (l.availability !== "disponivel") {
+              return (
+                <li key={l.id} className="flex items-center gap-3 rounded-xl border border-dashed border-line-strong p-3 opacity-80">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-canvas text-xs font-bold text-subtle ring-1 ring-line">{i + 1}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="line-clamp-2 text-sm font-medium text-fg">{l.title}</span>
+                    <span className="mt-0.5 block text-xs text-muted">Em breve</span>
+                  </span>
+                </li>
+              );
+            }
             return (
               <li key={l.id}>
                 <Link href={`/aulas/${l.id}`} className="flex items-center gap-3 rounded-xl border border-line p-3 transition-colors hover:border-brand/30 hover:bg-blush/40">
@@ -207,7 +226,7 @@ export function ModuleSheet({
                     <span className="line-clamp-2 text-sm font-medium text-fg">{l.title}</span>
                     <span className="mt-0.5 flex items-center gap-1 text-xs text-muted">
                       <Clock aria-hidden className="size-3" />
-                      {formatMinutes(l.durationMinutes)} · {LEVEL_LABEL[l.level]}
+                      {formatDuration(l.durationMinutes)} · {LEVEL_LABEL[l.level]}
                       {done ? <span className="sr-only"> · concluída</span> : null}
                     </span>
                   </span>
@@ -219,7 +238,9 @@ export function ModuleSheet({
         </ol>
       ) : null}
       <p className="mt-5 text-xs text-muted">
-        Capa e nome do módulo são oficiais. As aulas listadas são exemplos da demonstração.
+        {official
+          ? "Capa, nome e aulas oficiais do MVF."
+          : "Capa e nome do módulo são oficiais. As aulas listadas são exemplos da demonstração."}
       </p>
     </Sheet>
   );

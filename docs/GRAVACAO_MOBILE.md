@@ -72,8 +72,8 @@ inspiração em vídeos virais → roteiro/prompt → comunidade → gamificaç�
 | 0–5 s | Início | — | “Olá, Marina”, **Seu próximo passo** | O app responde “o que faço agora?” |
 | 5–10 s | Aula | **Abrir aula** | Capa do módulo, “Essa aula faz parte do seu plano” | Plano e aula conectados |
 | 10–17 s | Aulas | Barra → **Aulas**, deslizar o trilho “Recomendado para você” | Hero Formação MVF, capas oficiais | Catálogo premium estilo streaming |
-| 17–23 s | Virais | Barra → **Virais**, tocar um card → **Usar no Estúdio IA** | Gancho e estrutura do vídeo de referência | Inspiração organizada |
-| 23–30 s | Estúdio IA | **Hidratante facial** → **Gerar roteiro e prompts** | Pré-visualização com cenas e prompts | Roteiro pronto para o Google Flow |
+| 17–23 s | Virais | Barra → **Virais**, tocar um card → **Usar no Estúdio IA** | Abre a ferramenta certa com “Inspirado em” | Inspiração organizada |
+| 23–30 s | Estúdio IA | Em **Roteiros para Gravar Aparecendo**: **Hidratante facial**, descrição e modo de uso já digitados → **Gerar 10 roteiros** | Dez roteiros diferentes, prontos para gravar | Roteiro pronto para gravar com o celular |
 
 ### 60 segundos · cenário “Aluna em evolução”
 
@@ -83,7 +83,7 @@ inspiração em vídeos virais → roteiro/prompt → comunidade → gamificaç�
 | 6–14 s | Plano | Barra → **Plano**, marcar uma tarefa | Progresso subindo, etapas |
 | 14–24 s | Aula | Barra → **Aulas** → tocar um módulo → abrir aula → **Marcar como concluída** | Sheet do módulo, aula concluída |
 | 24–32 s | Aulas | Voltar e deslizar dois trilhos | Capas oficiais por trilho |
-| 32–42 s | Virais → Estúdio | Card → **Usar no Estúdio IA** → produto → **Gerar** → **Copiar tudo** | “Copiado!” |
+| 32–42 s | Estúdio | Estúdio IA → **Criar Personagem** → **Gerar prompt** → **Usar no Animador** → escolher roteiro → **Gerar prompts de animação** → **Copiar tudo** | Takes com a fala exata, “Copiado!” |
 | 42–50 s | Comunidade | Mais → **Comunidade** → **Compartilhe algo** → publicar | Postagem marcada “Você” |
 | 50–60 s | Conquistas | Mais → **Conquistas** | Nível, XP e selos atualizados |
 
@@ -112,8 +112,9 @@ Para começar pelo onboarding, use **Nova aluna** e mostre 3–4 perguntas antes
   sem estoque nem envio.
 - **Sem promessas:** fale em “possibilidade” da primeira comissão, nunca em resultado garantido ou
   renda.
-- **Estúdio IA:** gera **prompts e roteiros**, não vídeos. O vídeo é feito fora do app, no Google
-  Flow, e o app não se conecta a ele.
+- **Estúdio IA:** escreve **só texto**: prompts de imagem e de vídeo para colar no Google Flow e
+  roteiros para gravar. O app não cria imagem, voz nem vídeo, e não se conecta ao Flow. Na demo os
+  textos vêm de um **modelo local**: não diga que uma IA (DeepSeek ou outra) gerou o resultado.
 - **Funcionalidades simuladas:** comunidade, lives, suporte, loja, materiais e virais são
   demonstração. Não anuncie como integrações reais.
 - **Assets oficiais:** a logo da NUMI, o banner e as capas dos módulos são oficiais. As aulas

@@ -15,29 +15,32 @@ import {
   NotebookPen,
   Route,
   Signal,
-  VideoOff,
 } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { usePlan } from "@/components/plan/plan-provider";
-import { LEVEL_LABEL, ModuleCard, ModuleSheet, Rail, lessonsOfModule } from "@/components/aulas/catalog-parts";
+import { LEVEL_LABEL, ModuleCard, ModuleSheet, Rail, formatDuration, lessonsOfModule } from "@/components/aulas/catalog-parts";
+import { LessonPlayer } from "@/components/aulas/lesson-player";
 import { DemoBadge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LIBRARY_LESSONS, getLessonDetail, type LessonMaterial } from "@/demo/library";
-import { MEMBER_ASSETS, MEMBER_MODULES, getModule, moduleOfLesson, modulesOfRail } from "@/demo/member-area";
-import { formatMinutes, getStatus } from "@/lib/plan";
+import { MEMBER_ASSETS, getModule, moduleOfLesson, modulesOfRail } from "@/demo/member-area";
+import { catalog } from "@/lib/catalog";
+import type { MaterialKind } from "@/types/catalog";
+import { getStatus } from "@/lib/plan";
 import { cn } from "@/lib/cn";
 
-const MATERIAL_ICON: Record<LessonMaterial["kind"], typeof FileText> = {
+const MATERIAL_ICON: Record<MaterialKind, typeof FileText> = {
   checklist: ListChecks,
   modelo: ClipboardList,
   guia: FileText,
 };
 
 /**
- * Página da aula (DEMONSTRAÇÃO). Sem vídeo disponível, mostra o estado
- * honesto “Vídeo de exemplo ainda não adicionado” — nunca uma mídia fictícia.
- * Marcar como concluída também atualiza a tarefa correspondente do plano.
+ * Página da aula (dados do CATÁLOGO: oficial ou de exemplo, sempre identificado).
+ * O player decide o estado pela referência de mídia (sem URL privada); sem vídeo,
+ * mostra estado profissional — nunca uma mídia fictícia.
+ * Marcar como concluída também atualiza a tarefa correspondente do plano
+ * (comparando IDs já resolvidos pelos aliases de compatibilidade).
  */
 export function LessonDetail({ lessonId }: { lessonId: string }) {
   const { isLessonDone, setLessonDone } = useDemo();
@@ -45,21 +48,21 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
   const [openModuleId, setOpenModuleId] = useState<string | null>(null);
   useLayoutEffect(() => () => setOpenModuleId(null), []);
 
-  const lesson = LIBRARY_LESSONS.find((l) => l.id === lessonId);
+  const lesson = catalog.getLesson(lessonId);
   if (!lesson) return null;
 
-  const detail = getLessonDetail(lesson.id);
   const done = isLessonDone(lesson.id);
-  const planTask = plan?.tasks.find((t) => t.lessonId === lesson.id);
+  const planTask = plan?.tasks.find((t) => t.lessonId && catalog.resolveLessonId(t.lessonId) === lesson.id);
   const mod = moduleOfLesson(lesson.id);
   const cover = mod?.cover ?? MEMBER_ASSETS.banner;
   const trail = mod ? lessonsOfModule(mod) : [lesson];
   const index = trail.findIndex((l) => l.id === lesson.id);
+  const materials = catalog.materials().filter((m) => lesson.materialIds.includes(m.id));
+  const isDemo = lesson.origin === "demonstrativo";
+  const canComplete = lesson.availability === "disponivel";
 
-  // Próxima aula: a seguinte no módulo; senão, a primeira do próximo módulo com aulas.
-  const catalogOrder = MEMBER_MODULES.flatMap((m) => m.lessonIds);
-  const nextId = trail[index + 1]?.id ?? catalogOrder[catalogOrder.indexOf(lesson.id) + 1];
-  const next = LIBRARY_LESSONS.find((l) => l.id === nextId);
+  // Próxima aula: a seguinte na ordem do catálogo (no módulo, depois no próximo módulo com aulas).
+  const next = catalog.nextInTrail(lesson.id);
 
   const related = mod ? modulesOfRail(mod.railId).filter((m) => m.id !== mod.id) : [];
   const progressOf = (id: string) => {
@@ -89,7 +92,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
               <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/75 sm:text-sm">
                 <span className="inline-flex items-center gap-1">
                   <Clock aria-hidden className="size-3.5" />
-                  {formatMinutes(lesson.durationMinutes)}
+                  {formatDuration(lesson.durationMinutes)}
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Signal aria-hidden className="size-3.5" />
@@ -104,25 +107,11 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
 
       <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start">
         <div className="space-y-6">
-          {/* Vídeo (placeholder honesto) */}
-          {detail.video ? (
-            <video controls preload="metadata" src={detail.video} className="aspect-video w-full rounded-2xl bg-ink" />
-          ) : (
-            <div className="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl bg-ink text-center text-white shadow-raised">
-              <Image src={cover} alt="" fill sizes="(max-width: 1024px) 100vw, 700px" className="scale-110 object-cover opacity-30 blur-md" />
-              <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgb(23_15_25/0.35),rgb(23_15_25/0.85))]" />
-              <div className="relative px-6">
-                <span className="mx-auto grid size-14 place-items-center rounded-full bg-white/12 ring-1 ring-white/25 backdrop-blur">
-                  <VideoOff aria-hidden className="size-6" />
-                </span>
-                <p className="mt-3 font-serif text-lg font-semibold">Vídeo de exemplo ainda não adicionado</p>
-                <p className="mx-auto mt-1 max-w-xs text-xs text-white/70">As aulas oficiais continuam na área de membros atual até a migração.</p>
-              </div>
-            </div>
-          )}
+          {/* Vídeo: estado decidido pela referência de mídia do catálogo */}
+          <LessonPlayer media={lesson.media} availability={lesson.availability} cover={cover} title={lesson.title} />
 
           <div className="flex flex-wrap items-center gap-2">
-            <DemoBadge label="Aula de exemplo" />
+            {isDemo ? <DemoBadge label="Aula de exemplo" /> : null}
             {done ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success">
                 <CircleCheck aria-hidden className="size-3" /> Concluída
@@ -130,10 +119,10 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
             ) : null}
           </div>
 
-          <p className="text-[0.95rem] leading-relaxed text-fg sm:text-base">{detail.summary}</p>
+          {lesson.summary ? <p className="text-[0.95rem] leading-relaxed text-fg sm:text-base">{lesson.summary}</p> : null}
 
           <div className="grid gap-2.5 sm:grid-cols-2">
-            <Button size="lg" variant={done ? "secondary" : "primary"} onClick={() => setLessonDone(lesson.id, !done)} aria-pressed={done}>
+            <Button size="lg" variant={done ? "secondary" : "primary"} onClick={() => setLessonDone(lesson.id, !done)} aria-pressed={done} disabled={!canComplete}>
               <Check aria-hidden className="size-4" />
               {done ? "Concluída · desmarcar" : "Marcar como concluída"}
             </Button>
@@ -174,19 +163,19 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
                 <NotebookPen aria-hidden className="size-4 text-brand" />
                 Pratique depois da aula
               </h2>
-              <p className="mt-1 text-sm text-muted">{detail.practice}</p>
+              <p className="mt-1 text-sm text-muted">{lesson.practice || "Atividade prática em preparação."}</p>
             </section>
-            {detail.materials.length > 0 ? (
+            {materials.length > 0 ? (
               <section>
                 <h2 className="text-sm font-semibold text-fg">Materiais</h2>
                 <ul className="mt-2 space-y-2">
-                  {detail.materials.map((m) => {
+                  {materials.map((m) => {
                     const Icon = MATERIAL_ICON[m.kind];
                     return (
                       <li key={m.id} className="flex items-center gap-3 rounded-xl border border-line p-3">
                         <Icon aria-hidden className="size-4 shrink-0 text-brand" />
                         <span className="min-w-0 flex-1 text-sm text-fg">{m.title}</span>
-                        <span className="shrink-0 text-xs text-subtle">Arquivo em breve</span>
+                        <span className="shrink-0 text-xs text-subtle">{m.file.kind === "none" ? "Arquivo em breve" : "Integração pendente"}</span>
                       </li>
                     );
                   })}
@@ -226,7 +215,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
                     <span className="min-w-0 flex-1">
                       <span className="line-clamp-2 text-sm font-medium text-fg">{l.title}</span>
                       <span className="text-xs text-muted">
-                        {formatMinutes(l.durationMinutes)}
+                        {formatDuration(l.durationMinutes)}
                         {current ? " · você está aqui" : ldone ? " · concluída" : ""}
                       </span>
                     </span>

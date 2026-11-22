@@ -1,5 +1,9 @@
 # Área de membros (Aulas) — catálogo em trilhos
 
+> **Atualização (Prompt 09):** os dados agora vêm do catálogo central. Veja
+> [CATALOGO.md](CATALOGO.md) para a estrutura, a validação, a importação por planilha e as
+> pendências. As tabelas abaixo continuam valendo como referência do mapeamento das capas.
+
 A tela `/aulas` (modo demo) é um catálogo no estilo streaming, com identidade NUMI:
 - hero com o banner oficial;
 - “Continue assistindo”;

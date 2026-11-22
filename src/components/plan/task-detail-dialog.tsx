@@ -8,7 +8,7 @@ import { useOptionalDemo } from "@/components/demo/demo-provider";
 import { TaskDuration, TaskStatusBadge, TaskTypeLabel } from "@/components/plan/task-meta";
 import { Button } from "@/components/ui/button";
 import { DemoBadge } from "@/components/ui/badge";
-import { getDemoLesson } from "@/demo/lessons";
+import { catalog } from "@/lib/catalog";
 import { formatTaskDays, getStage, getStatus } from "@/lib/plan";
 import { cn } from "@/lib/cn";
 
@@ -33,7 +33,8 @@ export function TaskDetailDialog({ taskId, onClose }: { taskId: string; onClose:
 
   const status = getStatus(statusMap, task.id);
   const stage = getStage(plan, task.stageId);
-  const lesson = getDemoLesson(task.lessonId);
+  const lesson = task.lessonId ? catalog.getLesson(task.lessonId) : undefined;
+  const lessonModule = lesson ? catalog.getModule(lesson.moduleId) : undefined;
   const titleId = `task-dialog-title-${task.id}`;
   const prereqs = task.prerequisites
     .map((id) => plan.tasks.find((t) => t.id === id))
@@ -149,7 +150,7 @@ export function TaskDetailDialog({ taskId, onClose }: { taskId: string; onClose:
                 Aula relacionada
               </h3>
               <p className="mt-1 text-sm text-fg">{lesson.title}</p>
-              <p className="text-xs text-muted">Módulo: {lesson.module}</p>
+              <p className="text-xs text-muted">Módulo: {lessonModule?.title ?? "—"}</p>
               {modulesAvailable ? (
                 <Link
                   href={`/aulas/${lesson.id}`}
