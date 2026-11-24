@@ -32,7 +32,7 @@ export function AppHeader() {
   const parent = dest && item && item.href !== dest.href ? dest.fullLabel : undefined;
 
   return (
-    <header className="mvf-on-wine sticky top-0 z-30 border-b border-white/10 bg-wine-deep text-on-wine">
+    <header className="mvf-on-wine mvf-glass sticky top-0 z-30 rounded-b-[1.25rem] text-on-wine lg:rounded-none lg:border-b lg:border-white/10 lg:bg-wine-deep lg:shadow-none lg:backdrop-blur-none">
       <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 pt-[env(safe-area-inset-top)] box-content sm:h-16 sm:px-6 lg:px-8">
         <BrandMark compact className="hidden sm:flex lg:hidden" />
         <BrandMark className="sm:hidden" />
@@ -42,9 +42,9 @@ export function AppHeader() {
           <ol className="flex items-center gap-1.5 text-sm">
             {parent ? (
               <>
-                <li className="text-on-wine-muted">{parent}</li>
+                <li className="text-on-glass-muted">{parent}</li>
                 <li aria-hidden>
-                  <ChevronRight className="size-3.5 text-on-wine-muted" />
+                  <ChevronRight className="size-3.5 text-on-glass-muted" />
                 </li>
               </>
             ) : null}
@@ -77,7 +77,7 @@ export function AppHeader() {
             </span>
             <span className="hidden leading-tight sm:block">
               <span className="block text-sm font-semibold text-on-wine">{user.displayName}</span>
-              <span className="block text-xs text-on-wine-muted">
+              <span className="block text-xs text-on-glass-muted">
                 {ROLE_LABEL[user.role] ?? "Aluna"}
                 {demo ? " · demo" : ""}
               </span>
@@ -93,7 +93,7 @@ export function AppHeader() {
                 type="submit"
                 aria-label="Sair da conta"
                 title="Sair"
-                className="grid size-11 place-items-center rounded-full border border-white/15 text-on-wine-muted transition-colors hover:bg-wine-soft hover:text-on-wine"
+                className="grid size-11 place-items-center rounded-full border border-white/15 text-on-glass-muted transition-colors hover:bg-wine-soft hover:text-on-wine"
               >
                 <LogOut aria-hidden className="size-[18px]" />
               </button>

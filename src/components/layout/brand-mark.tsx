@@ -37,7 +37,7 @@ export function BrandMark({ compact = false, className }: { compact?: boolean; c
           <span className="block truncate text-[0.95rem] font-semibold tracking-[-0.01em] text-on-wine">
             {BRAND.appName}
           </span>
-          <span className="block truncate text-xs text-on-wine-muted">{BRAND.tagline}</span>
+          <span className="block truncate text-xs text-on-glass-muted">{BRAND.tagline}</span>
         </span>
       ) : null}
     </Link>

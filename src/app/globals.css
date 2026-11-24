@@ -30,6 +30,8 @@
   --mvf-on-wine: #f6ece2; /* texto bege sobre vinho */
   --mvf-on-wine-muted: #d3bab3; /* texto secundário sobre vinho */
   --mvf-accent: #e7a0b1; /* rosa de destaque sobre vinho (indicadores) */
+  --mvf-glass: 124 32 57; /* bordô rosado (quase vinho) do vidro fosco: cabeçalho e barra no celular */
+  --mvf-on-glass-muted: #ecdbd4; /* rótulo inativo sobre o vidro (≥ 4,6:1 mesmo sobre conteúdo claro) */
   --mvf-ink: #2b0e18; /* quase preto (vinho-noite) para cartões especiais */
   --mvf-ink-soft: #3c1623;
 
@@ -63,6 +65,7 @@
   --color-on-wine: var(--mvf-on-wine);
   --color-on-wine-muted: var(--mvf-on-wine-muted);
   --color-accent: var(--mvf-accent);
+  --color-on-glass-muted: var(--mvf-on-glass-muted);
   --color-ink: var(--mvf-ink);
   --color-ink-soft: var(--mvf-ink-soft);
   --color-fg: var(--mvf-fg);
@@ -113,6 +116,27 @@ body {
   outline: 2px solid var(--mvf-brand);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/*
+ * Vidro fosco bordô (cabeçalho e barra inferior no celular/tablet): translúcido o
+ * bastante para ver o conteúdo passando, embaçado, sem perder a leitura. Fica em
+ * @layer components para que utilitários (ex.: lg:bg-wine-deep) possam sobrescrever.
+ */
+@layer components {
+  .mvf-glass {
+    background-color: rgb(var(--mvf-glass) / 0.86);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 8px 24px -14px rgb(36 8 18 / 0.55);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .mvf-glass {
+      background-color: rgb(var(--mvf-glass) / 0.97);
+    }
+  }
 }
 
 /* Sobre a moldura vinho, o foco usa o rosa de destaque (bordô some no vinho). */

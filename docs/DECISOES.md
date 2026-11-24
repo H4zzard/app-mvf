@@ -430,6 +430,11 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   ficaram, recoloridos em vinho, porque garantem leitura). Mapa do plano em linha do tempo reta.
 - **D120 · Foco visível sobre vinho.** `.mvf-on-wine` troca o contorno de foco para o rosa de
   destaque; painéis claros dentro da moldura (`.mvf-light`) voltam ao bordô.
+- **D121 · Vidro fosco bordô no celular.** Abaixo de 1024 px, cabeçalho e barra inferior usam `.mvf-glass`
+  (bordô rosado `--mvf-glass` 124 32 57 a 86% + blur 14 px), com cantos de 20 px nas bordas voltadas ao
+  conteúdo. Opacidade escolhida pelo pior caso (conteúdo claro por trás): texto ≥ 5,7:1, rótulo inativo
+  (`on-glass-muted`) ≥ 4,6:1. Sem suporte a blur, cai para 97% de opacidade. Destino ativo da barra: cápsula
+  clara em relevo e ícone 10% maior. Desktop mantém a moldura vinho sólida.
 
 ## Em aberto (não decidir sem o operador/expert)
 

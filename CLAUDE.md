@@ -52,6 +52,8 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - Tokens de design: `src/app/globals.css` (`:root` + `@theme`). Não espalhe hex pelas páginas.
   Identidade 2.0: moldura e destaques em `wine`/`wine-deep` com texto `on-wine`; superfícies `canvas`/`card`/`paper`
   (sem branco puro); ação em `brand`. Blocos escuros levam `mvf-on-wine` (foco visível); fonte única Inter.
+  Cabeçalho e barra no celular: vidro bordô `.mvf-glass` (texto secundário em `on-glass-muted`).
+  Se o CSS novo não aparecer no dev, o cache do Turbopack está velho: pare o servidor e apague `.next`.
 
 ## Acesso e dados (Prompt 03)
 

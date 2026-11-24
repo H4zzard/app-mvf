@@ -42,7 +42,7 @@ export function NotificationsButton() {
         aria-controls={panelId}
         onClick={() => setOpenOn(open ? null : pathname)}
         className={cn(
-          "grid size-11 place-items-center rounded-full border border-white/15 text-on-wine-muted transition-colors hover:bg-wine-soft hover:text-on-wine",
+          "grid size-11 place-items-center rounded-full border border-white/15 text-on-glass-muted transition-colors hover:bg-wine-soft hover:text-on-wine",
           open && "border-on-wine/40 bg-wine-soft text-on-wine",
         )}
       >

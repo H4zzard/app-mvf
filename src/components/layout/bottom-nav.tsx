@@ -20,7 +20,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="mvf-on-wine fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-wine-deep pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-16px_rgb(36_8_18/0.6)] lg:hidden"
+      className="mvf-on-wine mvf-glass fixed inset-x-0 bottom-0 z-40 rounded-t-[1.25rem] pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <ul className="mx-auto grid h-16 max-w-2xl grid-cols-7">
         {PRIMARY_NAV.map((item) => {
@@ -36,20 +36,29 @@ export function BottomNav() {
                 className={cn(
                   "relative flex h-full min-w-11 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium leading-none tracking-tight transition-colors",
                   "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent",
-                  active ? "bg-wine-soft/55 text-on-wine" : "text-on-wine-muted hover:text-on-wine",
+                  active ? "text-white" : "text-on-glass-muted hover:text-on-wine",
                 )}
               >
-                {/* Indicador discreto do destino ativo */}
+                {/* Destino ativo: cápsula clara em relevo (“decalque”), um pouco maior. */}
                 <span
                   aria-hidden
-                  className={cn("absolute top-0 h-[2px] w-8 rounded-b-sm bg-accent", active ? "opacity-100" : "opacity-0")}
+                  className={cn(
+                    "absolute inset-x-0.5 inset-y-1.5 rounded-xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+                    active
+                      ? "scale-100 bg-white/16 opacity-100 ring-1 ring-white/25 shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_6px_14px_-8px_rgb(20_4_10/0.7)]"
+                      : "scale-90 opacity-0",
+                  )}
                 />
-                <Icon aria-hidden className={cn("size-[21px] shrink-0", active && "text-accent")} strokeWidth={active ? 2.1 : 1.6} />
-                <span aria-hidden className={cn("whitespace-nowrap", item.compactLabel && "max-[359px]:hidden", active && "font-semibold")}>
+                <Icon
+                  aria-hidden
+                  className={cn("relative size-[21px] shrink-0 transition-transform duration-200 ease-out motion-reduce:transition-none", active && "-translate-y-px scale-110")}
+                  strokeWidth={active ? 2.2 : 1.6}
+                />
+                <span aria-hidden className={cn("relative whitespace-nowrap", item.compactLabel && "max-[359px]:hidden", active && "font-semibold")}>
                   {item.label}
                 </span>
                 {item.compactLabel ? (
-                  <span aria-hidden className={cn("whitespace-nowrap min-[360px]:hidden", active && "font-semibold")}>
+                  <span aria-hidden className={cn("relative whitespace-nowrap min-[360px]:hidden", active && "font-semibold")}>
                     {item.compactLabel}
                   </span>
                 ) : null}
