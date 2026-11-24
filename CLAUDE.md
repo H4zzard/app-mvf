@@ -50,6 +50,8 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - `src/demo/` — **fixtures de demonstração**, isoladas. Nada de dado real aqui.
 - `src/lib/` — funções puras (seletores do plano, `cn`).
 - Tokens de design: `src/app/globals.css` (`:root` + `@theme`). Não espalhe hex pelas páginas.
+  Identidade 2.0: moldura e destaques em `wine`/`wine-deep` com texto `on-wine`; superfícies `canvas`/`card`/`paper`
+  (sem branco puro); ação em `brand`. Blocos escuros levam `mvf-on-wine` (foco visível); fonte única Inter.
 
 ## Acesso e dados (Prompt 03)
 

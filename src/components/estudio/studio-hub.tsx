@@ -65,18 +65,18 @@ export function StudioHub() {
             <li key={t.href}>
               <Link
                 href={t.href}
-                className="group flex h-full flex-col rounded-2xl border border-line bg-gradient-to-br from-blush via-card to-card p-5 shadow-card transition-shadow hover:border-brand/40 hover:shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                className="group flex h-full flex-col rounded-2xl border border-line bg-card p-5 shadow-card transition-shadow hover:border-line-strong hover:shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               >
                 <span className="flex items-center gap-3">
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-sm">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-wine text-on-wine">
                     <Icon aria-hidden className="size-6" />
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-brand">Ferramenta {t.n}</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.12em] text-subtle">Ferramenta {t.n}</span>
                 </span>
-                <span className="mt-4 block font-serif text-xl font-semibold leading-snug text-fg">{t.title}</span>
+                <span className="mt-4 block font-serif text-lg font-semibold leading-snug text-fg">{t.title}</span>
                 <span className="mt-1.5 block flex-1 text-sm text-muted">{t.description}</span>
                 <span className="mt-4 block text-xs text-subtle">{t.tag}</span>
-                <span className="mt-3 inline-flex min-h-11 items-center gap-1.5 self-start rounded-full bg-brand px-5 text-sm font-semibold text-white group-hover:bg-brand-hover">
+                <span className="mt-3 inline-flex min-h-11 items-center gap-1.5 self-start rounded-lg bg-brand px-5 text-sm font-semibold text-white group-hover:bg-brand-hover">
                   Abrir
                   <ArrowRight aria-hidden className="size-4" />
                 </span>

@@ -52,20 +52,20 @@ export function ProfileView() {
       <PageHeader eyebrow={demo ? <DemoBadge label="Conta de demonstração" /> : undefined} title="Perfil" />
 
       {/* Identificação */}
-      <section aria-label="Sua conta" className="flex items-center gap-4 rounded-xl border border-line bg-card p-4 shadow-card sm:p-5">
-        <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-blush text-lg font-semibold text-brand">
+      <section aria-label="Sua conta" className="mvf-on-wine flex items-center gap-4 rounded-2xl bg-wine-deep p-4 text-on-wine shadow-raised sm:p-5">
+        <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-paper text-lg font-semibold text-wine-deep">
           {initials(display)}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="break-words text-lg font-semibold leading-snug text-fg">{display}</p>
-          <p className="text-sm text-muted">
+          <p className="break-words text-lg font-semibold leading-snug text-on-wine">{display}</p>
+          <p className="text-sm text-on-wine-muted">
             {ROLE_LABEL[user.role] ?? "Aluna"}
             {demo ? " · dados fictícios" : ""}
           </p>
         </div>
         <Link
           href="/onboarding"
-          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-brand hover:bg-blush"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-on-wine/30 px-3 text-sm font-semibold text-on-wine hover:bg-wine-soft"
         >
           <SlidersHorizontal aria-hidden className="size-4" />
           <span className="max-[440px]:sr-only">Ajustar plano</span>
@@ -203,7 +203,7 @@ function PointsRow() {
   return (
     <li className="px-4 py-3.5">
       <div className="flex items-center gap-3">
-        <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-lg bg-blush text-brand">
+        <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-lg bg-wine text-on-wine">
           <Award className="size-[18px]" />
         </span>
         <div className="min-w-0 flex-1">

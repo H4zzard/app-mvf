@@ -48,7 +48,6 @@ export function PointsStrip({ className }: { className?: string }) {
   const { xp, balance } = useDemo();
   return (
     <section aria-label="Seu progresso de pontos" className={cn("relative overflow-hidden rounded-3xl bg-ink p-5 text-white shadow-raised sm:p-6", className)}>
-      <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-brand/25" />
       <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/60">Nível {xp.level.number}</p>

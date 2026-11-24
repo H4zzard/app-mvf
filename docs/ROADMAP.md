@@ -58,6 +58,13 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 - **Pendente:** teste em celulares físicos (checklist no relatório), categoria de plano real no Perfil
   quando houver dado confirmado, onboarding com vídeo (usar `FOCUS_ROUTE_PREFIXES`).
 
+## ✅ Identidade visual 2.0 — vinho + nude (24/11/2026)
+- Tokens novos (vinho, nude, bordô de ação, quase preto), Inter como fonte única, raios e sombras
+  sóbrios, moldura vinho (cabeçalho, lateral, barra inferior, login), destaques vinho no Início, mapa e
+  Perfil, Estúdio com blocos de prompt escuros. Sem mudança de lógica.
+- **Pendente:** paleta e fonte oficiais da marca (substituir só os tokens), revisão da expert em
+  celular físico, capas das Aulas sobre o novo fundo.
+
 ## ✅ Painel administrativo — estrutura e conteúdo (Prompt 13A, demonstrativo local)
 - `/gestao` só no desenvolvimento (três condições, 404 no servidor fora disso): visão geral com
   números reais, cursos e aulas, produtos NUMI, roteiros e presets, fluxo editorial, revisão e

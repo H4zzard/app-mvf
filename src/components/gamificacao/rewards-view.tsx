@@ -127,7 +127,7 @@ function RewardVisual({ reward, className }: { reward: Reward; className?: strin
       {reward.image ? (
         <Image src={reward.image} alt="" fill sizes="(max-width: 640px) 45vw, 240px" className="object-cover object-top" />
       ) : (
-        <span className="grid size-14 place-items-center rounded-2xl bg-white shadow-card">
+        <span className="grid size-14 place-items-center rounded-2xl bg-paper shadow-card">
           <Icon aria-hidden className="size-7" strokeWidth={1.6} />
         </span>
       )}
@@ -149,7 +149,7 @@ function RewardCard({ reward, info, onOpen }: { reward: Reward; info: ReturnType
           <span
             className={cn(
               "absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold shadow-sm",
-              info.state === "resgatada" ? "bg-success text-white" : info.state === "disponivel" ? "bg-white text-brand" : "bg-ink/80 text-white",
+              info.state === "resgatada" ? "bg-success text-white" : info.state === "disponivel" ? "bg-paper text-brand" : "bg-ink/80 text-white",
             )}
           >
             {info.state === "resgatada" ? <CircleCheck aria-hidden className="size-3" /> : info.state === "bloqueada" ? <Lock aria-hidden className="size-3" /> : <Sparkles aria-hidden className="size-3" />}

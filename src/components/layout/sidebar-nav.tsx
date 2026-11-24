@@ -32,18 +32,18 @@ export function SidebarNav({ collapsed = false }: { /** Modo trilho: apenas íco
                 className={cn(
                   "group relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors",
                   collapsed && "justify-center px-0",
-                  active ? "bg-blush font-semibold text-brand" : "text-fg/80 hover:bg-blush/60 hover:text-fg",
+                  active ? "bg-wine-soft font-semibold text-on-wine" : "text-on-wine-muted hover:bg-wine-soft/60 hover:text-on-wine",
                 )}
               >
                 <span
                   aria-hidden
-                  className={cn("absolute inset-y-2 left-0 w-[3px] rounded-r-sm bg-brand", active ? "opacity-100" : "opacity-0")}
+                  className={cn("absolute inset-y-2 left-0 w-[3px] rounded-r-sm bg-accent", active ? "opacity-100" : "opacity-0")}
                 />
-                <Icon aria-hidden className={cn("size-[18px] shrink-0", active ? "text-brand" : "text-muted group-hover:text-fg")} />
+                <Icon aria-hidden className={cn("size-[18px] shrink-0", active ? "text-accent" : "text-on-wine-muted group-hover:text-on-wine")} />
                 {collapsed ? null : (
                   <span aria-hidden className="min-w-0 flex-1 truncate">
                     {item.fullLabel}
-                    {item.id === "tribo" ? <span className="font-normal text-muted"> · Comunidade</span> : null}
+                    {item.id === "tribo" ? <span className="font-normal text-on-wine-muted"> · Comunidade</span> : null}
                   </span>
                 )}
               </Link>

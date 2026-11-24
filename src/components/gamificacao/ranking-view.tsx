@@ -63,8 +63,7 @@ export function RankingView() {
 
       {showExamples ? (
         <>
-          <section aria-label="Pódio" className="relative overflow-hidden rounded-3xl bg-[linear-gradient(160deg,#2a0f1b_0%,#5b1428_60%,#8c1d34_100%)] px-3 pb-0 pt-6 text-white shadow-raised sm:px-8">
-            <div aria-hidden className="pointer-events-none absolute -right-10 -top-16 size-48 rounded-full bg-white/5" />
+          <section aria-label="Pódio" className="relative overflow-hidden rounded-3xl bg-wine-deep px-3 pb-0 pt-6 text-white shadow-raised sm:px-8">
             <ol className="relative mx-auto grid max-w-lg grid-cols-3 items-end gap-2 sm:gap-4">
               {[podium[1], podium[0], podium[2]].map((r, i) =>
                 r ? <PodiumSpot key={r.id} row={r} place={i === 1 ? 1 : i === 0 ? 2 : 3} /> : <li key={`vazio-${i}`} />,

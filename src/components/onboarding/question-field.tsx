@@ -35,7 +35,7 @@ function Indicator({ shape }: { shape: "radio" | "checkbox" }) {
     <span
       aria-hidden
       className={cn(
-        "mt-0.5 grid size-5 shrink-0 place-items-center border-2 border-line-strong bg-white text-transparent transition-colors group-has-checked:border-brand group-has-checked:bg-brand group-has-checked:text-white",
+        "mt-0.5 grid size-5 shrink-0 place-items-center border-2 border-line-strong bg-paper text-transparent transition-colors group-has-checked:border-brand group-has-checked:bg-brand group-has-checked:text-white",
         shape === "radio" ? "rounded-full" : "rounded-md",
       )}
     >

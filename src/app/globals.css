@@ -1,41 +1,68 @@
 @import "tailwindcss";
 
 /*
- * Design tokens do App MVF.
- * Valores APROXIMADOS a partir das capturas da NUMI Insiders — não são cores
- * oficiais. Ajuste aqui (fonte única) quando a marca oficial for entregue.
+ * Design tokens do App MVF — identidade 2.0 (vinho + nude).
+ *
+ * Lógica: VINHO profundo é a cor da marca e da “moldura” do app (cabeçalho,
+ * lateral, barra inferior, blocos de destaque); BEGE/off-white quente é a
+ * superfície de leitura (substitui o branco puro); BORDÔ é a cor de ação
+ * (botões, ativo, links); quase preto é apoio pontual. Valores provisórios até a
+ * marca oficial entregar o guia — ajuste só aqui (fonte única).
+ * Contrastes conferidos (WCAG AA): fg/muted sobre canvas e card, texto bege sobre
+ * vinho, branco sobre bordô.
  */
 :root {
-  --mvf-canvas: #faf6f5; /* fundo principal */
-  --mvf-surface: #fefcfc; /* sidebar / superfícies */
-  --mvf-card: #ffffff;
-  --mvf-blush: #fef2f4; /* seleção / destaque suave */
-  --mvf-blush-strong: #fbe3e7;
-  --mvf-brand: #c62940; /* vermelho da marca */
-  --mvf-brand-hover: #a8213a;
-  --mvf-coral: #e04842; /* coral de ação */
-  --mvf-ink: #17172e; /* cartões especiais (índigo/bordô escuro) */
-  --mvf-ink-soft: #24243f;
-  --mvf-fg: #2b1d22; /* texto principal */
-  --mvf-muted: #77656b; /* texto secundário */
-  --mvf-subtle: #a6959a;
-  --mvf-border: #f1dfe2; /* bordas rosadas suaves */
-  --mvf-border-strong: #e6c9ce;
-  --mvf-success: #2f7d5b;
-  --mvf-success-soft: #e8f4ee;
-  --mvf-warning: #9a6412;
-  --mvf-warning-soft: #fdf3e2;
+  /* Superfícies claras (quentes, sem branco puro) */
+  --mvf-canvas: #f3ece3; /* fundo das páginas */
+  --mvf-surface: #f7f1e9; /* faixas e superfícies secundárias */
+  --mvf-card: #fbf7f1; /* cartões (off-white quente) */
+  --mvf-paper: #fffcf7; /* “branco” do app: pílulas sobre foto, botões claros */
+  --mvf-blush: #efe2d9; /* nude: seleção / destaque suave */
+  --mvf-blush-strong: #e4d0c4;
+
+  /* Marca */
+  --mvf-brand: #8b1d36; /* bordô de ação (CTA, ativo, links) */
+  --mvf-brand-hover: #6e1529;
+  --mvf-coral: #a9533d; /* terracota: apoio de estado (rotina do dia) */
+  --mvf-wine: #4a1323; /* vinho da moldura */
+  --mvf-wine-deep: #340b18; /* vinho mais fundo (barras, hero) */
+  --mvf-wine-soft: #5f1f31; /* realce sobre vinho (hover/ativo) */
+  --mvf-on-wine: #f6ece2; /* texto bege sobre vinho */
+  --mvf-on-wine-muted: #d3bab3; /* texto secundário sobre vinho */
+  --mvf-accent: #e7a0b1; /* rosa de destaque sobre vinho (indicadores) */
+  --mvf-ink: #2b0e18; /* quase preto (vinho-noite) para cartões especiais */
+  --mvf-ink-soft: #3c1623;
+
+  /* Texto e linhas */
+  --mvf-fg: #241519; /* texto principal */
+  --mvf-muted: #66514e; /* texto secundário */
+  --mvf-subtle: #79635e; /* rótulos e metadados */
+  --mvf-border: #e1d3c6; /* divisórias */
+  --mvf-border-strong: #cdb9aa;
+
+  /* Estados */
+  --mvf-success: #2b684d;
+  --mvf-success-soft: #e2ece2;
+  --mvf-warning: #87580f;
+  --mvf-warning-soft: #f5e8d1;
 }
 
 @theme inline {
   --color-canvas: var(--mvf-canvas);
   --color-surface: var(--mvf-surface);
   --color-card: var(--mvf-card);
+  --color-paper: var(--mvf-paper);
   --color-blush: var(--mvf-blush);
   --color-blush-strong: var(--mvf-blush-strong);
   --color-brand: var(--mvf-brand);
   --color-brand-hover: var(--mvf-brand-hover);
   --color-coral: var(--mvf-coral);
+  --color-wine: var(--mvf-wine);
+  --color-wine-deep: var(--mvf-wine-deep);
+  --color-wine-soft: var(--mvf-wine-soft);
+  --color-on-wine: var(--mvf-on-wine);
+  --color-on-wine-muted: var(--mvf-on-wine-muted);
+  --color-accent: var(--mvf-accent);
   --color-ink: var(--mvf-ink);
   --color-ink-soft: var(--mvf-ink-soft);
   --color-fg: var(--mvf-fg);
@@ -48,11 +75,20 @@
   --color-warning: var(--mvf-warning);
   --color-warning-soft: var(--mvf-warning-soft);
 
+  /* Uma família de produto (Inter) para tudo; `font-serif` vira o “display” do app. */
   --font-sans: var(--font-body);
-  --font-serif: var(--font-display);
+  --font-serif: var(--font-body);
 
-  --shadow-card: 0 1px 2px rgb(43 29 34 / 0.04), 0 4px 16px -6px rgb(198 41 64 / 0.08);
-  --shadow-raised: 0 2px 4px rgb(43 29 34 / 0.05), 0 12px 32px -12px rgb(198 41 64 / 0.18);
+  /* Sombras discretas e neutras (nada de brilho rosado). */
+  --shadow-card: 0 1px 2px rgb(36 21 25 / 0.05);
+  --shadow-raised: 0 1px 2px rgb(36 21 25 / 0.06), 0 10px 28px -14px rgb(36 21 25 / 0.32);
+}
+
+/* Raios mais sóbrios no app inteiro (menos “candy”): xl 10 px, 2xl 12 px, 3xl 16 px. */
+@theme {
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
 }
 
 html {
@@ -64,6 +100,12 @@ body {
   background: var(--mvf-canvas);
   color: var(--mvf-fg);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* Títulos (antiga serifada): mesma família, peso e espaçamento de produto. */
+.font-serif {
+  letter-spacing: -0.018em;
 }
 
 /* Foco visível consistente para teclado. */
@@ -71,6 +113,15 @@ body {
   outline: 2px solid var(--mvf-brand);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* Sobre a moldura vinho, o foco usa o rosa de destaque (bordô some no vinho). */
+.mvf-on-wine :focus-visible {
+  outline-color: var(--mvf-accent);
+}
+/* Painéis claros dentro da moldura vinho voltam ao foco bordô. */
+.mvf-on-wine .mvf-light :focus-visible {
+  outline-color: var(--mvf-brand);
 }
 
 /* Âncoras não ficam escondidas atrás do header fixo. */
@@ -85,7 +136,7 @@ body {
 
 /* Drawer e painéis com <dialog> nativo. */
 dialog::backdrop {
-  background: rgb(23 23 46 / 0.35);
+  background: rgb(36 8 18 / 0.5);
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -40,7 +40,7 @@ function Detail({ product: p }: { product: Product }) {
 
   return (
     <div className="space-y-5">
-      <Link href="/marketplace" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-muted hover:text-brand">
+      <Link href="/marketplace" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-muted hover:text-brand">
         <ArrowLeft aria-hidden className="size-4" />
         Marketplace
       </Link>
@@ -253,7 +253,7 @@ function ExternalButton({ href, label }: { href: string; label: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex min-h-10 items-center gap-2 rounded-full border border-line-strong bg-card px-4 text-sm font-semibold text-fg hover:border-brand/40 hover:bg-blush"
+      className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line-strong bg-card px-4 text-sm font-semibold text-fg hover:border-brand/40 hover:bg-blush"
     >
       {label}
       <ExternalLink aria-hidden className="size-4" />

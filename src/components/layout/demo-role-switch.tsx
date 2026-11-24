@@ -41,7 +41,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
   }
 
   return (
-    <fieldset className="rounded-2xl border border-dashed border-line-strong bg-canvas/70 p-3">
+    <fieldset className="mvf-light rounded-2xl border border-dashed border-line-strong bg-canvas p-3 text-fg">
       <legend className="flex items-center gap-1 px-1 text-[0.7rem] font-semibold uppercase tracking-wider text-subtle">
         <FlaskConical aria-hidden className="size-3" />
         Controles da demo · só neste dispositivo
@@ -62,7 +62,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
               onClick={() => pick(s.id)}
               className={cn(
                 "flex min-h-11 w-full flex-col items-start justify-center rounded-xl px-3 py-1.5 text-left transition-colors",
-                active ? "bg-brand text-white" : "bg-white text-fg ring-1 ring-line hover:bg-blush",
+                active ? "bg-brand text-white" : "bg-paper text-fg ring-1 ring-line hover:bg-blush",
               )}
             >
               <span className="text-sm font-semibold">{s.label}</span>
@@ -73,7 +73,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
       </div>
 
       <p className="mb-1.5 mt-3 text-xs font-medium text-muted">Visualizar menu como</p>
-      <div className="flex gap-1 rounded-full bg-white p-1 ring-1 ring-line">
+      <div className="flex gap-1 rounded-full bg-paper p-1 ring-1 ring-line">
         {ROLE_OPTIONS.map((opt) => {
           const active = user.role === opt.role;
           return (
@@ -94,7 +94,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
       </div>
       <p className="mt-1 text-[0.7rem] leading-snug text-muted">Só muda o menu. Não é controle de acesso.</p>
 
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-1.5 ring-1 ring-line">
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-paper px-3 py-1.5 ring-1 ring-line">
         <span className="text-xs leading-snug text-fg">
           <span className="block font-semibold">Manter ao recarregar</span>
           <span className="text-[0.7rem] text-muted">Só esta aba · dados de exemplo</span>

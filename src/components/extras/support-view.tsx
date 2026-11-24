@@ -112,7 +112,7 @@ export function SupportView() {
           })}
         </ul>
         {topic ? (
-          <button type="button" onClick={() => setTopic(null)} className="mt-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-muted hover:text-brand">
+          <button type="button" onClick={() => setTopic(null)} className="mt-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-muted hover:text-brand">
             <X aria-hidden className="size-4" />
             Ver todos os temas
           </button>
@@ -156,7 +156,7 @@ export function SupportView() {
                     {p.links.length ? (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {p.links.map((l) => (
-                          <Link key={l.href} href={l.href} className="inline-flex min-h-10 items-center rounded-full border border-line-strong px-3.5 text-sm font-semibold text-fg hover:border-brand/40 hover:bg-blush">
+                          <Link key={l.href} href={l.href} className="inline-flex min-h-10 items-center rounded-lg border border-line-strong px-3.5 text-sm font-semibold text-fg hover:border-brand/40 hover:bg-blush">
                             {l.label}
                           </Link>
                         ))}

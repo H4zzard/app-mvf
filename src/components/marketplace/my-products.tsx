@@ -93,7 +93,7 @@ export function MyProducts({ onExplore }: { onExplore: () => void }) {
                   </Button>
                   <Link
                     href={`/marketplace/${p.id}`}
-                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-line-strong bg-card px-3 text-sm font-semibold text-fg hover:border-brand/40 hover:bg-blush"
+                    className="inline-flex min-h-10 items-center justify-center rounded-lg border border-line-strong bg-card px-3 text-sm font-semibold text-fg hover:border-brand/40 hover:bg-blush"
                   >
                     Ver detalhes
                   </Link>

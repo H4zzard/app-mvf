@@ -41,7 +41,6 @@ export function PointsCard() {
       aria-labelledby="points-title"
       className="relative flex flex-col overflow-hidden rounded-2xl bg-ink p-5 text-white shadow-raised sm:p-6"
     >
-      <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-20 size-44 rounded-full bg-brand/20" />
       <div className="relative flex items-start justify-between gap-3">
         <div>
           <h2 id="points-title" className="font-serif text-lg font-semibold">

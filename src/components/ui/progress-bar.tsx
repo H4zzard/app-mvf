@@ -26,14 +26,14 @@ export function ProgressBar({
       className={cn(
         "w-full overflow-hidden rounded-full",
         size === "sm" ? "h-1.5" : "h-2.5",
-        tone === "brand" ? "bg-blush-strong" : "bg-white/15",
+        tone === "brand" ? "bg-blush-strong" : "bg-on-wine/20",
         className,
       )}
     >
       <div
         className={cn(
           "h-full rounded-full transition-[width] duration-500 ease-out",
-          tone === "brand" ? "bg-linear-to-r from-brand to-coral" : "bg-white",
+          tone === "brand" ? "bg-brand" : "bg-accent",
         )}
         style={{ width: `${clamped}%` }}
       />

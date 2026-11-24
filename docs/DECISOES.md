@@ -415,6 +415,22 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   Saíram do Início: acesso rápido de 4 ícones, lista “Sua jornada” (repetia o mapa), desafios e card de
   pontos (agora no Perfil). Nenhuma funcionalidade removida.
 
+## 24/11/2026 — Identidade visual 2.0 (vinho + nude)
+
+- **D117 · Paleta invertida a pedido da expert.** Vinho profundo (`wine`, `wine-deep`) vira a cor da
+  moldura (cabeçalho, lateral, barra inferior, login) e dos blocos de destaque (próxima ação, mapa,
+  perfil); bege/off-white quente (`canvas`, `card`, `paper`) substitui o branco; bordô (`brand`) fica
+  para ação; quase preto (`ink`) só pontual (blocos de prompt, cartões especiais). Tokens provisórios,
+  só em `globals.css`. Contraste AA conferido por par de tokens e por auditoria no navegador.
+- **D118 · Tipografia de produto.** Playfair (serifada) + DM Sans → Inter para tudo (via `next/font`,
+  sem dependência nova). A classe `font-serif` foi mantida e agora aponta para Inter com espaçamento de
+  título, para não tocar 90+ usos.
+- **D119 · Menos “candy”.** Raios globais reduzidos (xl 10 px, 2xl 12 px, 3xl 16 px), botões e
+  chips `rounded-lg`, bolhas decorativas e degradês ornamentais removidos (degradês sobre fotos
+  ficaram, recoloridos em vinho, porque garantem leitura). Mapa do plano em linha do tempo reta.
+- **D120 · Foco visível sobre vinho.** `.mvf-on-wine` troca o contorno de foco para o rosa de
+  destaque; painéis claros dentro da moldura (`.mvf-light`) voltam ao bordô.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a

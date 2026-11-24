@@ -21,7 +21,7 @@ export function EmptyState({
         className,
       )}
     >
-      <span className="grid size-12 place-items-center rounded-full bg-blush text-brand">
+      <span className="grid size-12 place-items-center rounded-xl bg-blush text-brand">
         <Icon aria-hidden className="size-5" />
       </span>
       <p className="mt-4 font-serif text-lg font-semibold text-fg">{title}</p>

@@ -59,7 +59,7 @@ export function useStudioSeed(tool: StudioTool, apply: (seed: StudioSeed) => voi
 export function ToolHeader({ title, description, step }: { title: string; description: string; step?: string }) {
   return (
     <header className="space-y-3">
-      <Link href="/estudio-ia" className="-ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-brand hover:bg-blush">
+      <Link href="/estudio-ia" className="-ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-brand hover:bg-blush">
         <ArrowLeft aria-hidden className="size-4" />
         Voltar ao Estúdio
       </Link>
@@ -79,7 +79,7 @@ export function Section({ title, hint, defaultOpen = true, children }: { title: 
     <details open={defaultOpen} className="group rounded-2xl border border-line bg-card shadow-card [&_summary::-webkit-details-marker]:hidden">
       <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-2xl px-4 py-3 focus-visible:outline-2 focus-visible:outline-brand sm:px-5">
         <span className="min-w-0 flex-1">
-          <span className="block font-serif text-lg font-semibold text-fg">{title}</span>
+          <span className="block font-serif text-base font-semibold text-fg sm:text-lg">{title}</span>
           {hint ? <span className="block text-xs text-muted">{hint}</span> : null}
         </span>
         <ChevronDown aria-hidden className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180 motion-reduce:transition-none" />
@@ -91,7 +91,7 @@ export function Section({ title, hint, defaultOpen = true, children }: { title: 
 
 export function Note({ children, tone = "info" }: { children: React.ReactNode; tone?: "info" | "warning" }) {
   return (
-    <p className={cn("flex gap-2 rounded-xl p-3 text-xs leading-relaxed", tone === "warning" ? "bg-warning-soft text-warning" : "bg-blush/60 text-fg/80")}>
+    <p className={cn("flex gap-2 rounded-xl p-3 text-xs leading-relaxed", tone === "warning" ? "bg-warning-soft text-warning" : "bg-surface text-fg/80 ring-1 ring-line")}>
       <Info aria-hidden className="mt-0.5 size-3.5 shrink-0" />
       <span className="min-w-0">{children}</span>
     </p>
@@ -101,7 +101,7 @@ export function Note({ children, tone = "info" }: { children: React.ReactNode; t
 /* --------------------------------- Campos --------------------------------- */
 
 const inputBase =
-  "w-full rounded-xl border bg-card px-4 text-base text-fg placeholder:text-subtle focus:outline-none focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:bg-canvas disabled:text-subtle";
+  "w-full rounded-lg border bg-paper px-4 text-base text-fg placeholder:text-subtle focus:border-brand/60 focus:outline-none focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:bg-canvas disabled:text-subtle";
 
 function FieldShell({ id, label, hint, error, full, children }: { id: string; label: string; hint?: string; error?: string; full?: boolean; children: React.ReactNode }) {
   return (
@@ -160,7 +160,7 @@ export function ChoiceSelect({
             onChange({ ...value, preset });
             if (preset === FREE) requestAnimationFrame(() => freeRef.current?.focus());
           }}
-          className={cn(inputBase, "min-h-12 appearance-none pr-10", error ? "border-brand" : "border-line")}
+          className={cn(inputBase, "min-h-12 appearance-none pr-10", error ? "border-brand" : "border-line-strong/80")}
         >
           {options.map((o) => (
             <option key={o.id} value={o.id}>
@@ -180,7 +180,7 @@ export function ChoiceSelect({
           onChange={(e) => onChange({ ...value, free: e.target.value })}
           aria-label={`${label}: texto livre`}
           placeholder="Escreva do seu jeito (inglês funciona melhor no Flow)"
-          className={cn(inputBase, "mt-2 min-h-12", error ? "border-brand" : "border-line")}
+          className={cn(inputBase, "mt-2 min-h-12", error ? "border-brand" : "border-line-strong/80")}
         />
       ) : null}
     </FieldShell>
@@ -226,7 +226,7 @@ export function TextField({
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className={cn(inputBase, "min-h-12", error ? "border-brand" : "border-line")}
+        className={cn(inputBase, "min-h-12", error ? "border-brand" : "border-line-strong/80")}
       />
     </FieldShell>
   );
@@ -267,7 +267,7 @@ export function TextArea({
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className={cn(inputBase, "resize-y py-3 leading-relaxed", error ? "border-brand" : "border-line")}
+        className={cn(inputBase, "resize-y py-3 leading-relaxed", error ? "border-brand" : "border-line-strong/80")}
       />
     </FieldShell>
   );
@@ -300,7 +300,7 @@ export function OutputBlock({ title, text, copyLabel = "Copiar", onCopied, mono 
         tabIndex={0}
         aria-label={title}
         className={cn(
-          "max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-line bg-canvas p-3 text-[0.8rem] leading-relaxed text-fg/90 focus-visible:outline-2 focus-visible:outline-brand",
+          "max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-white/5 bg-ink p-3.5 text-[0.8rem] leading-relaxed text-on-wine focus-visible:outline-2 focus-visible:outline-accent [scrollbar-color:var(--mvf-wine-soft)_transparent]",
           mono ? "font-mono" : "font-sans",
         )}
       >
@@ -322,7 +322,7 @@ export function scrollToResult(el: HTMLElement | null) {
 /** Barra de ação fixa acima da navegação inferior (celular) e no rodapé do formulário (desktop). */
 export function StickyActions({ children }: { children: React.ReactNode }) {
   return (
-    <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 -mx-1 rounded-2xl border border-line bg-surface/95 p-2 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-surface/85 lg:bottom-4">
+    <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 -mx-1 rounded-xl border border-line-strong/60 bg-card/95 p-2 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-card/90 lg:bottom-4">
       <div className="flex flex-wrap gap-2 [&>*]:flex-1">{children}</div>
     </div>
   );

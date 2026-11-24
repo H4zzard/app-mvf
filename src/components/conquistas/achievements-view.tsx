@@ -32,7 +32,6 @@ export function AchievementsView() {
       <GameTabs />
 
       <section aria-labelledby="level-title" className="relative overflow-hidden rounded-2xl bg-ink p-5 text-white shadow-raised sm:p-6">
-        <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-16 size-52 rounded-full bg-brand/25" />
         <div className="relative flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Nível {xp.level.number}</p>
@@ -126,7 +125,7 @@ export function AchievementsView() {
                 key={b.id}
                 className={cn("flex flex-col items-center rounded-2xl border p-3.5 text-center", on ? "border-brand/30 bg-blush/60" : "border-line bg-canvas/60")}
               >
-                <span className={cn("grid size-11 place-items-center rounded-full", on ? "bg-brand text-white" : "bg-white text-subtle ring-1 ring-line")}>
+                <span className={cn("grid size-11 place-items-center rounded-full", on ? "bg-brand text-white" : "bg-paper text-subtle ring-1 ring-line")}>
                   {on ? <Medal aria-hidden className="size-5" /> : <Lock aria-hidden className="size-4" />}
                 </span>
                 <span className={cn("mt-2 text-sm font-semibold", on ? "text-fg" : "text-muted")}>{b.title}</span>

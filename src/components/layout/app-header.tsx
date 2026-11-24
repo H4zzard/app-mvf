@@ -32,7 +32,7 @@ export function AppHeader() {
   const parent = dest && item && item.href !== dest.href ? dest.fullLabel : undefined;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line/80 bg-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-canvas/75">
+    <header className="mvf-on-wine sticky top-0 z-30 border-b border-white/10 bg-wine-deep text-on-wine">
       <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 pt-[env(safe-area-inset-top)] box-content sm:h-16 sm:px-6 lg:px-8">
         <BrandMark compact className="hidden sm:flex lg:hidden" />
         <BrandMark className="sm:hidden" />
@@ -42,13 +42,13 @@ export function AppHeader() {
           <ol className="flex items-center gap-1.5 text-sm">
             {parent ? (
               <>
-                <li className="text-muted">{parent}</li>
+                <li className="text-on-wine-muted">{parent}</li>
                 <li aria-hidden>
-                  <ChevronRight className="size-3.5 text-subtle" />
+                  <ChevronRight className="size-3.5 text-on-wine-muted" />
                 </li>
               </>
             ) : null}
-            <li aria-current="page" className="truncate font-semibold text-fg">
+            <li aria-current="page" className="truncate font-semibold text-on-wine">
               {item?.label ?? "Página"}
             </li>
           </ol>
@@ -68,16 +68,16 @@ export function AppHeader() {
             <SyncStatus />
           )}
           <NotificationsButton />
-          <div className="hidden items-center gap-2.5 rounded-full border border-line bg-card py-1 pl-1 pr-1 min-[400px]:flex sm:pr-3">
+          <div className="hidden items-center gap-2.5 rounded-full border border-white/12 bg-wine-soft/60 py-1 pl-1 pr-1 min-[400px]:flex sm:pr-3">
             <span
               aria-hidden
-              className="grid size-9 place-items-center rounded-full bg-blush font-semibold text-brand text-sm"
+              className="grid size-9 place-items-center rounded-full bg-paper text-sm font-semibold text-wine-deep"
             >
               {user.initials}
             </span>
             <span className="hidden leading-tight sm:block">
-              <span className="block text-sm font-semibold text-fg">{user.displayName}</span>
-              <span className="block text-xs text-muted">
+              <span className="block text-sm font-semibold text-on-wine">{user.displayName}</span>
+              <span className="block text-xs text-on-wine-muted">
                 {ROLE_LABEL[user.role] ?? "Aluna"}
                 {demo ? " · demo" : ""}
               </span>
@@ -93,7 +93,7 @@ export function AppHeader() {
                 type="submit"
                 aria-label="Sair da conta"
                 title="Sair"
-                className="grid size-11 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:text-brand"
+                className="grid size-11 place-items-center rounded-full border border-white/15 text-on-wine-muted transition-colors hover:bg-wine-soft hover:text-on-wine"
               >
                 <LogOut aria-hidden className="size-[18px]" />
               </button>

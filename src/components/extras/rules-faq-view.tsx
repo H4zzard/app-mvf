@@ -138,10 +138,10 @@ export function RulesFaqView() {
                     ) : (
                       <div className="flex items-center gap-2 text-xs text-muted">
                         <span>Isso ajudou?</span>
-                        <button type="button" onClick={() => setFeedback((s) => ({ ...s, [f.id]: "sim" }))} className="inline-flex min-h-10 items-center gap-1 rounded-full border border-line px-3 hover:border-brand/40">
+                        <button type="button" onClick={() => setFeedback((s) => ({ ...s, [f.id]: "sim" }))} className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-line px-3 hover:border-brand/40">
                           <ThumbsUp aria-hidden className="size-3.5" /> Sim
                         </button>
-                        <button type="button" onClick={() => setFeedback((s) => ({ ...s, [f.id]: "nao" }))} className="inline-flex min-h-10 items-center gap-1 rounded-full border border-line px-3 hover:border-brand/40">
+                        <button type="button" onClick={() => setFeedback((s) => ({ ...s, [f.id]: "nao" }))} className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-line px-3 hover:border-brand/40">
                           <ThumbsDown aria-hidden className="size-3.5" /> Não
                         </button>
                       </div>

@@ -121,11 +121,11 @@ export function ModuleCard({
           {recommended || complete ? (
             <span className="absolute left-2 top-2 flex flex-wrap gap-1">
               {complete ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[0.65rem] font-semibold text-success shadow-sm">
+                <span className="inline-flex items-center gap-1 rounded-md bg-paper/95 px-2 py-0.5 text-[0.65rem] font-semibold text-success shadow-sm">
                   <Check aria-hidden className="size-3" /> Concluído
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[0.65rem] font-semibold text-brand shadow-sm">
+                <span className="inline-flex items-center gap-1 rounded-md bg-paper/95 px-2 py-0.5 text-[0.65rem] font-semibold text-brand shadow-sm">
                   <Sparkles aria-hidden className="size-3" /> Para você
                 </span>
               )}
@@ -133,7 +133,7 @@ export function ModuleCard({
           ) : null}
           {total > 0 && !complete ? (
             <span aria-hidden className="absolute inset-x-2.5 bottom-2.5 h-1 overflow-hidden rounded-full bg-white/25">
-              <span className="block h-full rounded-full bg-white" style={{ width: `${Math.round((done / total) * 100)}%` }} />
+              <span className="block h-full rounded-full bg-paper" style={{ width: `${Math.round((done / total) * 100)}%` }} />
             </span>
           ) : null}
         </span>

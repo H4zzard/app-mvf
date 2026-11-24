@@ -96,7 +96,7 @@ export function CommunityView() {
               type="button"
               onClick={() => openComposer(t.kind)}
               aria-haspopup="dialog"
-              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-sm font-medium text-fg hover:border-brand/30 hover:bg-blush"
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border border-line bg-surface px-3.5 text-sm font-medium text-fg hover:border-brand/30 hover:bg-blush"
             >
               <Plus aria-hidden className="size-3.5 text-brand" />
               {t.label}

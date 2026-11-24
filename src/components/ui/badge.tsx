@@ -8,9 +8,9 @@ const tones: Record<Tone, string> = {
   brand: "bg-blush text-brand ring-brand/15",
   success: "bg-success-soft text-success ring-success/15",
   warning: "bg-warning-soft text-warning ring-warning/15",
-  demo: "bg-white text-muted ring-line-strong",
+  demo: "bg-paper text-muted ring-line-strong",
   soon: "bg-canvas text-muted ring-line",
-  inverse: "bg-white/10 text-white/85 ring-white/15",
+  inverse: "bg-white/10 text-on-wine ring-white/20",
 };
 
 export function Badge({
@@ -25,7 +25,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset max-w-full",
+        "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset max-w-full",
         tones[tone],
         className,
       )}

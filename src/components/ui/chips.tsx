@@ -64,8 +64,8 @@ export function Chip({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors",
-        active ? "border-brand bg-brand text-white" : "border-line bg-card text-fg/80 hover:border-brand/40 hover:bg-blush",
+        "inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3.5 text-sm font-medium transition-colors",
+        active ? "border-wine bg-wine text-on-wine" : "border-line bg-card text-fg/80 hover:border-line-strong hover:bg-surface",
         className,
       )}
     >
@@ -96,14 +96,14 @@ export function SearchField({
         placeholder={placeholder}
         aria-label={label}
         enterKeyHint="search"
-        className="min-h-12 w-full rounded-full border border-line bg-card pl-11 pr-12 text-base text-fg placeholder:text-subtle focus:border-brand/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-brand [&::-webkit-search-cancel-button]:hidden"
+        className="min-h-12 w-full rounded-lg border border-line-strong/70 bg-card pl-11 pr-12 text-base text-fg placeholder:text-subtle focus:border-brand/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-brand [&::-webkit-search-cancel-button]:hidden"
       />
       {value ? (
         <button
           type="button"
           onClick={() => onChange("")}
           aria-label="Limpar busca"
-          className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-blush"
+          className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-md text-muted hover:bg-blush"
         >
           <X aria-hidden className="size-4" />
         </button>

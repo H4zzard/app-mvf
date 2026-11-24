@@ -121,7 +121,7 @@ export function RecordingTool() {
               <p className="mt-1 text-xs text-muted">Produto demonstrativo: descreva abaixo só características reais.</p>
             ) : null}
           </div>
-          <button type="button" onClick={() => setInspiration(null)} aria-label="Dispensar aviso" className="grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-white">
+          <button type="button" onClick={() => setInspiration(null)} aria-label="Dispensar aviso" className="grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-paper">
             <X aria-hidden className="size-4" />
           </button>
         </div>
@@ -136,7 +136,7 @@ export function RecordingTool() {
                 {STUDIO_PRODUCTS.slice(0, 7).map((p) => (
                   <Chip key={p.id} active={brief.productName === p.name} onClick={() => selectProduct(p.id)} className="min-h-9 px-3 text-xs">
                     {p.name}
-                    {p.origin === "demonstrativo" ? <span className="text-[0.65rem] opacity-70">exemplo</span> : null}
+                    {p.origin === "demonstrativo" ? <span className="text-[0.65rem] font-normal">exemplo</span> : null}
                   </Chip>
                 ))}
               </div>

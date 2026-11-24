@@ -20,7 +20,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-[backdrop-filter]:bg-surface/90 lg:hidden"
+      className="mvf-on-wine fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-wine-deep pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-16px_rgb(36_8_18/0.6)] lg:hidden"
     >
       <ul className="mx-auto grid h-16 max-w-2xl grid-cols-7">
         {PRIMARY_NAV.map((item) => {
@@ -35,16 +35,16 @@ export function BottomNav() {
                 data-nav={item.id}
                 className={cn(
                   "relative flex h-full min-w-11 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium leading-none tracking-tight transition-colors",
-                  "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-brand",
-                  active ? "text-brand" : "text-muted hover:text-fg",
+                  "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent",
+                  active ? "bg-wine-soft/55 text-on-wine" : "text-on-wine-muted hover:text-on-wine",
                 )}
               >
                 {/* Indicador discreto do destino ativo */}
                 <span
                   aria-hidden
-                  className={cn("absolute top-0 h-[3px] w-7 rounded-b-sm bg-brand", active ? "opacity-100" : "opacity-0")}
+                  className={cn("absolute top-0 h-[2px] w-8 rounded-b-sm bg-accent", active ? "opacity-100" : "opacity-0")}
                 />
-                <Icon aria-hidden className="size-[21px] shrink-0" strokeWidth={active ? 2.2 : 1.8} />
+                <Icon aria-hidden className={cn("size-[21px] shrink-0", active && "text-accent")} strokeWidth={active ? 2.1 : 1.6} />
                 <span aria-hidden className={cn("whitespace-nowrap", item.compactLabel && "max-[359px]:hidden", active && "font-semibold")}>
                   {item.label}
                 </span>

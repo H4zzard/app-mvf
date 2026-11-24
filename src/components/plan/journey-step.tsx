@@ -60,22 +60,25 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
   return (
     <article className="mx-auto max-w-2xl" aria-labelledby="etapa-titulo">
       <div className="flex items-center justify-between gap-2">
-        <button type="button" onClick={goMap} className="-ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-muted hover:text-brand">
+        <button type="button" onClick={goMap} className="-ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-muted hover:text-brand">
           <ArrowLeft aria-hidden className="size-4" />
           Mapa
         </button>
         {phase ? (
-          <span className="text-xs text-muted">
+          <span className="flex items-center gap-2 text-xs text-muted">
+            <span aria-hidden className="block h-1 w-16 overflow-hidden rounded-full bg-blush-strong">
+              <span className="block h-full bg-wine" style={{ width: `${phase.total ? Math.round((phase.done / phase.total) * 100) : 0}%` }} />
+            </span>
             {phase.done}/{phase.total} nesta fase
           </span>
         ) : null}
       </div>
 
-      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand">
+      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-brand">
         {v.phase.title}
         {v.applicable ? ` · Etapa ${v.number}` : ""}
       </p>
-      <h1 id="etapa-titulo" className="mt-1 font-serif text-[1.65rem] font-semibold leading-tight text-fg sm:text-3xl">
+      <h1 id="etapa-titulo" className="mt-1.5 font-serif text-[1.7rem] font-semibold leading-[1.15] text-fg sm:text-[2.1rem]">
         {s.title}
       </h1>
 
@@ -104,7 +107,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
         </Notice>
       ) : null}
 
-      <p className="mt-4 text-lg leading-relaxed text-fg">{v.instruction}</p>
+      <p className="mt-4 text-[1.0625rem] leading-relaxed text-fg sm:text-lg">{v.instruction}</p>
 
       {/* Decisão: escolher o caminho */}
       {s.kind === "decisao" && v.applicable ? (
@@ -120,7 +123,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
                   const after = choose(stepId, o.id);
                   setJustDone({ next: after, phaseDone: null });
                 }}
-                className={cn("flex min-h-16 items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors", on ? "border-brand bg-blush/60" : "border-line bg-card hover:border-brand/40")}
+                className={cn("flex min-h-16 items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors", on ? "border-brand bg-blush/70" : "border-line bg-card hover:border-line-strong")}
               >
                 <span className={cn("grid size-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand bg-brand text-white" : "border-line-strong")}>{on ? <Check aria-hidden className="size-4" /> : null}</span>
                 <span>
@@ -138,10 +141,10 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
 
       {/* Resultado esperado */}
       {s.kind !== "decisao" ? (
-        <div className="mt-5 flex gap-3 rounded-2xl border border-line bg-card p-4">
+        <div className="mt-5 flex gap-3 rounded-xl border border-line border-l-[3px] border-l-success bg-card p-4">
           <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-success" />
           <div>
-            <p className="text-sm font-semibold text-fg">Resultado esperado</p>
+            <p className="text-sm font-semibold text-success">Resultado esperado</p>
             <p className="text-sm text-muted">{v.expected}</p>
           </div>
         </div>
@@ -159,7 +162,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
       {/* Aula de apoio */}
       {s.kind !== "decisao" && s.kind !== "confirmacao" ? (
         <section aria-labelledby="apoio" className="mt-6">
-          <h2 id="apoio" className="text-sm font-semibold text-fg">
+          <h2 id="apoio" className="text-xs font-semibold uppercase tracking-[0.1em] text-subtle">
             {s.kind === "aula" ? "Aula desta etapa" : "Precisa de ajuda?"}
           </h2>
           {lessons.length ? (
@@ -171,7 +174,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
                     onClick={() => rememberStep(stepId)}
                     className="flex items-center gap-3 rounded-2xl border border-line bg-card p-3 transition-colors hover:border-brand/30"
                   >
-                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blush text-brand">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-wine text-on-wine">
                       <CirclePlay aria-hidden className="size-5" />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -213,7 +216,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
 
       {/* Ação principal, sempre ao alcance do polegar (acima da barra inferior) */}
       <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 mt-6 lg:bottom-4">
-        <div className="rounded-3xl border border-line bg-surface/95 p-3 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-surface/85">
+        <div className="rounded-2xl border border-line-strong/60 bg-card/95 p-3 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-card/90">
           {justDone ? (
             // Empilhado: a mensagem tem a linha inteira (nunca fica sob os botões) e as ações vêm abaixo.
             <div role="status" className="space-y-3">

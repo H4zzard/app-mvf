@@ -42,8 +42,8 @@ export function NotificationsButton() {
         aria-controls={panelId}
         onClick={() => setOpenOn(open ? null : pathname)}
         className={cn(
-          "grid size-11 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:text-brand",
-          open && "border-brand/30 text-brand",
+          "grid size-11 place-items-center rounded-full border border-white/15 text-on-wine-muted transition-colors hover:bg-wine-soft hover:text-on-wine",
+          open && "border-on-wine/40 bg-wine-soft text-on-wine",
         )}
       >
         <Bell aria-hidden className="size-[18px]" />
@@ -53,7 +53,7 @@ export function NotificationsButton() {
           id={panelId}
           role="region"
           aria-label="Notificações"
-          className="absolute right-0 top-full z-40 mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-line bg-card p-4 shadow-raised"
+          className="mvf-light absolute right-0 top-full z-40 mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-line bg-card p-4 text-fg shadow-raised"
         >
           <p className="font-serif text-base font-semibold text-fg">Notificações</p>
           <div className="mt-3 flex items-start gap-3 rounded-xl bg-canvas p-3">

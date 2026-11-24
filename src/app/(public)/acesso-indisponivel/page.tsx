@@ -52,7 +52,7 @@ async function Actions() {
           href={support}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center rounded-full border border-line-strong px-5 text-sm font-semibold text-fg hover:bg-blush"
+          className="inline-flex min-h-11 items-center rounded-lg border border-line-strong px-5 text-sm font-semibold text-fg hover:bg-blush"
         >
           Falar com o suporte
         </a>

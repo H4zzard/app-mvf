@@ -25,7 +25,7 @@ export function SyncStatus() {
           type="button"
           onClick={dismissSyncError}
           aria-label="Fechar aviso"
-          className="grid size-7 shrink-0 place-items-center rounded-full hover:bg-white"
+          className="grid size-7 shrink-0 place-items-center rounded-full hover:bg-paper"
         >
           <X aria-hidden className="size-3.5" />
         </button>
@@ -34,7 +34,7 @@ export function SyncStatus() {
   }
 
   return (
-    <span aria-live="polite" className="hidden items-center gap-1.5 text-xs text-muted md:inline-flex">
+    <span aria-live="polite" className="hidden items-center gap-1.5 text-xs text-on-wine-muted md:inline-flex">
       {sync.pending > 0 ? (
         <>
           <LoaderCircle aria-hidden className="size-3.5 animate-spin motion-reduce:animate-none" />
@@ -42,7 +42,7 @@ export function SyncStatus() {
         </>
       ) : (
         <>
-          <CloudCheck aria-hidden className="size-3.5 text-success" />
+          <CloudCheck aria-hidden className="size-3.5 text-accent" />
           Progresso salvo
         </>
       )}

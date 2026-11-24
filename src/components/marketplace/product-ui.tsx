@@ -51,7 +51,7 @@ export function SaveButton({ product, saved, onToggle, className }: { product: P
       aria-label={saved ? `Remover ${product.name} dos salvos` : `Salvar ${product.name}`}
       className={cn("grid size-11 shrink-0 place-items-center rounded-full", className)}
     >
-      <span className={cn("grid size-8 place-items-center rounded-full bg-white shadow-card ring-1 ring-line", saved ? "text-brand" : "text-muted")}>
+      <span className={cn("grid size-8 place-items-center rounded-full bg-paper shadow-card ring-1 ring-line", saved ? "text-brand" : "text-muted")}>
         <Heart aria-hidden className={cn("size-4", saved && "fill-brand")} />
       </span>
     </button>
@@ -116,7 +116,7 @@ export function ProductCard({
       <div className="mt-auto space-y-3 px-3 pb-3 sm:px-3.5 sm:pb-3.5 sm:pt-3">
         <CommercialRow product={product} compact />
         <div className="grid grid-cols-2 gap-2">
-          <Link href={href} aria-label={`Ver detalhes de ${product.name}`} className="inline-flex min-h-10 items-center justify-center rounded-full border border-line-strong bg-card px-3 text-center text-sm font-semibold leading-tight text-fg transition-colors hover:border-brand/40 hover:bg-blush">
+          <Link href={href} aria-label={`Ver detalhes de ${product.name}`} className="inline-flex min-h-10 items-center justify-center rounded-lg border border-line-strong bg-card px-3 text-center text-sm font-semibold leading-tight text-fg transition-colors hover:border-brand/40 hover:bg-blush">
             Ver detalhes
           </Link>
           <Button size="sm" onClick={onCreateScript} disabled={unavailable} className="px-3 leading-tight whitespace-normal!" aria-label={`Criar roteiro para ${product.name}`}>

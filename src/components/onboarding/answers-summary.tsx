@@ -28,7 +28,7 @@ export function AnswersSummary({
               type="button"
               onClick={() => onEdit(q.id)}
               aria-label={`Editar: ${q.summaryLabel}`}
-              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-brand hover:bg-blush"
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-brand hover:bg-blush"
             >
               <Pencil aria-hidden className="size-3.5" />
               Editar

@@ -105,7 +105,7 @@ export function PostCard({
         {link ? (
           <Link
             href={link.href}
-            className="mt-3 inline-flex min-h-10 max-w-full items-center gap-2 rounded-full border border-line bg-canvas px-3 text-xs font-medium text-fg hover:border-brand/30 hover:text-brand"
+            className="mt-3 inline-flex min-h-10 max-w-full items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-xs font-medium text-fg hover:border-brand/30 hover:text-brand"
           >
             <link.icon aria-hidden className="size-3.5 shrink-0 text-brand" />
             <span className="truncate">{link.label}</span>
@@ -117,7 +117,7 @@ export function PostCard({
             onClick={onLike}
             aria-pressed={liked}
             aria-label={`${liked ? "Descurtir" : "Curtir"} (${likes} curtidas)`}
-            className={cn("inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium transition-colors", liked ? "text-brand" : "text-muted hover:bg-blush hover:text-fg")}
+            className={cn("inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors", liked ? "text-brand" : "text-muted hover:bg-blush hover:text-fg")}
           >
             <Heart aria-hidden className={cn("size-[18px]", liked && "fill-brand")} />
             {likes}
@@ -126,7 +126,7 @@ export function PostCard({
             type="button"
             onClick={onOpen}
             aria-haspopup="dialog"
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-muted hover:bg-blush hover:text-fg"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-muted hover:bg-blush hover:text-fg"
           >
             <MessageCircle aria-hidden className="size-[18px]" />
             {visibleComments}
@@ -160,7 +160,7 @@ export function PostCard({
               onClick={onReport}
               disabled={reported}
               aria-haspopup="dialog"
-              className="ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-muted hover:bg-blush hover:text-fg disabled:cursor-default disabled:hover:bg-transparent"
+              className="ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-muted hover:bg-blush hover:text-fg disabled:cursor-default disabled:hover:bg-transparent"
             >
               <Flag aria-hidden className="size-3.5" />
               {reported ? "Denunciada" : "Denunciar"}

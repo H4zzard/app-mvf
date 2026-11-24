@@ -287,7 +287,7 @@ function EventSheet({ ev, now, going, onToggle, onClose }: { ev: CommunityEvent;
                 href={stream}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover"
+                className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover"
               >
                 <Radio aria-hidden className="size-4" />
                 {phase === "ao_vivo" ? "Entrar na live" : "Link da transmissão"}

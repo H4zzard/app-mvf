@@ -10,7 +10,7 @@ import { ToolShortcuts } from "@/components/dashboard/quick-access";
 import { HelpFooter } from "@/components/layout/help-footer";
 import { MemberAreaBanner } from "@/components/dashboard/member-area-banner";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { DemoBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -83,69 +83,64 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         {/* 1. Próxima ação da Jornada — elemento dominante */}
-        <Card className="lg:col-span-2" aria-labelledby="next-step-title">
-          <div className="p-4 sm:p-7">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand">
+        <section className="mvf-on-wine rounded-2xl bg-wine-deep text-on-wine shadow-raised lg:col-span-2" aria-labelledby="next-step-title">
+          <div className="p-5 sm:p-8">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent">
               <Sparkles aria-hidden className="size-4" />
               Sua próxima ação
             </p>
             {next && phase ? (
               <>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Badge tone="brand">
-                    Fase {phaseNumber} · {phase.phase.title}
-                  </Badge>
-                  <Badge tone="neutral">
-                    Etapa {next.number} de {phase.total}
-                  </Badge>
-                </div>
-                <h2 id="next-step-title" className="mt-2.5 max-w-2xl font-serif text-[1.4rem] font-semibold leading-tight text-fg sm:text-[1.75rem]">
+                <p className="mt-3 text-sm text-on-wine-muted">
+                  Fase {phaseNumber} · {phase.phase.title} <span aria-hidden>·</span> Etapa {next.number} de {phase.total}
+                </p>
+                <h2 id="next-step-title" className="mt-1.5 max-w-2xl font-serif text-[1.5rem] font-semibold leading-tight text-on-wine sm:text-[1.9rem]">
                   {next.step.title}
                 </h2>
-                <p className="mt-1.5 text-sm text-muted">
+                <p className="mt-1.5 text-sm text-on-wine-muted">
                   {KIND_LABEL[next.step.kind]}
                   {next.step.minutes ? ` · cerca de ${next.step.minutes} min` : ""}
                 </p>
-                <p className="mt-3 max-w-2xl rounded-lg bg-canvas p-3 text-sm text-fg sm:p-3.5">
-                  <span className="font-semibold text-brand">O que fazer: </span>
+                <p className="mt-4 max-w-2xl rounded-lg bg-wine-soft/60 p-3 text-sm text-on-wine ring-1 ring-white/8 sm:p-3.5">
+                  <span className="font-semibold text-accent">O que fazer: </span>
                   <span className="line-clamp-2 sm:line-clamp-none">{next.instruction}</span>
                 </p>
                 {jp ? (
                   <div className="mt-4 max-w-2xl">
                     <div className="flex items-baseline justify-between gap-3 text-sm">
-                      <span className="font-medium text-fg">Progresso da jornada</span>
-                      <span className="text-muted">
-                        {jp.done} de {jp.total} etapas · <strong className="font-semibold text-fg">{jp.percent}%</strong>
+                      <span className="font-medium text-on-wine">Progresso da jornada</span>
+                      <span className="text-on-wine-muted">
+                        {jp.done} de {jp.total} etapas · <strong className="font-semibold text-on-wine">{jp.percent}%</strong>
                       </span>
                     </div>
-                    <ProgressBar value={jp.percent} label="Progresso geral da jornada" size="sm" className="mt-2" />
+                    <ProgressBar value={jp.percent} label="Progresso geral da jornada" size="sm" tone="inverse" className="mt-2" />
                   </div>
                 ) : null}
                 <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <ButtonLink href={`/meu-plano/etapa/${next.step.id}`} size="lg" className="px-5 sm:px-6">
+                  <ButtonLink href={`/meu-plano/etapa/${next.step.id}`} variant="inverse" size="lg" className="px-5 sm:px-6">
                     Continuar minha jornada
                     <ArrowRight aria-hidden className="size-4" />
                   </ButtonLink>
-                  <ButtonLink href="/meu-plano" variant="ghost" size="lg" className="px-4">
+                  <ButtonLink href="/meu-plano" variant="onWine" size="lg" className="px-4">
                     Ver mapa
                   </ButtonLink>
                 </div>
               </>
             ) : (
               <div className="mt-4">
-                <h2 id="next-step-title" className="font-serif text-2xl font-semibold text-fg">
+                <h2 id="next-step-title" className="font-serif text-2xl font-semibold text-on-wine">
                   Trilha concluída!
                 </h2>
-                <p className="mt-2 max-w-xl text-sm text-muted">
+                <p className="mt-2 max-w-xl text-sm text-on-wine-muted">
                   Você marcou todas as tarefas desta trilha. A trilha de consistência e evolução será liberada em breve.
                 </p>
-                <ButtonLink href="/meu-plano" variant="secondary" className="mt-5">
+                <ButtonLink href="/meu-plano" variant="inverse" className="mt-5">
                   Revisar meu plano
                 </ButtonLink>
               </div>
             )}
           </div>
-        </Card>
+        </section>
 
         {/* 2. Continuidade: rotina sugerida para hoje */}
         <Card className="p-4 sm:p-6" aria-labelledby="today-title">
@@ -201,11 +196,11 @@ function AnnouncementsCard() {
         titleId="announcements-title"
         title="Avisos NUMI"
         description="Comunicados importantes da equipe."
-        action={<Megaphone aria-hidden className="size-5 text-brand" />}
+        action={<Megaphone aria-hidden className="size-5 text-subtle" />}
       />
       <ul className="mt-4 space-y-3 sm:mt-5">
         {DEMO_ANNOUNCEMENTS.map((a) => (
-          <li key={a.id} className="rounded-xl border border-line bg-canvas/50 p-4">
+          <li key={a.id} className="border-l-2 border-brand/40 py-0.5 pl-3.5">
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-medium text-fg">{a.title}</p>
               {a.isDemo ? <DemoBadge label="Aviso do protótipo" /> : null}

@@ -2,18 +2,21 @@ import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "ghost" | "inverse";
+type Variant = "primary" | "secondary" | "ghost" | "inverse" | "onWine";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold tracking-[-0.005em] whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55";
 
 const variants: Record<Variant, string> = {
   primary: "bg-brand text-white shadow-sm hover:bg-brand-hover disabled:hover:bg-brand",
   secondary:
-    "border border-line-strong bg-card text-fg hover:border-brand/40 hover:bg-blush disabled:hover:bg-card",
-  ghost: "text-brand hover:bg-blush",
-  inverse: "bg-white text-ink hover:bg-blush",
+    "border border-line-strong bg-card text-fg hover:border-brand/50 hover:bg-surface disabled:hover:bg-card",
+  ghost: "text-brand hover:bg-blush/70",
+  /** Botão claro sobre fundo vinho/foto (CTA principal em blocos escuros). */
+  inverse: "bg-paper text-wine-deep shadow-sm hover:bg-blush",
+  /** Secundário sobre fundo vinho. */
+  onWine: "border border-on-wine/35 text-on-wine hover:border-on-wine/60 hover:bg-wine-soft",
 };
 
 // Alturas mínimas de 40–48 px para alvos de toque confortáveis.

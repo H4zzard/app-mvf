@@ -34,7 +34,8 @@ export function PlanView() {
 }
 
 /** Deslocamento do percurso (só com espaço: a partir de 380 px). */
-const OFFSETS = ["", "min-[380px]:ml-8", "min-[380px]:ml-14", "min-[380px]:ml-8", "", "min-[380px]:-ml-0"];
+// Identidade 2.0: linha do tempo reta (o zigue-zague tinha cara de jogo infantil).
+const OFFSETS = [""];
 
 function JourneyMap() {
   const { journey } = useJourney();
@@ -62,11 +63,11 @@ function JourneyMap() {
     <div className="mx-auto max-w-2xl space-y-6">
       <header>
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-          <span>Meu Plano</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Meu Plano</span>
           {persistence === "memory" ? <DemoBadge label={personalized ? "Plano personalizado · demonstração" : "Exemplo de plano · demonstração"} /> : null}
         </div>
         <p className="mt-3 text-sm text-muted">Olá, {greetingName(profile)}</p>
-        <h1 className="font-serif text-[1.7rem] font-semibold leading-tight text-fg sm:text-4xl">
+        <h1 className="mt-0.5 font-serif text-[1.65rem] font-semibold leading-tight text-fg sm:text-[2.1rem]">
           {allDone ? "Você concluiu seu caminho" : (currentPhase?.phase.headline ?? "Seu caminho")}
         </h1>
         {currentPhase ? (
@@ -79,36 +80,36 @@ function JourneyMap() {
       {!personalized ? <PersonalizeBanner /> : null}
 
       {/* Próxima ação — o que fazer agora */}
-      <section aria-labelledby="proxima-acao" className="rounded-3xl border border-brand/20 bg-card p-4 shadow-card sm:p-5">
+      <section aria-labelledby="proxima-acao" className="mvf-on-wine rounded-2xl bg-wine-deep p-4 text-on-wine shadow-raised sm:p-6">
         {current ? (
           <>
-            <p id="proxima-acao" className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">
+            <p id="proxima-acao" className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
               Próxima ação
             </p>
-            <p className="mt-1.5 font-serif text-xl font-semibold leading-snug text-fg">{current.step.title}</p>
-            <p className="mt-0.5 text-sm text-muted">
+            <p className="mt-2 font-serif text-[1.35rem] font-semibold leading-snug text-on-wine">{current.step.title}</p>
+            <p className="mt-1 text-sm text-on-wine-muted">
               {current.phase.title} · etapa {current.number} de {currentPhase?.total}
             </p>
-            <ButtonLink href={`/meu-plano/etapa/${current.step.id}`} size="lg" className="mt-4 w-full sm:w-auto" onClick={() => rememberStep(current.step.id)}>
+            <ButtonLink href={`/meu-plano/etapa/${current.step.id}`} variant="inverse" size="lg" className="mt-5 w-full sm:w-auto" onClick={() => rememberStep(current.step.id)}>
               Continuar
               <ArrowRight aria-hidden className="size-4" />
             </ButtonLink>
           </>
         ) : (
-          <p id="proxima-acao" className="flex items-center gap-2 font-medium text-success">
+          <p id="proxima-acao" className="flex items-center gap-2 font-medium text-on-wine">
             <PartyPopper aria-hidden className="size-5" />
             {allDone ? "Todas as etapas do seu caminho estão concluídas." : "Nenhuma etapa disponível agora."}
           </p>
         )}
-        <div className="mt-4 space-y-2 border-t border-line pt-4">
+        <div className="mt-5 space-y-2 border-t border-white/12 pt-4">
           <div className="flex items-baseline justify-between text-sm">
-            <span className="text-muted">Progresso total</span>
-            <span className="font-semibold text-fg">
+            <span className="text-on-wine-muted">Progresso total</span>
+            <span className="font-semibold text-on-wine">
               {progress.done} de {progress.total} · {progress.percent}%
             </span>
           </div>
-          <ProgressBar value={progress.percent} label="Progresso total do plano" />
-          <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+          <ProgressBar value={progress.percent} label="Progresso total do plano" tone="inverse" />
+          <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-on-wine-muted">
             <span>
               Execução: {progress.execution.done}/{progress.execution.total}
             </span>
@@ -161,8 +162,8 @@ function PhaseBlock({ view, number, isCurrent }: { view: PhaseView; number: numb
   const pct = view.total ? Math.round((view.done / view.total) * 100) : 0;
   return (
     <li aria-labelledby={`fase-${view.phase.id}`}>
-      <div className={cn("flex items-center gap-3 rounded-2xl p-3", isCurrent ? "bg-blush/60" : "bg-surface")}>
-        <span className={cn("grid size-10 shrink-0 place-items-center rounded-full text-sm font-bold", view.complete ? "bg-success text-white" : isCurrent ? "bg-brand text-white" : "bg-card text-muted ring-1 ring-line")}>
+      <div className={cn("flex items-center gap-3 rounded-xl border p-3", isCurrent ? "border-brand/35 bg-card shadow-card" : "border-line bg-surface")}>
+        <span className={cn("grid size-10 shrink-0 place-items-center rounded-lg text-sm font-bold tabular-nums", view.complete ? "bg-success text-white" : isCurrent ? "bg-wine text-on-wine" : "bg-card text-muted ring-1 ring-line")}>
           {view.complete ? <Check aria-hidden className="size-5" /> : number}
         </span>
         <div className="min-w-0 flex-1">
@@ -171,12 +172,13 @@ function PhaseBlock({ view, number, isCurrent }: { view: PhaseView; number: numb
             {view.phase.title}
           </h2>
           <p className="text-xs text-muted">
+            {isCurrent && !view.complete ? <span className="font-semibold text-brand">Fase atual · </span> : null}
             {view.done} de {view.total} etapas{view.complete ? " · concluída" : ""}
           </p>
         </div>
         <span className="w-14 shrink-0" aria-hidden>
-          <span className="block h-1.5 overflow-hidden rounded-full bg-line">
-            <span className={cn("block h-full rounded-full", view.complete ? "bg-success" : "bg-brand")} style={{ width: `${pct}%` }} />
+          <span className="block h-1.5 overflow-hidden rounded-full bg-blush-strong">
+            <span className={cn("block h-full rounded-full", view.complete ? "bg-success" : "bg-wine")} style={{ width: `${pct}%` }} />
           </span>
         </span>
       </div>
@@ -228,24 +230,24 @@ function StepNode({ view: v, offset, last }: { view: StepView; offset: string; l
           aria-current={current ? "step" : undefined}
           className={cn(
             "relative z-10 grid shrink-0 place-items-center rounded-full font-semibold transition-transform focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand motion-safe:active:scale-95",
-            current ? "size-14 bg-brand text-white shadow-raised ring-4 ring-brand/20" : "size-12",
-            v.state === "concluida" && "bg-blush text-brand ring-1 ring-brand/20",
-            v.state === "disponivel" && "bg-card text-brand ring-2 ring-brand/50",
-            v.state === "bloqueada" && "bg-canvas text-subtle ring-1 ring-line",
+            current ? "size-14 bg-brand text-white shadow-raised ring-4 ring-brand/15" : "size-12",
+            v.state === "concluida" && "bg-wine text-on-wine",
+            v.state === "disponivel" && "bg-card text-brand ring-2 ring-brand/60",
+            v.state === "bloqueada" && "bg-surface text-subtle ring-1 ring-line-strong/70",
           )}
         >
           {Icon ? <Icon aria-hidden className={current ? "size-6" : "size-5"} /> : <span aria-hidden>{v.number}</span>}
         </Link>
-        {!last ? <span aria-hidden className={cn("w-0.5 flex-1 rounded-full", v.state === "concluida" ? "bg-brand/30" : "bg-line-strong/60")} style={{ minHeight: "1.25rem" }} /> : null}
+        {!last ? <span aria-hidden className={cn("w-0.5 flex-1", v.state === "concluida" ? "bg-wine/70" : "bg-line-strong/70")} style={{ minHeight: "1.25rem" }} /> : null}
       </div>
       <Link
         href={`/meu-plano/etapa/${v.step.id}`}
         onClick={() => rememberStep(v.step.id)}
         tabIndex={-1}
-        className={cn("min-w-0 flex-1 pb-5", current ? "pt-2.5" : "pt-2")}
+        className={cn("min-w-0 flex-1", current ? "mb-5 mt-0.5 self-start rounded-xl border border-brand/30 bg-card px-3.5 py-3 shadow-card" : "pb-5 pt-2")}
       >
-        {current ? <span className="mb-1 inline-block rounded-full bg-brand px-2.5 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wider text-white">Você está aqui</span> : null}
-        <span className={cn("block leading-snug", current ? "text-base font-semibold text-fg" : v.state === "bloqueada" ? "text-sm text-muted" : v.state === "concluida" ? "text-sm text-muted line-through decoration-brand/30" : "text-sm font-medium text-fg")}>
+        {current ? <span className="mb-1.5 inline-block rounded-md bg-brand px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wider text-white">Você está aqui</span> : null}
+        <span className={cn("block leading-snug", current ? "text-base font-semibold text-fg" : v.state === "bloqueada" ? "text-sm text-muted" : v.state === "concluida" ? "text-sm text-muted" : "text-sm font-medium text-fg")}>
           {v.step.title}
         </span>
         {v.state === "bloqueada" && v.missing[0] ? <span className="mt-0.5 block text-xs text-subtle">Libera após: {v.missing[0].title}</span> : null}

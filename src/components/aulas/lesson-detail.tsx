@@ -81,15 +81,15 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
       {/* Cabeçalho com a capa do módulo */}
       <section className="relative -mx-4 -mt-5 overflow-hidden bg-ink text-white sm:-mx-6 sm:-mt-8 lg:mx-0 lg:mt-0 lg:rounded-3xl">
         <Image src={cover} alt="" fill priority sizes="100vw" className="scale-125 object-cover opacity-45 blur-2xl" />
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(23_15_25/0.35),rgb(23_15_25/0.92))]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(52_11_24/0.35),rgb(52_11_24/0.92))]" />
         <div className="relative px-4 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6">
           {fromStep ? (
-            <Link href={`/meu-plano/etapa/${fromStep.id}`} className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:text-white/80">
+            <Link href={`/meu-plano/etapa/${fromStep.id}`} className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-white hover:text-white/80">
               <ArrowLeft aria-hidden className="size-4" />
               Voltar à etapa: {fromStep.title}
             </Link>
           ) : (
-            <Link href="/aulas" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-white/80 hover:text-white">
+            <Link href="/aulas" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-white/80 hover:text-white">
               <ArrowLeft aria-hidden className="size-4" />
               Área de membros
             </Link>
