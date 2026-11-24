@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Handshake, Info, Lightbulb, SearchX, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, Handshake, Info, Lightbulb, SearchX, SlidersHorizontal, Wallet } from "lucide-react";
 import { usePlan } from "@/components/plan/plan-provider";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
 import { Badge, DemoBadge, SoonBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -64,8 +64,14 @@ export function MarketplaceView() {
     <div className="space-y-5">
       <PageHeader
         eyebrow={<DemoBadge label="Demonstração" />}
-        title="Marketplace"
+        title="Produtos"
         description="Descubra produtos, consulte as informações e prepare seus vídeos no Estúdio IA."
+        actions={
+          <ButtonLink href="/minhas-vendas" variant="secondary">
+            <Wallet aria-hidden className="size-4" />
+            Minhas vendas
+          </ButtonLink>
+        }
       />
 
       <p className="flex items-start gap-2.5 rounded-xl border border-line bg-surface p-3 text-xs text-muted">

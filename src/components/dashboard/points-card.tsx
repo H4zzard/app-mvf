@@ -13,15 +13,28 @@ import { ProgressBar } from "@/components/ui/progress-bar";
  * - Modo demo: o MESMO XP da tela Conquistas (derivado das ações da sessão).
  * - Modo real: prévia pelas tarefas concluídas. Nunca representa ganhos.
  */
-export function PointsCard() {
+/**
+ * Resumo de pontos/nível (mesma fonte do card e do Perfil — nada de contador paralelo):
+ * demo → XP de `computeXp`; conta real → prévia pelas tarefas concluídas.
+ */
+export function usePointsSummary() {
   const { plan, statusMap, persistence } = usePlan();
   const demo = useOptionalDemo();
   const g = computeDemoGamification(plan?.tasks ?? [], statusMap);
-  const points = demo ? demo.xp.xp : g.points;
-  const levelNumber = demo ? demo.xp.level.number : g.levelNumber;
-  const levelName = demo ? demo.xp.level.name : g.levelName;
-  const toNextPts = demo ? demo.xp.xpToNext : g.pointsToNextLevel;
-  const percent = demo ? demo.xp.levelPercent : g.pointsToNextLevel > 0 ? Math.round((g.points / (g.points + g.pointsToNextLevel)) * 100) : 100;
+  return {
+    demo: demo !== null,
+    persistence,
+    points: demo ? demo.xp.xp : g.points,
+    unit: demo ? "XP" : "pts",
+    levelNumber: demo ? demo.xp.level.number : g.levelNumber,
+    levelName: demo ? demo.xp.level.name : g.levelName,
+    toNextPts: demo ? demo.xp.xpToNext : g.pointsToNextLevel,
+    percent: demo ? demo.xp.levelPercent : g.pointsToNextLevel > 0 ? Math.round((g.points / (g.points + g.pointsToNextLevel)) * 100) : 100,
+  };
+}
+
+export function PointsCard() {
+  const { demo, persistence, points, levelNumber, levelName, toNextPts, percent } = usePointsSummary();
 
   return (
     <section

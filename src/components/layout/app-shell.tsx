@@ -1,24 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { ChevronUp, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { AppHeader } from "@/components/layout/app-header";
-import { BottomNav, MoreSheet } from "@/components/layout/bottom-nav";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { DemoControls } from "@/components/layout/demo-role-switch";
+import { usePlan } from "@/components/plan/plan-provider";
+import { isAppNavHidden } from "@/lib/navigation/destinations";
 import { cn } from "@/lib/cn";
 
 /**
  * Shell compartilhado:
- * - ≥ 1024 px: sidebar recolhível;
- * - < 1024 px: barra inferior fixa (4 destinos + “Mais”), sem sidebar nem
- *   drawer competindo pela tela. O conteúdo reserva espaço para a barra e
- *   para a área segura do aparelho.
+ * - ≥ 1024 px: lateral recolhível com os MESMOS sete destinos;
+ * - < 1024 px: barra inferior fixa com os sete destinos (sem “Mais”). O
+ *   conteúdo reserva espaço para a barra e para a área segura do aparelho.
+ * - Modo foco (onboarding ainda não concluído e rotas de `FOCUS_ROUTE_PREFIXES`):
+ *   sem barra e sem lateral, para o primeiro acesso ser um caminho único.
  */
 export function AppShell({ children, demo = false }: { children: React.ReactNode; demo?: boolean }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const pathname = usePathname();
+  const { profile } = usePlan();
+  const focus = isAppNavHidden(pathname, { hasProfile: profile !== null });
 
   return (
     <div className="flex min-h-dvh">
@@ -31,7 +37,8 @@ export function AppShell({ children, demo = false }: { children: React.ReactNode
       {/* Sidebar desktop */}
       <aside
         className={cn(
-          "sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 lg:flex",
+          "sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200",
+          !focus && "lg:flex",
           collapsed ? "w-[76px]" : "w-[272px]",
         )}
       >
@@ -79,14 +86,17 @@ export function AppShell({ children, demo = false }: { children: React.ReactNode
         <AppHeader />
         <main
           id="conteudo"
-          className="mx-auto w-full max-w-[1320px] flex-1 px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-10"
+          data-focus={focus || undefined}
+          className={cn(
+            "mx-auto w-full max-w-[1320px] flex-1 px-4 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-10",
+            focus ? "pb-[calc(2.5rem+env(safe-area-inset-bottom))]" : "pb-[calc(6rem+env(safe-area-inset-bottom))]",
+          )}
         >
           {children}
         </main>
       </div>
 
-      <BottomNav onOpenMore={() => setMoreOpen(true)} moreOpen={moreOpen} />
-      {moreOpen ? <MoreSheet onClose={() => setMoreOpen(false)} /> : null}
+      {focus ? null : <BottomNav />}
     </div>
   );
 }

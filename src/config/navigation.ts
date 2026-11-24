@@ -18,8 +18,14 @@ import {
   Trophy,
   UserRound,
   Wallet,
+  GraduationCap,
+  WandSparkles,
+  ShoppingBag,
+  UsersRound,
+  type LucideIcon,
 } from "lucide-react";
 import type { NavigationGroup, NavigationItem, UserRole } from "@/types";
+import { DESTINATIONS, type Destination, type DestinationId } from "../lib/navigation/destinations.ts";
 
 export const NAV_GROUPS: NavigationGroup[] = [
   { id: "aprender", label: "Aprender" },
@@ -104,7 +110,7 @@ export const NAV_ITEMS: NavigationItem[] = [
   {
     id: "marketplace",
     demoReady: true,
-    label: "Marketplace",
+    label: "Produtos",
     href: "/marketplace",
     icon: Store,
     group: "criar",
@@ -136,7 +142,8 @@ export const NAV_ITEMS: NavigationItem[] = [
   {
     id: "comunidade",
     demoReady: true,
-    label: "Comunidade",
+    label: "Comunidade MVF",
+    shortLabel: "Tribo",
     href: "/comunidade",
     icon: MessagesSquare,
     group: "comunidade",
@@ -198,13 +205,12 @@ export const NAV_ITEMS: NavigationItem[] = [
   // Conta
   {
     id: "perfil",
-    demoReady: true,
     label: "Perfil",
     href: "/perfil",
     icon: UserRound,
     group: "conta",
-    status: "soon",
-    description: "Seus dados, preferências e respostas do onboarding.",
+    status: "available",
+    description: "Sua conta, evolução e ajuda.",
   },
   {
     id: "suporte",
@@ -256,8 +262,24 @@ export function isNavItemVisible(item: NavigationItem, role: UserRole): boolean 
   return !item.visibleTo || item.visibleTo.includes(role);
 }
 
-/** Destinos fixos da barra inferior do celular (o 5º é “Mais”). */
-export const MOBILE_PRIMARY_IDS = ["inicio", "meu-plano", "aulas", "videos-virais"] as const;
+/**
+ * Navegação 2.0: os sete destinos (barra inferior no celular, lateral no desktop).
+ * Ordem, rótulos e rotas vêm de `src/lib/navigation/destinations.ts` (puro, testado);
+ * aqui só se acrescentam os ícones. Não existe menu “Mais”.
+ */
+const DESTINATION_ICONS: Record<DestinationId, LucideIcon> = {
+  inicio: House,
+  plano: Route,
+  aulas: GraduationCap,
+  estudio: WandSparkles,
+  produtos: ShoppingBag,
+  tribo: UsersRound,
+  perfil: UserRound,
+};
+
+export type PrimaryNavItem = Destination & { icon: LucideIcon };
+
+export const PRIMARY_NAV: readonly PrimaryNavItem[] = DESTINATIONS.map((d) => ({ ...d, icon: DESTINATION_ICONS[d.id] }));
 
 /** “Em breve” para quem vê o item: no modo demo, módulos com tela mock ficam disponíveis. */
 export function isItemSoon(item: NavigationItem, demo: boolean): boolean {

@@ -30,7 +30,7 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
   execução da Fase C com evidências em `docs/RELATORIO_PILOTO_04.md`.
 
 ## ✅ Front mobile-first para demonstração (Prompt 05)
-- Barra inferior + “Mais”, Início curto no celular, Aulas (biblioteca + detalhe), Virais, Estúdio IA,
+- Barra inferior (hoje: 7 destinos, ver Navegação 2.0), Início curto no celular, Aulas (biblioteca + detalhe), Virais, Estúdio IA,
   Comunidade, Marketplace, Conquistas, Lives, Suporte, Minhas Vendas (vazio honesto), Perfil.
 - Tudo mock fica no modo demo local; produção mostra “Em breve”. Roteiro em `docs/GRAVACAO_MOBILE.md`.
 - **Pendente (ativos reais):** logo, fotos, catálogo NUMI, vídeos das aulas, roteiros validados,
@@ -49,6 +49,14 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 - **Pendente (equipe/expert):** aprovar fases e microetapas, confirmar procedimentos do TikTok,
   enviar prints reais, aulas oficiais de apoio (perfil, bio, avatar), modelos de bio e prompts.
 - **Próximo:** onboarding em vídeo (mesmo contrato), depois o Prompt 13B (pausado).
+
+## ✅ Navegação 2.0 + interface corporativa (prioritário, 24/11/2026)
+- Barra inferior com sete destinos (sem “Mais”), lateral desktop com os mesmos destinos, Perfil como
+  central de conta/evolução/ajuda, Início reorganizado por prioridade, atalhos de Virais no Início e
+  no Estúdio, rodapés de ajuda no Início e nas Aulas, modo foco para o primeiro acesso.
+  Ver `docs/NAVEGACAO_MVF.md`.
+- **Pendente:** teste em celulares físicos (checklist no relatório), categoria de plano real no Perfil
+  quando houver dado confirmado, onboarding com vídeo (usar `FOCUS_ROUTE_PREFIXES`).
 
 ## ✅ Painel administrativo — estrutura e conteúdo (Prompt 13A, demonstrativo local)
 - `/gestao` só no desenvolvimento (três condições, 404 no servidor fora disso): visão geral com

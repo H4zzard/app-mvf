@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import { NAV_GROUPS, findNavItemByPath } from "@/config/navigation";
+import { findNavItemByPath } from "@/config/navigation";
+import { destinationForPath } from "@/lib/navigation/destinations";
 import { useSession } from "@/components/layout/session-provider";
 import { NotificationsButton } from "@/components/layout/notifications-button";
 import { BrandMark } from "@/components/layout/brand-mark";
@@ -26,7 +27,9 @@ export function AppHeader() {
   const { user, mode } = useSession();
   const demo = mode === "demo";
   const item = findNavItemByPath(pathname);
-  const group = item ? NAV_GROUPS.find((g) => g.id === item.group) : undefined;
+  // Trilha: destino dono › página (ex.: Perfil › Ranking). Na página principal do destino, só o nome.
+  const dest = destinationForPath(pathname);
+  const parent = dest && item && item.href !== dest.href ? dest.fullLabel : undefined;
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/80 bg-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-canvas/75">
@@ -37,9 +40,9 @@ export function AppHeader() {
         {/* Localização atual */}
         <nav aria-label="Localização" className="hidden min-w-0 sm:block">
           <ol className="flex items-center gap-1.5 text-sm">
-            {group ? (
+            {parent ? (
               <>
-                <li className="text-muted">{group.label}</li>
+                <li className="text-muted">{parent}</li>
                 <li aria-hidden>
                   <ChevronRight className="size-3.5 text-subtle" />
                 </li>

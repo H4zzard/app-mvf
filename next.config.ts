@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/", destination: "/inicio", permanent: false },
       { source: "/virais", destination: "/videos-virais", permanent: false },
+      // Navegação 2.0: o menu “Mais” deixou de existir; links antigos vão para a central do Perfil.
+      { source: "/mais", destination: "/perfil", permanent: false },
     ];
   },
 };

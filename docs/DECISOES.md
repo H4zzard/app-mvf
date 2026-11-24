@@ -395,6 +395,26 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   procedimentos do TikTok marcados para revisão; métricas numéricas da reunião (CTR, estoque,
   conversão) não entraram como regra.
 
+## 24/11/2026 — Navegação 2.0 e interface corporativa
+
+- **D111 · Sete destinos, sem “Mais”.** Início, Plano, Aulas, Estúdio, Produtos, Tribo e Perfil, na
+  barra inferior (< 1024 px) e na lateral (desktop), a partir de `src/lib/navigation/destinations.ts`.
+  Substitui a D46. Cada rota tem um destino dono, ativo também nas subrotas (teste impede rota órfã).
+- **D112 · Rótulos compactos em vez de menu extra.** Abaixo de 360 px, “IA” e “Loja” (mesma fonte de
+  11 px). Nome acessível sempre contém a palavra visível (“Tribo, Comunidade MVF”, “Loja de produtos”).
+- **D113 · Perfil como central.** Conta, Minha evolução (XP/nível pela mesma fonte do card de pontos +
+  Desafios, Ranking, Conquistas, Recompensas), Ajuda e informações, Conta (respostas, ajustar plano,
+  sair) e controles da demo no celular. Disponível para todas as contas; não mostra e-mail, categoria,
+  preço ou benefício não confirmados; “Conhecer outros planos” é só “Em breve”, sem checkout.
+- **D114 · Destinos de Virais, Lives, Materiais e Minhas vendas.** Virais → Estúdio (atalhos no Início e
+  no Estúdio); Lives → Tribo; Materiais → Aulas; Minhas vendas → Produtos. `/mais` → `/perfil`.
+- **D115 · Modo foco no App Shell.** `isAppNavHidden`: sem barra nem lateral no onboarding não concluído e
+  nas rotas de `FOCUS_ROUTE_PREFIXES` (reservado para o primeiro acesso com vídeo).
+- **D116 · Início por prioridade.** Próxima ação da jornada (com progresso do mesmo motor) → Para hoje e
+  área de membros → Ferramentas (Virais, Estúdio) → Avisos (com Lives e Tribo) → “Precisa de ajuda?”.
+  Saíram do Início: acesso rápido de 4 ícones, lista “Sua jornada” (repetia o mapa), desafios e card de
+  pontos (agora no Perfil). Nenhuma funcionalidade removida.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a

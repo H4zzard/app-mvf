@@ -44,7 +44,7 @@ No celular, conectado **ao mesmo Wi-Fi**, abra a URL no Safari (iPhone) ou no Ch
 
 1. **Celular:** modo Não Perturbe, brilho alto, rotação travada na vertical, tema claro, zoom e
    tamanho de texto do sistema no padrão.
-2. **Cenário:** toque em **Mais → Controles da demo → Cenário para gravação**:
+2. **Cenário:** toque em **Perfil → Controles da demo (ao final) → Cenário para gravação**:
 
    | Cenário | O que mostra | Melhor para |
    |---|---|---|
@@ -84,8 +84,8 @@ inspiração em vídeos virais → roteiro/prompt → comunidade → gamificaç�
 | 14–24 s | Aula | Barra → **Aulas** → tocar um módulo → abrir aula → **Marcar como concluída** | Sheet do módulo, aula concluída |
 | 24–32 s | Aulas | Voltar e deslizar dois trilhos | Capas oficiais por trilho |
 | 32–42 s | Estúdio | Estúdio IA → **Criar Personagem** → **Gerar prompt** → **Usar no Animador** → escolher roteiro → **Gerar prompts de animação** → **Copiar tudo** | Takes com a fala exata, “Copiado!” |
-| 42–50 s | Comunidade | Mais → **Comunidade** → **Compartilhe algo** → publicar | Postagem marcada “Você” |
-| 50–60 s | Conquistas | Mais → **Conquistas** | Nível, XP e selos atualizados |
+| 42–50 s | Comunidade | **Tribo** → **Compartilhe algo** → publicar | Postagem marcada “Você” |
+| 50–60 s | Conquistas | **Perfil** → **Conquistas** | Nível, XP e selos atualizados |
 
 ### 90 segundos · cenário “Aluna em evolução”
 
@@ -136,7 +136,7 @@ Marque cada item no iPhone e/ou Android que será usado. Itens não testados fic
 - [ ] Logo, banner e capas carregam nítidos. Rosto e textos das capas sem cortes.
 - [ ] A barra inferior não cobre conteúdo nem botões. A área segura do iPhone (notch e barra de
       gestos) é respeitada.
-- [ ] Toques respondem na primeira tentativa: barra inferior, Mais, cards, chips, “Concluir”.
+- [ ] Toques respondem na primeira tentativa: barra inferior, Perfil, cards, chips, “Concluir”.
 - [ ] Trilhos de Aulas deslizam suaves com o dedo e param em cada capa.
 - [ ] Sheets (módulo, viral, recompensa) abrem e fecham pelo X e tocando fora, sem travar a rolagem.
 - [ ] Teclado: busca, Estúdio (produto), comentário e postagem não dão zoom e não escondem o botão de

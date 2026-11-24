@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChevronDown, FileWarning, LifeBuoy, MessagesSquare, SearchX, ShieldCheck, ThumbsDown, ThumbsUp } from "lucide-react";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
 import { DemoBadge } from "@/components/ui/badge";
@@ -12,7 +13,14 @@ import { DEMO_FAQ_FULL, DEMO_RULES, FAQ_TOPICS, type FaqTopic } from "@/demo/rul
 import { matchesQuery } from "@/lib/demo/filters";
 import { cn } from "@/lib/cn";
 
-type Tab = "regras" | FaqTopic | "todas";
+type Tab = "regras" | "faq" | FaqTopic | "todas";
+
+/** `?secao=` vindo do Perfil, do Início e das Aulas (regras, faq ou um tema do FAQ). */
+function tabFromParam(value: string | null): Tab {
+  if (value === "regras" || value === "faq") return value;
+  if (value && Object.hasOwn(FAQ_TOPICS, value)) return value as FaqTopic;
+  return "todas";
+}
 
 /**
  * Regras e FAQ (DEMONSTRAÇÃO). Textos demonstrativos PENDENTES DE REVISÃO da
@@ -20,12 +28,19 @@ type Tab = "regras" | FaqTopic | "todas";
  */
 export function RulesFaqView() {
   const [query, setQuery] = useState("");
-  const [tab, setTab] = useState<Tab>("todas");
+  const secao = useSearchParams().get("secao");
+  const [tab, setTab] = useState<Tab>(() => tabFromParam(secao));
+  // A tela fica montada (escondida) entre visitas: um novo `?secao=` reabre a seção pedida.
+  const [lastSecao, setLastSecao] = useState(secao);
+  if (secao !== lastSecao) {
+    setLastSecao(secao);
+    setTab(tabFromParam(secao));
+  }
   const [open, setOpen] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, "sim" | "nao">>({});
 
   const rules = DEMO_RULES.filter((r) => (tab === "todas" || tab === "regras") && matchesQuery(query, r.title, r.body));
-  const faq = DEMO_FAQ_FULL.filter((f) => (tab === "todas" || tab === f.topic) && matchesQuery(query, f.question, f.answer));
+  const faq = DEMO_FAQ_FULL.filter((f) => (tab === "todas" || tab === "faq" || tab === f.topic) && matchesQuery(query, f.question, f.answer));
   const nothing = rules.length === 0 && faq.length === 0;
 
   return (
@@ -53,6 +68,7 @@ export function RulesFaqView() {
           options={[
             { value: "todas" as const, label: "Tudo" },
             { value: "regras" as const, label: "Regras" },
+            { value: "faq" as const, label: "Perguntas" },
             ...(Object.keys(FAQ_TOPICS) as FaqTopic[]).map((t) => ({ value: t, label: FAQ_TOPICS[t] })),
           ]}
         />

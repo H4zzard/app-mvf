@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Clapperboard, Library, Trash2, UserRound, Video, Wand2 } from "lucide-react";
+import { ArrowRight, ChevronRight, Clapperboard, Flame, Library, Trash2, UserRound, Video, Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDemo } from "@/components/demo/demo-provider";
 import { DemoBadge } from "@/components/ui/badge";
@@ -85,6 +85,22 @@ export function StudioHub() {
           );
         })}
       </ul>
+
+      {/* Acesso auxiliar: Virais → escolher referência → Estúdio → criar conteúdo. Não é um 4º gerador. */}
+      <Link
+        href="/videos-virais"
+        data-tool="videos-virais"
+        className="group flex min-h-16 items-center gap-3 rounded-xl border border-line bg-card p-4 shadow-card transition-colors hover:border-brand/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+      >
+        <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-lg bg-blush text-brand">
+          <Flame className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-fg">Explorar vídeos virais</span>
+          <span className="block text-sm text-muted">Encontre referências e adapte ideias para seus conteúdos.</span>
+        </span>
+        <ChevronRight aria-hidden className="size-5 shrink-0 text-subtle group-hover:text-brand" />
+      </Link>
 
       <Card className="space-y-3 p-4 sm:p-5">
         <h2 className="font-serif text-lg font-semibold text-fg">Como funciona</h2>

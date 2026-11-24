@@ -1,11 +1,11 @@
 "use client";
 
 import { useLayoutEffect, useState } from "react";
-import { FlaskConical, Lock, LockOpen, MessageCircle, PenSquare, Plus, SearchX, SlidersHorizontal } from "lucide-react";
+import { FlaskConical, Lock, LockOpen, MessageCircle, PenSquare, Plus, Radio, SearchX, SlidersHorizontal } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
 import { Badge, DemoBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -65,8 +65,14 @@ export function CommunityView() {
     <div className="space-y-5">
       <PageHeader
         eyebrow={<DemoBadge label="Comunidade de demonstração" />}
-        title="Comunidade"
+        title="Comunidade MVF"
         description="Troque dúvidas, aprendizados e marcos da sua jornada com outras alunas."
+        actions={
+          <ButtonLink href="/lives" variant="secondary">
+            <Radio aria-hidden className="size-4" />
+            Lives e encontros
+          </ButtonLink>
+        }
       />
 
       {/* Nova publicação + modelos (atalhos) */}

@@ -81,7 +81,8 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
   veem “Em breve” até existir dado real. Nunca renderizar fixture fora da demo.
 - Estado da demo: `DemoProvider` + redutor puro `src/lib/demo/store.ts` (memória). Plano continua
   só no `PlanProvider`. Dados de exemplo em `src/demo/` sempre rotulados (“exemplo”, “demonstrativo”).
-- Navegação < 1024 px: barra inferior (`MOBILE_PRIMARY_IDS`) + folha “Mais”. Respeitar safe area.
+- Navegação: 7 destinos fixos (`src/lib/navigation/destinations.ts`), barra inferior < 1024 px e lateral no
+  desktop. Sem menu “Mais”. Rota nova precisa de destino dono (`owns`); regras em `docs/NAVEGACAO_MVF.md`.
 - Telas visitadas ficam no DOM escondidas por `<Activity>`: feche sheets no `useLayoutEffect` de
   limpeza e, nos testes de navegador, considere só elementos visíveis.
 

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { HelpFooter } from "@/components/layout/help-footer";
 import { useLayoutEffect, useMemo, useState } from "react";
 import { ArrowDown, CircleCheck, CirclePlay, Clock, Play, Search, SearchX, Sparkles, X } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
@@ -198,6 +199,17 @@ export function CatalogView() {
           </p>
         </div>
       )}
+
+      {/* Rodapé de ajuda: discreto, depois de todos os trilhos (não interfere no estilo de streaming). */}
+      <div className="space-y-3">
+        <HelpFooter title="Dúvidas para começar?" />
+        <p className="text-sm text-muted">
+          Procurando arquivos de apoio?{" "}
+          <Link href="/materiais" className="inline-flex min-h-11 items-center font-semibold text-brand hover:underline">
+            Ver materiais
+          </Link>
+        </p>
+      </div>
 
       {openModule ? <ModuleSheet module={openModule} isLessonDone={isLessonDone} onClose={() => setOpenModuleId(null)} /> : null}
     </div>
