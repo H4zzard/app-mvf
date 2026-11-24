@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-24",
+  "review": [
+    "Nenhum print oficial foi fornecido até esta data. As etapas mostram “Print desta etapa pendente de cadastro”.",
+    "Prints: capturas REAIS e autorizadas pela equipe, salvas em public/jornada/<id-da-etapa>-<ordem>.webp (ou .png/.jpg). Formato vertical de celular (9:19,5), largura entre 720 e 1080 px, até 400 KB. Ver docs/PLANO_INTERATIVO.md."
+  ],
+  "prints": []
+}

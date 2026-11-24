@@ -134,3 +134,10 @@ dialog::backdrop {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Meu Plano 2.0: confirmação curta ao concluir uma etapa (só com movimento permitido). */
+@keyframes mvf-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}

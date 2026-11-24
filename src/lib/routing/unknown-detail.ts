@@ -9,8 +9,9 @@
  */
 import { catalog } from "../catalog/index.ts";
 import { productCatalog } from "../products/index.ts";
+import { JOURNEY_STEPS } from "../../demo/journey-catalog.ts";
 
-const DETAIL = /^\/(aulas|marketplace)\/([^/]+)\/?$/;
+const DETAIL = /^\/(aulas|marketplace|meu-plano\/etapa)\/([^/]+)\/?$/;
 
 export function isUnknownDetailPath(pathname: string): boolean {
   const m = DETAIL.exec(pathname);
@@ -22,6 +23,7 @@ export function isUnknownDetailPath(pathname: string): boolean {
     return true; // codificação inválida nunca é um ID válido
   }
   if (m[1] === "aulas") return !catalog.getLesson(id);
+  if (m[1] === "meu-plano/etapa") return !JOURNEY_STEPS.some((s) => s.id === id);
   return !productCatalog.get(id);
 }
 

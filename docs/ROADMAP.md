@@ -41,6 +41,15 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
   intacta) e Roteiros para Gravar Aparecendo (10 roteiros), com modelo local e sem rede.
 - **Pendente:** integração DeepSeek no servidor (texto) e roteiros próprios da equipe. Ver `docs/ESTUDIO_IA.md`.
 
+## ✅ Meu Plano 2.0 — jornada interativa (prioritário, reunião 23/11/2026)
+- Mapa de evolução com fases e microetapas, tela de execução (uma ação por vez, print, resultado
+  esperado, aula de apoio, “Concluí esta etapa” → “Próxima etapa”), personalização pelo motor
+  existente, progresso histórico e XP preservados, Início abrindo a microetapa atual.
+  Ver `docs/PLANO_INTERATIVO.md`.
+- **Pendente (equipe/expert):** aprovar fases e microetapas, confirmar procedimentos do TikTok,
+  enviar prints reais, aulas oficiais de apoio (perfil, bio, avatar), modelos de bio e prompts.
+- **Próximo:** onboarding em vídeo (mesmo contrato), depois o Prompt 13B (pausado).
+
 ## ✅ Painel administrativo — estrutura e conteúdo (Prompt 13A, demonstrativo local)
 - `/gestao` só no desenvolvimento (três condições, 404 no servidor fora disso): visão geral com
   números reais, cursos e aulas, produtos NUMI, roteiros e presets, fluxo editorial, revisão e

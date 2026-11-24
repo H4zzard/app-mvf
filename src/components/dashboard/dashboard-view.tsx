@@ -1,33 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Check, CirclePlay, Megaphone, PartyPopper, Sparkles, Sun, Target } from "lucide-react";
+import { ArrowRight, Megaphone, PartyPopper, Sparkles, Sun, Target } from "lucide-react";
 import { useActivePlan, usePlan } from "@/components/plan/plan-provider";
 import { useOptionalDemo } from "@/components/demo/demo-provider";
 import { PersonalizeBanner, PersonalizeHero } from "@/components/onboarding/personalize-callout";
-import { TaskDuration, TaskTypeLabel } from "@/components/plan/task-meta";
+import { useJourney } from "@/components/plan/use-journey";
 import { QuickAccess } from "@/components/dashboard/quick-access";
 import { PointsCard } from "@/components/dashboard/points-card";
 import { MemberAreaBanner } from "@/components/dashboard/member-area-banner";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Badge, DemoBadge } from "@/components/ui/badge";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { DEMO_ANNOUNCEMENTS } from "@/demo/session";
 import { CHALLENGES, MISSIONS, challengeProgress, missionProgress } from "@/lib/demo/xp";
 import { greetingName } from "@/lib/greeting";
-import {
-  computeProgress,
-  computeStageProgress,
-  formatMinutes,
-  getDailySuggestion,
-  getNextTask,
-  getStage,
-  getStatus,
-  getUpcomingTasks,
-} from "@/lib/plan";
+import { formatMinutes, getDailySuggestion } from "@/lib/plan";
 import { cn } from "@/lib/cn";
 
 export function DashboardView() {
@@ -62,16 +53,20 @@ function FirstAccessDashboard({ name, demo }: { name: string; demo: boolean }) {
 }
 
 function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersonalized: boolean; demo: boolean }) {
-  const { plan, statusMap, toggleComplete } = useActivePlan();
+  const { plan, statusMap } = useActivePlan();
+  // Meu Plano 2.0: o próximo passo é a próxima MICROETAPA da jornada (mesmo statusMap).
+  const { journey } = useJourney();
   // Módulos de demonstração disponíveis (modo demo local OU prévia autorizada no servidor).
   const modules = useOptionalDemo() !== null;
 
-  const progress = computeProgress(plan, statusMap);
-  const next = getNextTask(plan, statusMap);
-  const stage = next ? getStage(plan, next.stageId) : undefined;
-  const stageProgress = stage ? computeStageProgress(plan, statusMap, stage.id) : undefined;
-  const upcoming = getUpcomingTasks(plan, statusMap, 3);
   const daily = getDailySuggestion(plan, statusMap, plan.dailyMinutes);
+  const next = journey?.current ?? null;
+  const phase = journey?.currentPhase ?? null;
+  const phaseNumber = phase && journey ? journey.phases.indexOf(phase) + 1 : 0;
+  const jp = journey?.progress;
+  const progress = { percent: jp?.percent ?? 0, completed: jp?.done ?? 0, total: jp?.total ?? 0, remaining: (jp?.total ?? 0) - (jp?.done ?? 0) };
+  const upcoming = journey ? journey.steps.filter((v) => v.applicable && !v.done && v.state !== "bloqueada").slice(0, 3) : [];
+  const KIND_LABEL = { acao: "Ação prática", aula: "Aula", decisao: "Escolha rápida", confirmacao: "Confirmação" } as const;
 
   return (
     <div className="space-y-4 sm:space-y-8">
@@ -89,9 +84,9 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
         }
         title={`Olá, ${name}`}
         description={
-          stage && next
-            ? `Etapa ${stage.order} de ${plan.stages.length} — ${stage.title}.`
-            : "Você concluiu todas as atividades deste plano. Hora de pensar em consistência."
+          phase && next && journey
+            ? `Fase ${phaseNumber} de ${journey.phases.length} — ${phase.phase.title}.`
+            : "Você concluiu todas as etapas deste plano. Hora de pensar em consistência."
         }
       />
 
@@ -106,50 +101,39 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
               <Sparkles aria-hidden className="size-4" />
               Seu próximo passo
             </p>
-            {next && stage ? (
+            {next && phase ? (
               <>
                 <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4">
                   <Badge tone="brand">
-                    Etapa {stage.order} · {stage.shortTitle}
+                    Fase {phaseNumber} · {phase.phase.title}
                   </Badge>
-                  {getStatus(statusMap, next.id) === "in_progress" ? <Badge tone="neutral">Em andamento</Badge> : null}
+                  <Badge tone="neutral">
+                    Etapa {next.number} de {phase.total}
+                  </Badge>
                 </div>
                 <h2
                   id="next-step-title"
                   className="mt-2.5 max-w-2xl font-serif text-[1.45rem] font-semibold leading-tight text-fg sm:mt-3 sm:text-3xl"
                 >
-                  {next.title}
+                  {next.step.title}
                 </h2>
-                <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted sm:mt-3">
-                  <TaskTypeLabel type={next.type} />
-                  <TaskDuration minutes={next.durationMinutes} />
-                  <span className="inline-flex items-center gap-1">
-                    <CalendarDays aria-hidden className="size-3.5" />
-                    Dia sugerido {next.daySuggestion}
-                  </span>
-                </div>
+                <p className="mt-2 text-sm text-muted">
+                  {KIND_LABEL[next.step.kind]}
+                  {next.step.minutes ? ` · cerca de ${next.step.minutes} min` : ""}
+                </p>
                 <p className="mt-3.5 max-w-2xl rounded-xl bg-canvas/80 p-3.5 text-sm text-fg sm:mt-4 sm:p-4">
-                  <span className="font-semibold text-brand">Por que agora: </span>
-                  <span className="line-clamp-2 sm:line-clamp-none">{next.whyInPlan}</span>
+                  <span className="font-semibold text-brand">O que fazer: </span>
+                  <span className="line-clamp-2 sm:line-clamp-none">{next.instruction}</span>
                 </p>
                 <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-6 sm:flex sm:flex-wrap sm:gap-3">
-                  {modules && next.lessonId ? (
-                    <ButtonLink href={`/aulas/${next.lessonId}`} size="lg" className="px-4 sm:px-6">
-                      <CirclePlay aria-hidden className="size-4" />
-                      Abrir aula
-                    </ButtonLink>
-                  ) : (
-                    <ButtonLink href={`/meu-plano#task-${next.id}`} size="lg" className="px-4 sm:px-6">
-                      <span className="sm:hidden">Continuar</span>
-                      <span className="hidden sm:inline">Continuar meu plano</span>
-                      <ArrowRight aria-hidden className="size-4" />
-                    </ButtonLink>
-                  )}
-                  <Button variant="secondary" size="lg" onClick={() => toggleComplete(next.id)} className="px-4 sm:px-6">
-                    <Check aria-hidden className="size-4" />
-                    <span className="sm:hidden">Concluir</span>
-                    <span className="hidden sm:inline">Marcar como concluída</span>
-                  </Button>
+                  <ButtonLink href={`/meu-plano/etapa/${next.step.id}`} size="lg" className="px-4 sm:px-6">
+                    <span className="sm:hidden">Continuar</span>
+                    <span className="hidden sm:inline">Continuar meu plano</span>
+                    <ArrowRight aria-hidden className="size-4" />
+                  </ButtonLink>
+                  <ButtonLink href="/meu-plano" variant="secondary" size="lg" className="px-4 sm:px-6">
+                    Ver mapa
+                  </ButtonLink>
                 </div>
               </>
             ) : (
@@ -180,19 +164,18 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
             <p className="pb-1 text-right text-sm text-muted">
               {progress.completed} de {progress.total}
               <br />
-              tarefas
+              etapas
             </p>
           </div>
           <ProgressBar value={progress.percent} label="Progresso geral do plano" className="mt-3" />
           <dl className="mt-5 hidden grid-cols-3 gap-2 text-center sm:grid">
-            <Stat label="Etapas" value={plan.stages.length} />
+            <Stat label="Fases" value={journey?.phases.length ?? 0} />
             <Stat label="Concluídas" value={progress.completed} />
             <Stat label="Pendentes" value={progress.remaining} />
           </dl>
-          {stage && stageProgress ? (
+          {phase ? (
             <p className="mt-4 hidden text-sm text-muted sm:block">
-              Etapa atual: <strong className="font-semibold text-fg">{stage.title}</strong> · {stageProgress.completed}/
-              {stageProgress.total}
+              Fase atual: <strong className="font-semibold text-fg">{phase.phase.title}</strong> · {phase.done}/{phase.total}
             </p>
           ) : null}
           <ButtonLink href="/meu-plano" variant="ghost" size="sm" className="-ml-3 mt-auto self-start sm:pt-2">
@@ -257,36 +240,33 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
           />
           {upcoming.length > 0 ? (
             <ol className="mt-5 space-y-3">
-              {upcoming.map((task, i) => {
-                const s = getStage(plan, task.stageId);
-                return (
-                  <li key={task.id}>
-                    <Link
-                      href={`/meu-plano#task-${task.id}`}
+              {upcoming.map((v, i) => (
+                <li key={v.step.id}>
+                  <Link
+                    href={`/meu-plano/etapa/${v.step.id}`}
+                    className={cn(
+                      "flex items-center gap-4 rounded-xl border p-3 transition-colors",
+                      i === 0 ? "border-brand/30 bg-blush/50" : "border-line hover:border-line-strong hover:bg-canvas/60",
+                    )}
+                  >
+                    <span
                       className={cn(
-                        "flex items-center gap-4 rounded-xl border p-3 transition-colors",
-                        i === 0 ? "border-brand/30 bg-blush/50" : "border-line hover:border-line-strong hover:bg-canvas/60",
+                        "grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold",
+                        i === 0 ? "bg-brand text-white" : "bg-canvas text-muted ring-1 ring-line",
                       )}
                     >
-                      <span
-                        className={cn(
-                          "grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold",
-                          i === 0 ? "bg-brand text-white" : "bg-canvas text-muted ring-1 ring-line",
-                        )}
-                      >
-                        {i + 1}
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="line-clamp-2 font-medium text-fg">{v.step.title}</span>
+                      <span className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted">
+                        <span>{v.phase.title}</span>
+                        <span>{KIND_LABEL[v.step.kind]}</span>
                       </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="line-clamp-2 font-medium text-fg">{task.title}</span>
-                        <span className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted">
-                          <span>{s?.shortTitle}</span>
-                          <TaskDuration minutes={task.durationMinutes} />
-                        </span>
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
+                    </span>
+                  </Link>
+                </li>
+              ))}
             </ol>
           ) : (
             <EmptyState icon={PartyPopper} title="Nenhum passo pendente" description="Você concluiu todas as tarefas desta trilha." className="mt-5" />

@@ -370,6 +370,31 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - **D102 · CSV de produtos** aceita `caminho|texto|capa-oficial` (retrocompatível), para a
   reimportação não trocar o tipo da imagem.
 
+### Meu Plano 2.0 — jornada interativa (prioritário, reunião de 23/11/2026)
+
+- **D103 · Jornada como camada sobre o motor.** `buildPlan` continua decidindo as atividades; a
+  jornada (`src/lib/journey`, pura) expande em microetapas por fase. Sem segundo motor nem segunda
+  fonte de respostas; estado único no `statusMap` do PlanProvider.
+- **D104 · IDs e persistência.** Microetapas `t-j-…` e sinalizadores de decisão `t-j-flag-…` no
+  formato da tabela `user_task_progress`; a Server Action do plano passou a aceitá-los. Sem migration;
+  `apply_onboarding` não apaga progresso (replanejar preserva).
+- **D105 · XP pela atividade antiga.** Microetapa não dá XP; a atividade antiga é marcada concluída
+  quando todas as suas microetapas aplicáveis terminam (regra `computeXp`, uma vez). Atividade antiga
+  já concluída ⇒ microetapas concluídas (progresso histórico preservado).
+- **D106 · Aprendizado × execução.** Etapas de aula = atividades de aula do motor (mesmo ID); só elas
+  sincronizam com a conclusão da aula na biblioteca. Ações práticas nunca são marcadas por aula.
+- **D107 · Não aplicável ≠ concluída.** Etapas fora do perfil ficam recolhidas com motivo; a decisão
+  “já tenho conta” na jornada vence a resposta do onboarding e pode ser trocada.
+- **D108 · Telas.** Mapa vertical (`/meu-plano`) com uma etapa “Você está aqui” e execução em rota
+  própria (`/meu-plano/etapa/[id]`, 404 para ID desconhecido), uma ação por tela, botão fixo acima da
+  barra inferior, “Próxima etapa” imediata e volta ao mapa posicionada na etapa (âncora). O Início
+  abre direto a microetapa atual. Componentes do checklist antigo removidos (sem uso).
+- **D109 · Prints só reais.** Manifesto `src/content/jornada-prints.json` (vazio) + `public/jornada/`;
+  sem print, “Print desta etapa pendente de cadastro”. Nada de imagem genérica.
+- **D110 · Conteúdo como proposta.** 6 fases e 57 microetapas são proposta técnica preliminar;
+  procedimentos do TikTok marcados para revisão; métricas numéricas da reunião (CTR, estoque,
+  conversão) não entraram como regra.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a
@@ -379,6 +404,7 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - Regras de pontos, níveis, recompensas e salas Elite+ / Icon (Icon inclui Elite+?).
 - Regras de convivência, moderação, agenda real de lives, política de gravações e canais oficiais de suporte.
 - Criar os papéis “Editor de conteúdo” e “Revisor” no banco (ou mapear para `expert`)?
+- Metodologia oficial da jornada (fases, microetapas, procedimentos do TikTok, prints e aulas de apoio).
 - Catálogo real de aulas/atividades e revisão das regras do motor pela expert (o atual é demo).
 - Migração/hospedagem das aulas hoje na Kiwify (direitos, arquivos-fonte, player).
 - Comissões NUMI e integração com TikTok Shop.

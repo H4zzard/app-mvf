@@ -11,6 +11,7 @@ import type { TaskStatus } from "@/types";
 import { ONBOARDING_VERSION, sanitizeDraft, validateProfile } from "@/config/onboarding-questions";
 import { buildPlan, ENGINE_VERSION } from "@/lib/personalization/engine";
 import { TASK_CATALOG } from "@/demo/task-catalog";
+import { journeyStatusIds } from "@/lib/journey/journey";
 import { authorizeMemberAction } from "@/lib/auth/viewer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -18,7 +19,8 @@ export type ActionResult<T = object> =
   | ({ ok: true } & T)
   | { ok: false; error: "unauthenticated" | "forbidden" | "unconfigured" | "demo" | "invalid" | "conflict" | "server" };
 
-const KNOWN_TASK_IDS = new Set(TASK_CATALOG.map((t) => t.id));
+// Atividades do motor + microetapas e sinalizadores da jornada (mesmo formato t-…, mesma tabela).
+const KNOWN_TASK_IDS = new Set([...TASK_CATALOG.map((t) => t.id), ...journeyStatusIds()]);
 const STATUSES = new Set<TaskStatus>(["pending", "in_progress", "completed"]);
 
 export async function setTaskStatusAction(taskId: unknown, status: unknown): Promise<ActionResult> {

@@ -135,6 +135,15 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - “Aprovado”/“Publicado localmente” no painel não são aprovação/publicação reais. Regras em `docs/PAINEL_ADMIN.md`.
 - Permissões só em `permissions.ts`; perfis do painel são simulação. Roteiros do Animador vêm de `src/lib/studio/library.ts`.
 
+## Meu Plano 2.0 — jornada interativa
+
+- Regras em `docs/PLANO_INTERATIVO.md`. Motor puro `src/lib/journey/` sobre `buildPlan` (nunca um segundo motor);
+  catálogo-proposta em `src/demo/journey-catalog.ts`; estado único no `statusMap` do PlanProvider.
+- IDs de microetapa `t-j-…` estáveis (nunca renomear); toda atividade do motor precisa de etapa (há teste).
+- Microetapa não dá XP: a atividade antiga é concluída quando todas as suas etapas aplicáveis terminam.
+- Aula de apoio nunca marca ação prática. “Não se aplica” nunca conta como concluída.
+- Prints só reais (`src/content/jornada-prints.json` + `public/jornada/`); sem print, mostrar a pendência.
+
 ## Gamificação da demo (Prompt 07)
 
 - Fonte única: `src/lib/demo/xp.ts` (XP, níveis, marcos, missões) e `src/lib/demo/economy.ts`

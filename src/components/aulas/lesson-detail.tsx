@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLayoutEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -27,6 +28,7 @@ import { MEMBER_ASSETS, getModule, moduleOfLesson, modulesOfRail } from "@/demo/
 import { catalog } from "@/lib/catalog";
 import type { MaterialKind } from "@/types/catalog";
 import { getStatus } from "@/lib/plan";
+import { JOURNEY_STEPS } from "@/demo/journey-catalog";
 import { cn } from "@/lib/cn";
 
 const MATERIAL_ICON: Record<MaterialKind, typeof FileText> = {
@@ -47,6 +49,9 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
   const { plan, statusMap } = usePlan();
   const [openModuleId, setOpenModuleId] = useState<string | null>(null);
   useLayoutEffect(() => () => setOpenModuleId(null), []);
+  // Veio de uma etapa do Meu Plano (aula de apoio)? Oferece voltar exatamente a ela.
+  const fromStepId = useSearchParams().get("etapa");
+  const fromStep = fromStepId ? JOURNEY_STEPS.find((s) => s.id === fromStepId) : undefined;
 
   const lesson = catalog.getLesson(lessonId);
   if (!lesson) return null;
@@ -78,10 +83,17 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
         <Image src={cover} alt="" fill priority sizes="100vw" className="scale-125 object-cover opacity-45 blur-2xl" />
         <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(23_15_25/0.35),rgb(23_15_25/0.92))]" />
         <div className="relative px-4 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6">
-          <Link href="/aulas" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-white/80 hover:text-white">
-            <ArrowLeft aria-hidden className="size-4" />
-            Área de membros
-          </Link>
+          {fromStep ? (
+            <Link href={`/meu-plano/etapa/${fromStep.id}`} className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-white hover:text-white/80">
+              <ArrowLeft aria-hidden className="size-4" />
+              Voltar à etapa: {fromStep.title}
+            </Link>
+          ) : (
+            <Link href="/aulas" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-white/80 hover:text-white">
+              <ArrowLeft aria-hidden className="size-4" />
+              Área de membros
+            </Link>
+          )}
           <div className="mt-3 flex items-end gap-4 sm:gap-6">
             <span className="relative aspect-[2/3] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-[0_16px_32px_-12px_rgb(0_0_0/0.7)] ring-1 ring-white/15 sm:w-36">
               <Image src={cover} alt={mod ? `Capa do módulo ${mod.title}` : ""} fill sizes="144px" className="object-cover" />
@@ -148,9 +160,9 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
               <p className="mt-0.5 text-xs text-muted">
                 {getStatus(statusMap, planTask.id) === "completed"
                   ? "Concluída no plano."
-                  : "Ao marcar a aula como concluída, a tarefa do plano também é concluída."}
+                  : "Esta aula é uma etapa de aprendizado do seu plano: concluir a aula conclui essa etapa (ações práticas são marcadas só por você)."}
               </p>
-              <ButtonLink href={`/meu-plano#task-${planTask.id}`} variant="ghost" size="sm" className="-ml-3 mt-1">
+              <ButtonLink href={`/meu-plano/etapa/${planTask.id}`} variant="ghost" size="sm" className="-ml-3 mt-1">
                 Ver no Meu Plano
                 <ArrowRight aria-hidden className="size-4" />
               </ButtonLink>

@@ -1,0 +1,1 @@
+Prints REAIS das etapas da jornada (ver docs/PLANO_INTERATIVO.md e src/content/jornada-prints.json).

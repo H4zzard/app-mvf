@@ -1,0 +1,2 @@
+id,fase,ordem,atividade_antiga,tipo,titulo,instrucao,resultado_esperado,aulas_apoio,prerequisitos,aplica_quando,tempo_min,atalho,procedimento_externo,prints
+t-j-exemplo-apague-esta-linha,f-conta,1,t-perfil,acao,EXEMPLO — Abra a edição do perfil,EXEMPLO — No app X, toque em Perfil e depois em Editar perfil.,A tela Editar perfil está aberta.,,t-j-conta-decisao,Todas que entram em t-perfil,,,sim,t-j-exemplo-apague-esta-linha-1.webp|Tela do perfil com o botão Editar perfil|Toque em Editar perfil|TikTok · Perfil|50;30
