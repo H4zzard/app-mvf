@@ -215,41 +215,48 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
       <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 mt-6 lg:bottom-4">
         <div className="rounded-3xl border border-line bg-surface/95 p-3 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-surface/85">
           {justDone ? (
-            <div role="status" className="flex flex-wrap items-center gap-2">
-              <span className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold text-success">
+            // Empilhado: a mensagem tem a linha inteira (nunca fica sob os botões) e as ações vêm abaixo.
+            <div role="status" className="space-y-3">
+              <p className="flex items-center gap-2.5 text-sm font-semibold leading-snug text-success">
                 <span className="grid size-8 shrink-0 place-items-center rounded-full bg-success text-white motion-safe:animate-[mvf-pop_240ms_ease-out]">
                   <Check aria-hidden className="size-4" />
                 </span>
-                {justDone.phaseDone ? `Fase concluída: ${justDone.phaseDone}` : s.kind === "decisao" ? "Resposta registrada" : "Etapa concluída"}
-              </span>
-              {justDone.next ? (
-                <Button onClick={() => go(justDone.next!.step.id)} className="whitespace-normal! leading-tight">
-                  Próxima etapa
-                  <ArrowRight aria-hidden className="size-4" />
-                </Button>
-              ) : (
-                <Button onClick={goMap}>Ver mapa</Button>
-              )}
-              {justDone.next ? (
-                <Button variant="ghost" size="sm" onClick={goMap}>
-                  Mapa
-                </Button>
-              ) : null}
+                <span className="min-w-0">{justDone.phaseDone ? `Fase concluída: ${justDone.phaseDone}` : s.kind === "decisao" ? "Resposta registrada" : "Etapa concluída"}</span>
+              </p>
+              <div className="flex gap-2">
+                {justDone.next ? (
+                  <Button onClick={() => go(justDone.next!.step.id)} className="flex-1">
+                    Próxima etapa
+                    <ArrowRight aria-hidden className="size-4" />
+                  </Button>
+                ) : (
+                  <Button onClick={goMap} className="flex-1">
+                    Ver mapa
+                  </Button>
+                )}
+                {justDone.next ? (
+                  <Button variant="secondary" onClick={goMap} className="shrink-0">
+                    Mapa
+                  </Button>
+                ) : null}
+              </div>
             </div>
           ) : v.applicable && v.done && s.kind !== "decisao" ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="flex flex-1 items-center gap-2 text-sm font-medium text-fg">
-                <CircleCheck aria-hidden className="size-5 text-success" /> Concluída
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => undo(stepId)}>
-                <Undo2 aria-hidden className="size-4" />
-                Desfazer
-              </Button>
-              {journey.current ? (
-                <Button size="sm" onClick={() => go(journey.current!.step.id)}>
-                  Ir para a etapa atual
+            <div className="space-y-3">
+              <p className="flex items-center gap-2 text-sm font-medium text-fg">
+                <CircleCheck aria-hidden className="size-5 shrink-0 text-success" /> Concluída
+              </p>
+              <div className="flex gap-2">
+                {journey.current ? (
+                  <Button onClick={() => go(journey.current!.step.id)} className="min-w-0 flex-1 whitespace-normal! leading-tight">
+                    Ir para a etapa atual
+                  </Button>
+                ) : null}
+                <Button variant="secondary" onClick={() => undo(stepId)} className={journey.current ? "shrink-0" : "flex-1"}>
+                  <Undo2 aria-hidden className="size-4" />
+                  Desfazer
                 </Button>
-              ) : null}
+              </div>
             </div>
           ) : s.kind === "decisao" ? (
             <p className="text-center text-sm text-muted">{v.done ? "Você já respondeu. Pode mudar a resposta acima." : "Escolha uma opção acima para continuar."}</p>
