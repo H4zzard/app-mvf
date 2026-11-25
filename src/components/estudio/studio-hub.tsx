@@ -76,7 +76,7 @@ export function StudioHub() {
                 <span className="mt-4 block font-serif text-lg font-semibold leading-snug text-fg">{t.title}</span>
                 <span className="mt-1.5 block flex-1 text-sm text-muted">{t.description}</span>
                 <span className="mt-4 block text-xs text-subtle">{t.tag}</span>
-                <span className="mt-3 inline-flex min-h-11 items-center gap-1.5 self-start rounded-lg bg-brand px-5 text-sm font-semibold text-white group-hover:bg-brand-hover">
+                <span className="mt-3 inline-flex min-h-11 items-center gap-1.5 self-start rounded-lg bg-brand px-5 text-sm font-semibold text-paper group-hover:bg-brand-hover">
                   Abrir
                   <ArrowRight aria-hidden className="size-4" />
                 </span>

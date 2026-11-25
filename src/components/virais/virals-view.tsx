@@ -93,7 +93,7 @@ export function ViralsView() {
           <Chip active={filters.onlyFavorites} onClick={() => set("onlyFavorites", !filters.onlyFavorites)}>
             <Bookmark aria-hidden className="size-4" />
             Salvos
-            <span className={cn("text-xs", filters.onlyFavorites ? "text-white/80" : "text-subtle")}>{favorites.length}</span>
+            <span className={cn("text-xs", filters.onlyFavorites ? "text-on-wine-muted" : "text-subtle")}>{favorites.length}</span>
           </Chip>
           <Chip active={extraFilters > 0} onClick={() => setFiltersOpen(true)}>
             <SlidersHorizontal aria-hidden className="size-4" />
@@ -214,14 +214,14 @@ function ViralCard({ viral, saved, onOpen, onToggleSave }: { viral: ViralReferen
         <span
           className={cn(
             "relative flex aspect-[9/14] flex-col justify-end p-3",
-            dark ? "bg-ink text-white" : "bg-blush text-fg",
+            dark ? "bg-ink text-paper" : "bg-blush text-fg",
           )}
         >
-          <span aria-hidden className={cn("absolute left-3 top-3 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold", dark ? "bg-white/12 text-white/90" : "bg-white text-brand")}>
+          <span aria-hidden className={cn("absolute left-3 top-3 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold", dark ? "bg-paper/12 text-paper/90" : "bg-paper text-brand")}>
             {PLATFORM_LABEL[viral.platform]}
           </span>
           <span className="line-clamp-4 font-serif text-[0.95rem] font-semibold leading-snug sm:text-base">“{viral.hook}”</span>
-          <span className={cn("mt-2 inline-flex items-center gap-1 text-[0.7rem]", dark ? "text-white/70" : "text-muted")}>
+          <span className={cn("mt-2 inline-flex items-center gap-1 text-[0.7rem]", dark ? "text-on-wine-muted" : "text-muted")}>
             <Clock aria-hidden className="size-3" />
             {viral.durationSec}s · {FORMAT_LABEL[viral.format]}
           </span>
@@ -241,10 +241,10 @@ function ViralCard({ viral, saved, onOpen, onToggleSave }: { viral: ViralReferen
         aria-label={saved ? `Remover “${viral.title}” dos salvos` : `Salvar “${viral.title}”`}
         className={cn(
           "absolute right-1.5 top-1.5 grid size-11 place-items-center rounded-full transition-colors",
-          saved ? "text-brand" : dark ? "text-white/85 hover:text-white" : "text-fg/70 hover:text-brand",
+          saved ? "text-brand" : dark ? "text-paper/85 hover:text-paper" : "text-fg/70 hover:text-brand",
         )}
       >
-        <span className={cn("grid size-8 place-items-center rounded-full", saved ? "bg-white" : dark ? "bg-white/12" : "bg-white/80")}>
+        <span className={cn("grid size-8 place-items-center rounded-full", saved ? "bg-paper" : dark ? "bg-paper/12" : "bg-paper/80")}>
           {saved ? <BookmarkCheck aria-hidden className="size-4" /> : <Bookmark aria-hidden className="size-4" />}
         </span>
       </button>

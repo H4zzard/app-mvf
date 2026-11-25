@@ -28,7 +28,7 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
             onClick={() => onChange(o.value)}
             className={cn(
               "inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-semibold transition-colors",
-              on ? "bg-wine text-on-wine shadow-sm" : "text-muted hover:bg-blush hover:text-fg",
+              on ? "bg-brand text-on-wine shadow-sm" : "text-muted hover:bg-blush hover:text-fg",
             )}
           >
             {o.short ? (
@@ -40,7 +40,7 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
               <span className="truncate">{o.label}</span>
             )}
             {o.count !== undefined ? (
-              <span className={cn("grid h-5 min-w-5 shrink-0 place-items-center rounded-full px-1 text-[0.7rem]", on ? "bg-white/15 text-on-wine" : "bg-canvas text-subtle")}>{o.count}</span>
+              <span className={cn("grid h-5 min-w-5 shrink-0 place-items-center rounded-full px-1 text-[0.7rem]", on ? "bg-paper/15 text-on-wine" : "bg-canvas text-subtle")}>{o.count}</span>
             ) : null}
           </button>
         );

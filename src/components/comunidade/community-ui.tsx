@@ -38,7 +38,7 @@ export function Avatar({ initials, me, team, small }: { initials: string; me?: b
       className={cn(
         "grid shrink-0 place-items-center rounded-full font-semibold",
         small ? "size-8 text-xs" : "size-10 text-sm",
-        me ? "bg-brand text-white" : team ? "bg-ink text-white" : "bg-blush text-brand",
+        me ? "bg-brand text-paper" : team ? "bg-ink text-paper" : "bg-blush text-brand",
       )}
     >
       {initials}

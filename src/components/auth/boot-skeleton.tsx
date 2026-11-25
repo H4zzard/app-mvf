@@ -7,7 +7,7 @@ export function AppBootSkeleton() {
       <span className="sr-only">Verificando seu acesso…</span>
       <div className="hidden w-[272px] shrink-0 border-r border-line bg-surface lg:block">
         <div className="flex h-16 items-center gap-2.5 px-5">
-          <span className="grid size-9 place-items-center rounded-xl bg-brand font-serif text-sm font-bold text-white">
+          <span className="grid size-9 place-items-center rounded-xl bg-brand font-serif text-sm font-bold text-paper">
             {BRAND.shortName}
           </span>
           <span className="h-4 w-24 rounded bg-blush-strong/60" />

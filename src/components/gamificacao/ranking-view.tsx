@@ -55,7 +55,7 @@ export function RankingView() {
             className="grid min-h-11 min-w-12 place-items-center"
           >
             <span className={cn("relative h-7 w-12 rounded-full transition-colors", showExamples ? "bg-brand" : "bg-line-strong")}>
-              <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-white shadow transition-transform", showExamples ? "translate-x-6" : "translate-x-1")} />
+              <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-paper shadow transition-transform", showExamples ? "translate-x-6" : "translate-x-1")} />
             </span>
           </button>
         </div>
@@ -63,7 +63,7 @@ export function RankingView() {
 
       {showExamples ? (
         <>
-          <section aria-label="Pódio" className="relative overflow-hidden rounded-3xl bg-wine-deep px-3 pb-0 pt-6 text-white shadow-raised sm:px-8">
+          <section aria-label="Pódio" className="relative overflow-hidden rounded-3xl bg-wine-deep px-3 pb-0 pt-6 text-paper shadow-raised sm:px-8">
             <ol className="relative mx-auto grid max-w-lg grid-cols-3 items-end gap-2 sm:gap-4">
               {[podium[1], podium[0], podium[2]].map((r, i) =>
                 r ? <PodiumSpot key={r.id} row={r} place={i === 1 ? 1 : i === 0 ? 2 : 3} /> : <li key={`vazio-${i}`} />,
@@ -95,29 +95,29 @@ export function RankingView() {
 }
 
 const PLACE_STYLE: Record<1 | 2 | 3, { h: string; ring: string; label: string }> = {
-  1: { h: "h-28 sm:h-32", ring: "ring-[#e9c46a]", label: "1º" },
-  2: { h: "h-20 sm:h-24", ring: "ring-white/70", label: "2º" },
-  3: { h: "h-16 sm:h-20", ring: "ring-[#d4a373]", label: "3º" },
+  1: { h: "h-28 sm:h-32", ring: "ring-accent", label: "1º" },
+  2: { h: "h-20 sm:h-24", ring: "ring-paper/70", label: "2º" },
+  3: { h: "h-16 sm:h-20", ring: "ring-paper/70", label: "3º" },
 };
 
 function PodiumSpot({ row, place }: { row: RankingRow; place: 1 | 2 | 3 }) {
   const st = PLACE_STYLE[place];
   return (
     <li className="flex min-w-0 flex-col items-center text-center">
-      {place === 1 ? <Crown aria-hidden className="mb-1 size-6 text-[#e9c46a]" /> : null}
+      {place === 1 ? <Crown aria-hidden className="mb-1 size-6 text-accent" /> : null}
       <span
         className={cn(
           "grid place-items-center rounded-full font-semibold ring-4",
           place === 1 ? "size-16 text-lg sm:size-20" : "size-12 sm:size-14",
-          row.isMe ? "bg-white text-brand" : "bg-white/15 text-white",
+          row.isMe ? "bg-paper text-brand" : "bg-paper/15 text-paper",
           st.ring,
         )}
       >
         {row.initials}
       </span>
       <span className="mt-2 line-clamp-2 w-full text-xs font-semibold leading-tight sm:text-sm">{row.name}</span>
-      <span className="text-[0.7rem] text-white/70">{row.xp} XP</span>
-      <span className={cn("mt-2 grid w-full place-items-start justify-center rounded-t-2xl bg-white/12 pt-2 font-serif text-xl font-semibold ring-1 ring-white/10", st.h)}>
+      <span className="text-[0.7rem] text-on-wine-muted">{row.xp} XP</span>
+      <span className={cn("mt-2 grid w-full place-items-start justify-center rounded-t-2xl bg-paper/12 pt-2 font-serif text-xl font-semibold ring-1 ring-paper/10", st.h)}>
         <span className="sr-only">Posição </span>
         {st.label}
       </span>
@@ -128,7 +128,7 @@ function PodiumSpot({ row, place }: { row: RankingRow; place: 1 | 2 | 3 }) {
 function MyPosition({ row, total }: { row: RankingRow; total: number }) {
   return (
     <Card className="flex items-center gap-4 border-brand/30 bg-blush/60 p-4">
-      <span className="grid size-12 shrink-0 place-items-center rounded-full bg-brand font-serif text-lg font-semibold text-white">{row.position}º</span>
+      <span className="grid size-12 shrink-0 place-items-center rounded-full bg-brand font-serif text-lg font-semibold text-paper">{row.position}º</span>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold uppercase tracking-wider text-brand">Sua posição</p>
         <p className="truncate font-semibold text-fg">{row.name}</p>
@@ -153,7 +153,7 @@ function RankRow({ row }: { row: RankingRow }) {
       )}
     >
       <span className="w-7 shrink-0 text-center font-serif text-lg font-semibold text-muted">{row.position}</span>
-      <span className={cn("grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold", row.isMe ? "bg-brand text-white" : "bg-blush text-brand")}>
+      <span className={cn("grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold", row.isMe ? "bg-brand text-paper" : "bg-blush text-brand")}>
         {row.initials}
       </span>
       <span className="min-w-0 flex-1">

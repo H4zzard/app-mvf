@@ -101,7 +101,7 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
                   {KIND_LABEL[next.step.kind]}
                   {next.step.minutes ? ` · cerca de ${next.step.minutes} min` : ""}
                 </p>
-                <p className="mt-4 max-w-2xl rounded-lg bg-wine-soft/60 p-3 text-sm text-on-wine ring-1 ring-white/8 sm:p-3.5">
+                <p className="mt-4 max-w-2xl rounded-lg bg-wine-soft/60 p-3 text-sm text-on-wine ring-1 ring-paper/8 sm:p-3.5">
                   <span className="font-semibold text-accent">O que fazer: </span>
                   <span className="line-clamp-2 sm:line-clamp-none">{next.instruction}</span>
                 </p>

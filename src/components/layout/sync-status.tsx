@@ -34,7 +34,7 @@ export function SyncStatus() {
   }
 
   return (
-    <span aria-live="polite" className="hidden items-center gap-1.5 text-xs text-on-glass-muted md:inline-flex">
+    <span aria-live="polite" className="hidden items-center gap-1.5 text-xs text-muted md:inline-flex">
       {sync.pending > 0 ? (
         <>
           <LoaderCircle aria-hidden className="size-3.5 animate-spin motion-reduce:animate-none" />
@@ -42,7 +42,7 @@ export function SyncStatus() {
         </>
       ) : (
         <>
-          <CloudCheck aria-hidden className="size-3.5 text-accent" />
+          <CloudCheck aria-hidden className="size-3.5 text-brand" />
           Progresso salvo
         </>
       )}

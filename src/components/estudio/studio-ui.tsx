@@ -300,7 +300,7 @@ export function OutputBlock({ title, text, copyLabel = "Copiar", onCopied, mono 
         tabIndex={0}
         aria-label={title}
         className={cn(
-          "max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-white/5 bg-ink p-3.5 text-[0.8rem] leading-relaxed text-on-wine focus-visible:outline-2 focus-visible:outline-accent [scrollbar-color:var(--mvf-wine-soft)_transparent]",
+          "max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-paper/5 bg-ink p-3.5 text-[0.8rem] leading-relaxed text-on-wine focus-visible:outline-2 focus-visible:outline-accent [scrollbar-color:var(--mvf-wine-soft)_transparent]",
           mono ? "font-mono" : "font-sans",
         )}
       >
@@ -322,7 +322,7 @@ export function scrollToResult(el: HTMLElement | null) {
 /** Barra de ação fixa acima da navegação inferior (celular) e no rodapé do formulário (desktop). */
 export function StickyActions({ children }: { children: React.ReactNode }) {
   return (
-    <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 -mx-1 rounded-xl border border-line-strong/60 bg-card/95 p-2 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-card/90 lg:bottom-4">
+    <div className="sticky bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 -mx-1 rounded-xl border border-line-strong/60 bg-card/95 p-2 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-card/90 lg:bottom-4">
       <div className="flex flex-wrap gap-2 [&>*]:flex-1">{children}</div>
     </div>
   );

@@ -42,7 +42,7 @@ async function ConfirmBody({ searchParams }: { searchParams: PageProps<"/auth/co
         </p>
         <Link
           href="/login"
-          className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand px-5 text-sm font-semibold text-paper hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           Pedir um novo link
         </Link>
@@ -65,7 +65,7 @@ async function ConfirmBody({ searchParams }: { searchParams: PageProps<"/auth/co
         )}
         <button
           type="submit"
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 text-sm font-semibold text-paper hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <LogIn aria-hidden className="size-4" /> Entrar
         </button>

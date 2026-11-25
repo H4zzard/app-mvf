@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronUp, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { BrandMark } from "@/components/layout/brand-mark";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { AppHeader } from "@/components/layout/app-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
@@ -15,8 +14,9 @@ import { cn } from "@/lib/cn";
 /**
  * Shell compartilhado:
  * - ≥ 1024 px: lateral recolhível com os MESMOS sete destinos;
- * - < 1024 px: barra inferior fixa com os sete destinos (sem “Mais”). O
+ * - < 1024 px: barra inferior FLUTUANTE (vidro bordô) com os sete destinos. O
  *   conteúdo reserva espaço para a barra e para a área segura do aparelho.
+ * - Topo mínimo: só o sino (sem faixa nem marca).
  * - Modo foco (onboarding ainda não concluído e rotas de `FOCUS_ROUTE_PREFIXES`):
  *   sem barra e sem lateral, para o primeiro acesso ser um caminho único.
  */
@@ -42,13 +42,11 @@ export function AppShell({ children, demo = false }: { children: React.ReactNode
           collapsed ? "w-[76px]" : "w-[272px]",
         )}
       >
-        <div className={cn("flex h-16 items-center", collapsed ? "justify-center" : "px-5")}>
-          <BrandMark compact={collapsed} />
-        </div>
-        <div className="flex-1 overflow-y-auto px-3 pb-4">
+        {/* Sem logo nem nome da marca no topo (correção visual 25/11/2026). */}
+        <div className="flex-1 overflow-y-auto px-3 pb-4 pt-6">
           <SidebarNav collapsed={collapsed} />
         </div>
-        <div className="space-y-3 border-t border-white/10 p-3">
+        <div className="space-y-3 border-t border-paper/15 p-3">
           {!collapsed && demo ? (
             <details className="group rounded-xl">
               <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between rounded-lg px-3 text-sm font-medium text-on-wine-muted hover:bg-wine-soft hover:text-on-wine [&::-webkit-details-marker]:hidden">
@@ -88,8 +86,8 @@ export function AppShell({ children, demo = false }: { children: React.ReactNode
           id="conteudo"
           data-focus={focus || undefined}
           className={cn(
-            "mx-auto w-full max-w-[1320px] flex-1 px-4 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-10",
-            focus ? "pb-[calc(2.5rem+env(safe-area-inset-bottom))]" : "pb-[calc(6rem+env(safe-area-inset-bottom))]",
+            "mx-auto w-full max-w-[1320px] flex-1 px-4 pt-2 sm:px-6 sm:pt-3 lg:px-8 lg:pb-10",
+            focus ? "pb-[calc(2.5rem+env(safe-area-inset-bottom))]" : "pb-[calc(6.5rem+env(safe-area-inset-bottom))]",
           )}
         >
           {children}

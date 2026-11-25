@@ -470,7 +470,7 @@ export function AnimationTool() {
                   <li key={t.n}>
                     <Card className="space-y-3 p-4 sm:p-5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-0.5 text-xs font-semibold text-white">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-0.5 text-xs font-semibold text-paper">
                           <Clapperboard aria-hidden className="size-3" />
                           Take {t.n}/{t.total}
                         </span>

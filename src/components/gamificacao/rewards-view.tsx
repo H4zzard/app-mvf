@@ -149,7 +149,7 @@ function RewardCard({ reward, info, onOpen }: { reward: Reward; info: ReturnType
           <span
             className={cn(
               "absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold shadow-sm",
-              info.state === "resgatada" ? "bg-success text-white" : info.state === "disponivel" ? "bg-paper text-brand" : "bg-ink/80 text-white",
+              info.state === "resgatada" ? "bg-success text-paper" : info.state === "disponivel" ? "bg-paper text-brand" : "bg-ink/80 text-paper",
             )}
           >
             {info.state === "resgatada" ? <CircleCheck aria-hidden className="size-3" /> : info.state === "bloqueada" ? <Lock aria-hidden className="size-3" /> : <Sparkles aria-hidden className="size-3" />}

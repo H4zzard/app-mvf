@@ -39,36 +39,36 @@ export function PointsCard() {
   return (
     <section
       aria-labelledby="points-title"
-      className="relative flex flex-col overflow-hidden rounded-2xl bg-ink p-5 text-white shadow-raised sm:p-6"
+      className="relative flex flex-col overflow-hidden rounded-2xl bg-ink p-5 text-paper shadow-raised sm:p-6"
     >
       <div className="relative flex items-start justify-between gap-3">
         <div>
           <h2 id="points-title" className="font-serif text-lg font-semibold">
             Pontos e conquistas
           </h2>
-          <p className="mt-0.5 text-sm text-white/65">{persistence === "server" ? "Prévia pelo seu progresso" : "Simulação desta sessão"}</p>
+          <p className="mt-0.5 text-sm text-on-wine-muted">{persistence === "server" ? "Prévia pelo seu progresso" : "Simulação desta sessão"}</p>
         </div>
-        <span className="grid size-10 place-items-center rounded-xl bg-white/10">
+        <span className="grid size-10 place-items-center rounded-xl bg-paper/10">
           <Award aria-hidden className="size-5" />
         </span>
       </div>
 
       <div className="relative mt-4 flex items-end gap-2 sm:mt-5">
         <span className="font-serif text-5xl font-semibold">{points}</span>
-        <span className="pb-2 text-sm text-white/70">{demo ? "XP" : "pts"}</span>
+        <span className="pb-2 text-sm text-on-wine-muted">{demo ? "XP" : "pts"}</span>
       </div>
-      <p className="relative text-sm text-white/80">
+      <p className="relative text-sm text-on-wine-muted">
         Nível {levelNumber} · {levelName}
       </p>
       <ProgressBar value={percent} label="Progresso até o próximo nível (simulação)" tone="inverse" size="sm" className="relative mt-3" />
-      <p className="relative mt-2 text-xs text-white/65">
+      <p className="relative mt-2 text-xs text-on-wine-muted">
         {toNextPts > 0 ? `${toNextPts} ${demo ? "XP" : "pts"} para o próximo nível` : "Nível máximo desta prévia"}
       </p>
 
       <div className="relative mt-auto flex flex-wrap items-center justify-between gap-2 pt-5">
         <DemoBadge inverse label="Regras de pontos em definição" />
         {demo ? (
-          <Link href="/conquistas" className="inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-white hover:underline">
+          <Link href="/conquistas" className="inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-paper hover:underline">
             Conquistas
             <ArrowRight aria-hidden className="size-4" />
           </Link>

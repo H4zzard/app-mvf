@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#340B18",
+  themeColor: "#F6EFE0",
   // Permite usar env(safe-area-inset-*) no iPhone (notch e barra inferior).
   viewportFit: "cover",
 };

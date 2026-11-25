@@ -83,7 +83,7 @@ export function CommunityView() {
           aria-haspopup="dialog"
           className="flex w-full items-center gap-3 rounded-2xl border border-line bg-card p-3 text-left shadow-card transition-colors hover:border-brand/30"
         >
-          <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-sm font-semibold text-white">
+          <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-sm font-semibold text-paper">
             EU
           </span>
           <span className="flex-1 text-sm text-muted">Compartilhe algo com a comunidade…</span>
@@ -141,7 +141,7 @@ export function CommunityView() {
 
       {locked && current ? (
         <Card className="p-6 text-center">
-          <span className="mx-auto grid size-12 place-items-center rounded-full bg-ink text-white">
+          <span className="mx-auto grid size-12 place-items-center rounded-full bg-ink text-paper">
             <Lock aria-hidden className="size-5" />
           </span>
           <h2 className="mt-3 font-serif text-xl font-semibold text-fg">{current.label}</h2>
@@ -166,7 +166,7 @@ export function CommunityView() {
             >
               <SlidersHorizontal aria-hidden className="size-4" />
               <span className="hidden min-[380px]:inline">Tipo</span>
-              {filtersOn ? <span className="grid size-5 place-items-center rounded-full bg-brand text-[0.7rem] text-white">1</span> : null}
+              {filtersOn ? <span className="grid size-5 place-items-center rounded-full bg-brand text-[0.7rem] text-paper">1</span> : null}
             </Button>
           </div>
           {showFilters ? (
@@ -274,7 +274,7 @@ export function CommunityView() {
         Celular: publicar sempre à mão, acima da barra inferior. `sticky` (e não `fixed`):
         o shell cria um bloco de contenção que faria um `fixed` herdar a largura errada.
       */}
-      <div className="pointer-events-none sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 flex justify-end lg:hidden">
+      <div className="pointer-events-none sticky bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 flex justify-end lg:hidden">
         <Button onClick={() => openComposer()} aria-haspopup="dialog" className={cn("pointer-events-auto shadow-raised", composer && "invisible")}>
           <PenSquare aria-hidden className="size-4" />
           Publicar

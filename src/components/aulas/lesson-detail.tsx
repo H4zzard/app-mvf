@@ -79,29 +79,29 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
   return (
     <div className="space-y-7 sm:space-y-9">
       {/* Cabeçalho com a capa do módulo */}
-      <section className="relative -mx-4 -mt-5 overflow-hidden bg-ink text-white sm:-mx-6 sm:-mt-8 lg:mx-0 lg:mt-0 lg:rounded-3xl">
+      <section className="relative -mx-4 -mt-2 overflow-hidden bg-ink text-paper sm:-mx-6 sm:-mt-3 lg:mx-0 lg:mt-0 lg:rounded-3xl">
         <Image src={cover} alt="" fill priority sizes="100vw" className="scale-125 object-cover opacity-45 blur-2xl" />
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(52_11_24/0.35),rgb(52_11_24/0.92))]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(164_5_45/0.35),rgb(164_5_45/0.92))]" />
         <div className="relative px-4 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6">
           {fromStep ? (
-            <Link href={`/meu-plano/etapa/${fromStep.id}`} className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-white hover:text-white/80">
+            <Link href={`/meu-plano/etapa/${fromStep.id}`} className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-paper hover:text-on-wine-muted">
               <ArrowLeft aria-hidden className="size-4" />
               Voltar à etapa: {fromStep.title}
             </Link>
           ) : (
-            <Link href="/aulas" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-white/80 hover:text-white">
+            <Link href="/aulas" className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-on-wine-muted hover:text-paper">
               <ArrowLeft aria-hidden className="size-4" />
               Área de membros
             </Link>
           )}
           <div className="mt-3 flex items-end gap-4 sm:gap-6">
-            <span className="relative aspect-[2/3] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-[0_16px_32px_-12px_rgb(0_0_0/0.7)] ring-1 ring-white/15 sm:w-36">
+            <span className="relative aspect-[2/3] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-[0_16px_32px_-12px_rgb(164_5_45/0.7)] ring-1 ring-paper/15 sm:w-36">
               <Image src={cover} alt={mod ? `Capa do módulo ${mod.title}` : ""} fill sizes="144px" className="object-cover" />
             </span>
             <div className="min-w-0 pb-1">
-              {mod ? <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/70">{mod.title}</p> : null}
+              {mod ? <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-on-wine-muted">{mod.title}</p> : null}
               <h1 className="mt-1.5 font-serif text-[1.6rem] font-semibold leading-[1.1] sm:text-4xl">{lesson.title}</h1>
-              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/75 sm:text-sm">
+              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-wine-muted sm:text-sm">
                 <span className="inline-flex items-center gap-1">
                   <Clock aria-hidden className="size-3.5" />
                   {formatDuration(lesson.durationMinutes)}
@@ -219,7 +219,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
                     <span
                       className={cn(
                         "grid size-8 shrink-0 place-items-center rounded-full text-xs font-bold",
-                        ldone ? "bg-success-soft text-success" : current ? "bg-brand text-white" : "bg-canvas text-muted ring-1 ring-line",
+                        ldone ? "bg-success-soft text-success" : current ? "bg-brand text-paper" : "bg-canvas text-muted ring-1 ring-line",
                       )}
                     >
                       {ldone ? <Check aria-hidden className="size-4" /> : i + 1}

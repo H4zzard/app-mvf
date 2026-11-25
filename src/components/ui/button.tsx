@@ -9,9 +9,9 @@ const base =
   "inline-flex items-center justify-center gap-2 rounded-lg font-semibold tracking-[-0.005em] whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-brand text-white shadow-sm hover:bg-brand-hover disabled:hover:bg-brand",
+  primary: "bg-brand text-paper shadow-sm hover:bg-brand-hover disabled:hover:bg-brand",
   secondary:
-    "border border-line-strong bg-card text-fg hover:border-brand/50 hover:bg-surface disabled:hover:bg-card",
+    "border border-brand/70 bg-card text-brand hover:border-brand hover:bg-blush disabled:hover:bg-card",
   ghost: "text-brand hover:bg-blush/70",
   /** Botão claro sobre fundo vinho/foto (CTA principal em blocos escuros). */
   inverse: "bg-paper text-wine-deep shadow-sm hover:bg-blush",

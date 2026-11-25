@@ -27,7 +27,7 @@ export function AssistantMessage({
     <div className={cn("flex items-start gap-3", className)}>
       <span
         aria-hidden
-        className="mt-1 grid size-9 shrink-0 place-items-center rounded-full bg-brand font-serif text-[0.7rem] font-bold text-white"
+        className="mt-1 grid size-9 shrink-0 place-items-center rounded-full bg-brand font-serif text-[0.7rem] font-bold text-paper"
       >
         {BRAND.shortName}
       </span>

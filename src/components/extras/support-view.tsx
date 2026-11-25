@@ -99,7 +99,7 @@ export function SupportView() {
                     on ? "border-brand bg-blush/60" : "border-line bg-card shadow-card hover:border-brand/30",
                   )}
                 >
-                  <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl", on ? "bg-brand text-white" : "bg-blush text-brand")}>
+                  <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl", on ? "bg-brand text-paper" : "bg-blush text-brand")}>
                     <Icon aria-hidden className="size-4" />
                   </span>
                   <span className="min-w-0">

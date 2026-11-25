@@ -39,7 +39,7 @@ export function ChipGroup<T extends string>({
         <Chip key={o.value} active={value === o.value} onClick={() => onChange(o.value)}>
           {o.label}
           {o.count !== undefined ? (
-            <span className={cn("text-xs", value === o.value ? "text-white/80" : "text-subtle")}>{o.count}</span>
+            <span className={cn("text-xs", value === o.value ? "text-on-wine-muted" : "text-subtle")}>{o.count}</span>
           ) : null}
         </Chip>
       ))}
@@ -65,7 +65,7 @@ export function Chip({
       onClick={onClick}
       className={cn(
         "inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3.5 text-sm font-medium transition-colors",
-        active ? "border-wine bg-wine text-on-wine" : "border-line bg-card text-fg/80 hover:border-line-strong hover:bg-surface",
+        active ? "border-brand bg-brand text-on-wine" : "border-line bg-card text-fg hover:border-line-strong hover:bg-blush",
         className,
       )}
     >

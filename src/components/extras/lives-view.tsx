@@ -123,7 +123,7 @@ function DateBlock({ ev, now, large }: { ev: CommunityEvent; now: number; large?
       className={cn(
         "grid shrink-0 place-items-center rounded-2xl text-center",
         large ? "size-20" : "size-16",
-        phase === "ao_vivo" ? "bg-brand text-white" : phase === "encerrado" ? "bg-canvas text-muted" : "bg-blush text-brand",
+        phase === "ao_vivo" ? "bg-brand text-paper" : phase === "encerrado" ? "bg-canvas text-muted" : "bg-blush text-brand",
       )}
       aria-hidden
     >
@@ -172,7 +172,7 @@ function AudienceBadge({ ev }: { ev: CommunityEvent }) {
 function FeaturedEvent({ ev, now, going, onToggle, onOpen }: { ev: CommunityEvent; now: number; going: boolean; onToggle: () => void; onOpen: () => void }) {
   return (
     <Card className="overflow-hidden">
-      <div className="bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white/80">Próximo encontro</div>
+      <div className="bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-wide text-on-wine-muted">Próximo encontro</div>
       <div className="flex gap-4 p-4 sm:p-5">
         <DateBlock ev={ev} now={now} large />
         <div className="min-w-0 flex-1">
@@ -287,7 +287,7 @@ function EventSheet({ ev, now, going, onToggle, onClose }: { ev: CommunityEvent;
                 href={stream}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover"
+                className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand px-5 text-sm font-semibold text-paper hover:bg-brand-hover"
               >
                 <Radio aria-hidden className="size-4" />
                 {phase === "ao_vivo" ? "Entrar na live" : "Link da transmissão"}

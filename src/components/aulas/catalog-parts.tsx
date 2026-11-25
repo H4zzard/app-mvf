@@ -110,7 +110,7 @@ export function ModuleCard({
         aria-haspopup="dialog"
         className="group block w-full rounded-2xl text-left outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
       >
-        <span className="relative block aspect-[2/3] overflow-hidden rounded-2xl bg-ink shadow-[0_10px_24px_-12px_rgb(43_29_34/0.55)] ring-1 ring-black/5 transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-[0_18px_32px_-14px_rgb(198_41_64/0.45)]">
+        <span className="relative block aspect-[2/3] overflow-hidden rounded-2xl bg-ink shadow-[0_10px_24px_-12px_rgb(164_5_45/0.55)] ring-1 ring-wine-deep/5 transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-[0_18px_32px_-14px_rgb(164_5_45/0.45)]">
           <Image
             src={module.cover}
             alt=""
@@ -132,7 +132,7 @@ export function ModuleCard({
             </span>
           ) : null}
           {total > 0 && !complete ? (
-            <span aria-hidden className="absolute inset-x-2.5 bottom-2.5 h-1 overflow-hidden rounded-full bg-white/25">
+            <span aria-hidden className="absolute inset-x-2.5 bottom-2.5 h-1 overflow-hidden rounded-full bg-paper/25">
               <span className="block h-full rounded-full bg-paper" style={{ width: `${Math.round((done / total) * 100)}%` }} />
             </span>
           ) : null}

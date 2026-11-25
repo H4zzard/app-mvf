@@ -245,7 +245,7 @@ function Toggle({ icon: Icon, label, checked, onChange }: { icon: LucideIcon; la
       <span className="flex-1 text-sm text-fg">{label}</span>
       <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={() => onChange(!checked)} className="grid min-h-11 min-w-14 place-items-center">
         <span className={cn("relative h-7 w-12 rounded-full transition-colors", checked ? "bg-brand" : "bg-line-strong")}>
-          <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-white shadow transition-transform", checked ? "translate-x-6" : "translate-x-1")} />
+          <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-paper shadow transition-transform", checked ? "translate-x-6" : "translate-x-1")} />
         </span>
       </button>
     </li>

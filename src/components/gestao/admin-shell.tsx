@@ -59,13 +59,13 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors",
-                  active ? "bg-brand text-white" : "text-fg hover:bg-blush",
+                  active ? "bg-brand text-paper" : "text-fg hover:bg-blush",
                 )}
               >
                 <item.icon aria-hidden className="size-4 shrink-0" />
                 <span className="flex-1">{item.label}</span>
                 {"pending" in item && pending ? (
-                  <span className={cn("grid h-5 min-w-5 place-items-center rounded-full px-1 text-[0.7rem] font-semibold", active ? "bg-white/25 text-white" : "bg-brand text-white")}>
+                  <span className={cn("grid h-5 min-w-5 place-items-center rounded-full px-1 text-[0.7rem] font-semibold", active ? "bg-paper/25 text-paper" : "bg-brand text-paper")}>
                     {pending}
                     <span className="sr-only"> alterações pendentes</span>
                   </span>
@@ -132,10 +132,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   useLayoutEffect(() => () => setMenu(false), []);
   return (
     <div className="min-h-dvh bg-canvas">
-      <div role="note" className="flex items-center justify-center gap-2 bg-ink px-4 py-2 text-center text-xs text-white/90">
+      <div role="note" className="flex items-center justify-center gap-2 bg-ink px-4 py-2 text-center text-xs text-paper/90">
         <FlaskConical aria-hidden className="size-3.5 shrink-0" />
         <span>
-          <strong className="font-semibold text-white">Painel demonstrativo local.</strong> Nada é salvo no banco ou nos arquivos; recarregar descarta as edições.
+          <strong className="font-semibold text-paper">Painel demonstrativo local.</strong> Nada é salvo no banco ou nos arquivos; recarregar descarta as edições.
         </span>
       </div>
 

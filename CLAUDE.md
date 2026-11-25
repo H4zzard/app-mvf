@@ -50,9 +50,9 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - `src/demo/` — **fixtures de demonstração**, isoladas. Nada de dado real aqui.
 - `src/lib/` — funções puras (seletores do plano, `cn`).
 - Tokens de design: `src/app/globals.css` (`:root` + `@theme`). Não espalhe hex pelas páginas.
-  Identidade 2.0: moldura e destaques em `wine`/`wine-deep` com texto `on-wine`; superfícies `canvas`/`card`/`paper`
-  (sem branco puro); ação em `brand`. Blocos escuros levam `mvf-on-wine` (foco visível); fonte única Inter.
-  Cabeçalho e barra no celular: vidro bordô `.mvf-glass` (texto secundário em `on-glass-muted`).
+  PALETA RESTRITA (D122): só bordô `#a4052d`/`#b8002e` e bege `#fffbf8`/`#f6efe0` (e misturas/alpha delas).
+  Nada de branco, preto, cinza, rosa claro ou cores do Tailwind: use `paper`, `canvas`, `card`, `brand`, `wine*`, `on-wine`.
+  Topo sem marca (só o sino); barra inferior flutuante em vidro bordô `.mvf-glass`. Fonte única Inter.
   Se o CSS novo não aparecer no dev, o cache do Turbopack está velho: pare o servidor e apague `.next`.
 
 ## Acesso e dados (Prompt 03)

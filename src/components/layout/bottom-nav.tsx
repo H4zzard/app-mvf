@@ -8,7 +8,9 @@ import { cn } from "@/lib/cn";
 
 /**
  * Barra inferior do celular/tablet (< 1024 px): os SETE destinos, lado a lado,
- * sem menu “Mais”. Cada item tem ≥ 44 × 44 px mesmo em 320 px (7 × 45,7 px).
+ * sem menu “Mais”. FLUTUANTE: retângulo com cantos levemente arredondados,
+ * vidro bordô translúcido (fundo embaçado aparece por trás), afastado das bordas
+ * e acima da área segura. Cada item tem ≥ 44 × 44 px mesmo em 320 px (312 / 7).
  * Abaixo de 360 px, “Estúdio” e “Produtos” viram “IA” e “Loja” (mesmo corpo de
  * fonte); o nome acessível completo é sempre o mesmo.
  * O destino continua ativo nas subpáginas (ex.: /ranking → Perfil).
@@ -20,9 +22,9 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="mvf-on-wine mvf-glass fixed inset-x-0 bottom-0 z-40 rounded-t-[1.25rem] pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="mvf-on-wine mvf-glass fixed inset-x-1 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 mx-auto max-w-2xl rounded-xl min-[360px]:inset-x-3 lg:hidden"
     >
-      <ul className="mx-auto grid h-16 max-w-2xl grid-cols-7">
+      <ul className="grid h-16 grid-cols-7 px-0.5">
         {PRIMARY_NAV.map((item) => {
           const active = item.id === activeId;
           const Icon = item.icon;
@@ -36,16 +38,16 @@ export function BottomNav() {
                 className={cn(
                   "relative flex h-full min-w-11 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium leading-none tracking-tight transition-colors",
                   "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent",
-                  active ? "text-white" : "text-on-glass-muted hover:text-on-wine",
+                  active ? "text-paper" : "text-on-glass-muted hover:text-on-wine",
                 )}
               >
-                {/* Destino ativo: cápsula clara em relevo (“decalque”), um pouco maior. */}
+                {/* Destino ativo: bolha de vidro (bege translúcido sobre o bordô = bordô mais claro), em relevo. */}
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute inset-x-0.5 inset-y-1.5 rounded-xl transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+                    "absolute inset-x-0.5 inset-y-1.5 rounded-lg backdrop-blur-sm transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
                     active
-                      ? "scale-100 bg-white/16 opacity-100 ring-1 ring-white/25 shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_6px_14px_-8px_rgb(20_4_10/0.7)]"
+                      ? "scale-100 bg-paper/15 opacity-100 ring-1 ring-paper/30 shadow-[inset_0_1px_0_rgb(255_251_248/0.28),0_6px_16px_-8px_rgb(164_5_45/0.9)]"
                       : "scale-90 opacity-0",
                   )}
                 />

@@ -10,7 +10,7 @@ const tones: Record<Tone, string> = {
   warning: "bg-warning-soft text-warning ring-warning/15",
   demo: "bg-paper text-muted ring-line-strong",
   soon: "bg-canvas text-muted ring-line",
-  inverse: "bg-white/10 text-on-wine ring-white/20",
+  inverse: "bg-paper/10 text-on-wine ring-paper/20",
 };
 
 export function Badge({

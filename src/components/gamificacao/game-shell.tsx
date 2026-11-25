@@ -29,7 +29,7 @@ export function GameTabs() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[0.7rem] font-medium transition-colors sm:min-h-10 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3.5 sm:text-sm",
-                  active ? "bg-brand text-white" : "text-muted hover:bg-blush hover:text-fg",
+                  active ? "bg-brand text-paper" : "text-muted hover:bg-blush hover:text-fg",
                 )}
               >
                 <Icon aria-hidden className="size-4" />
@@ -47,26 +47,26 @@ export function GameTabs() {
 export function PointsStrip({ className }: { className?: string }) {
   const { xp, balance } = useDemo();
   return (
-    <section aria-label="Seu progresso de pontos" className={cn("relative overflow-hidden rounded-3xl bg-ink p-5 text-white shadow-raised sm:p-6", className)}>
+    <section aria-label="Seu progresso de pontos" className={cn("relative overflow-hidden rounded-3xl bg-ink p-5 text-paper shadow-raised sm:p-6", className)}>
       <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/60">Nível {xp.level.number}</p>
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-on-wine-muted">Nível {xp.level.number}</p>
           <p className="font-serif text-2xl font-semibold leading-tight">{xp.level.name}</p>
-          <p className="mt-1 text-sm text-white/75">
-            <strong className="font-semibold text-white">{xp.xp} XP</strong>
+          <p className="mt-1 text-sm text-on-wine-muted">
+            <strong className="font-semibold text-paper">{xp.xp} XP</strong>
             {xp.nextLevel ? ` · ${xp.xpToNext} para ${xp.nextLevel.name}` : " · nível máximo da demo"}
           </p>
         </div>
-        <div className="rounded-2xl bg-white/10 px-3.5 py-2.5 text-right ring-1 ring-white/15">
-          <p className="flex items-center justify-end gap-1 text-[0.65rem] font-semibold uppercase tracking-wider text-white/65">
+        <div className="rounded-2xl bg-paper/10 px-3.5 py-2.5 text-right ring-1 ring-paper/15">
+          <p className="flex items-center justify-end gap-1 text-[0.65rem] font-semibold uppercase tracking-wider text-on-wine-muted">
             <Coins aria-hidden className="size-3.5" /> Saldo
           </p>
           <p className="font-serif text-2xl font-semibold leading-none">{balance}</p>
-          <p className="text-[0.65rem] text-white/60">pontos</p>
+          <p className="text-[0.65rem] text-on-wine-muted">pontos</p>
         </div>
       </div>
       <ProgressBar value={xp.levelPercent} label="Progresso até o próximo nível" tone="inverse" size="sm" className="relative mt-4" />
-      <p className="relative mt-2 text-[0.7rem] text-white/55">Pontos de demonstração · não são dinheiro nem resultado de vendas.</p>
+      <p className="relative mt-2 text-[0.7rem] text-on-wine-muted">Pontos de demonstração · não são dinheiro nem resultado de vendas.</p>
     </section>
   );
 }

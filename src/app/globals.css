@@ -1,52 +1,52 @@
 @import "tailwindcss";
 
 /*
- * Design tokens do App MVF — identidade 2.0 (vinho + nude).
+ * Design tokens do App MVF — paleta restrita (correção 25/11/2026).
  *
- * Lógica: VINHO profundo é a cor da marca e da “moldura” do app (cabeçalho,
- * lateral, barra inferior, blocos de destaque); BEGE/off-white quente é a
- * superfície de leitura (substitui o branco puro); BORDÔ é a cor de ação
- * (botões, ativo, links); quase preto é apoio pontual. Valores provisórios até a
- * marca oficial entregar o guia — ajuste só aqui (fonte única).
- * Contrastes conferidos (WCAG AA): fg/muted sobre canvas e card, texto bege sobre
- * vinho, branco sobre bordô.
+ * DUAS famílias, nada além delas:
+ *   Bordô  #a4052d (principal) · #b8002e (realce)
+ *   Bege   #fffbf8 (claro)     · #f6efe0 (fundo)
+ * Todo o resto é MISTURA dessas cores (pré-calculada aqui para não somar
+ * transparências) ou transparência delas. Sem branco puro, sem rosa claro,
+ * sem cinza, sem verde/amarelo de estado. Texto em fundo claro = bordô;
+ * texto em fundo bordô = bege. Contraste conferido (todo texto ≥ 4,5:1).
  */
 :root {
-  /* Superfícies claras (quentes, sem branco puro) */
-  --mvf-canvas: #f3ece3; /* fundo das páginas */
-  --mvf-surface: #f7f1e9; /* faixas e superfícies secundárias */
-  --mvf-card: #fbf7f1; /* cartões (off-white quente) */
-  --mvf-paper: #fffcf7; /* “branco” do app: pílulas sobre foto, botões claros */
-  --mvf-blush: #efe2d9; /* nude: seleção / destaque suave */
-  --mvf-blush-strong: #e4d0c4;
+  /* Bege */
+  --mvf-canvas: #f6efe0; /* fundo das páginas */
+  --mvf-surface: #fbf5ec; /* bege intermediário (faixas, campos desabilitados) */
+  --mvf-card: #fffbf8; /* cartões */
+  --mvf-paper: #fffbf8; /* “claro” do app (substitui o branco) */
+  --mvf-blush: #f0dfd3; /* bordô 7% sobre o fundo: seleção suave */
+  --mvf-blush-strong: #ebcec7; /* bordô 14% sobre o fundo: trilhos, realces */
 
-  /* Marca */
-  --mvf-brand: #8b1d36; /* bordô de ação (CTA, ativo, links) */
-  --mvf-brand-hover: #6e1529;
-  --mvf-coral: #a9533d; /* terracota: apoio de estado (rotina do dia) */
-  --mvf-wine: #4a1323; /* vinho da moldura */
-  --mvf-wine-deep: #340b18; /* vinho mais fundo (barras, hero) */
-  --mvf-wine-soft: #5f1f31; /* realce sobre vinho (hover/ativo) */
-  --mvf-on-wine: #f6ece2; /* texto bege sobre vinho */
-  --mvf-on-wine-muted: #d3bab3; /* texto secundário sobre vinho */
-  --mvf-accent: #e7a0b1; /* rosa de destaque sobre vinho (indicadores) */
-  --mvf-glass: 124 32 57; /* bordô rosado (quase vinho) do vidro fosco: cabeçalho e barra no celular */
-  --mvf-on-glass-muted: #ecdbd4; /* rótulo inativo sobre o vidro (≥ 4,6:1 mesmo sobre conteúdo claro) */
-  --mvf-ink: #2b0e18; /* quase preto (vinho-noite) para cartões especiais */
-  --mvf-ink-soft: #3c1623;
+  /* Bordô */
+  --mvf-brand: #a4052d; /* ação: botões, links, ativo */
+  --mvf-brand-hover: #b8002e;
+  --mvf-coral: #b8002e;
+  --mvf-wine: #b8002e; /* bordô de realce em superfícies escuras */
+  --mvf-wine-deep: #a4052d; /* blocos de destaque, lateral, login */
+  --mvf-wine-soft: #b12749; /* bege 14% sobre bordô: realce dentro de blocos bordô */
+  --mvf-on-wine: #fffbf8; /* texto sobre bordô */
+  --mvf-on-wine-muted: #f1d6da; /* bege 85% sobre bordô: texto secundário */
+  --mvf-accent: #f6efe0; /* destaque sobre bordô (indicadores, foco) */
+  --mvf-glass: 164 5 45; /* vidro da barra inferior: bordô principal translúcido */
+  --mvf-on-glass-muted: #f2d9dc; /* rótulo inativo sobre o vidro (≥ 4,7:1 no pior caso) */
+  --mvf-ink: #a4052d; /* blocos escuros (prompts, cartões especiais) */
+  --mvf-ink-soft: #b8002e;
 
-  /* Texto e linhas */
-  --mvf-fg: #241519; /* texto principal */
-  --mvf-muted: #66514e; /* texto secundário */
-  --mvf-subtle: #79635e; /* rótulos e metadados */
-  --mvf-border: #e1d3c6; /* divisórias */
-  --mvf-border-strong: #cdb9aa;
+  /* Texto e linhas (bordô sobre bege) */
+  --mvf-fg: #a4052d;
+  --mvf-muted: #ae2142; /* bordô 88% */
+  --mvf-subtle: #b32f4d; /* bordô 82% */
+  --mvf-border: #e9cac3; /* bordô 16% */
+  --mvf-border-strong: #dfadae; /* bordô 28% */
 
-  /* Estados */
-  --mvf-success: #2b684d;
-  --mvf-success-soft: #e2ece2;
-  --mvf-warning: #87580f;
-  --mvf-warning-soft: #f5e8d1;
+  /* Estados: mesma paleta (sem cor extra). O ícone/rótulo diz o estado. */
+  --mvf-success: #a4052d;
+  --mvf-success-soft: #f0dfd3;
+  --mvf-warning: #a4052d;
+  --mvf-warning-soft: #f0dfd3;
 }
 
 @theme inline {
@@ -83,8 +83,8 @@
   --font-serif: var(--font-body);
 
   /* Sombras discretas e neutras (nada de brilho rosado). */
-  --shadow-card: 0 1px 2px rgb(36 21 25 / 0.05);
-  --shadow-raised: 0 1px 2px rgb(36 21 25 / 0.06), 0 10px 28px -14px rgb(36 21 25 / 0.32);
+  --shadow-card: 0 1px 2px rgb(164 5 45 / 0.06);
+  --shadow-raised: 0 1px 2px rgb(164 5 45 / 0.08), 0 12px 28px -14px rgb(164 5 45 / 0.35);
 }
 
 /* Raios mais sóbrios no app inteiro (menos “candy”): xl 10 px, 2xl 12 px, 3xl 16 px. */
@@ -119,18 +119,20 @@ body {
 }
 
 /*
- * Vidro fosco bordô (cabeçalho e barra inferior no celular/tablet): translúcido o
- * bastante para ver o conteúdo passando, embaçado, sem perder a leitura. Fica em
- * @layer components para que utilitários (ex.: lg:bg-wine-deep) possam sobrescrever.
+ * Vidro bordô (barra inferior flutuante): bordô principal a 85% + blur, para
+ * perceber o conteúdo passando por trás sem perder a leitura (texto ≥ 6:1,
+ * rótulo inativo ≥ 4,7:1 mesmo com conteúdo claro atrás). Fica em
+ * @layer components para utilitários poderem sobrescrever.
  */
 @layer components {
   .mvf-glass {
-    background-color: rgb(var(--mvf-glass) / 0.86);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    backdrop-filter: blur(14px) saturate(140%);
+    background-color: rgb(var(--mvf-glass) / 0.85);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgb(255 251 248 / 0.14);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.08),
-      0 8px 24px -14px rgb(36 8 18 / 0.55);
+      inset 0 1px 0 rgb(255 251 248 / 0.16),
+      0 14px 32px -12px rgb(164 5 45 / 0.45);
   }
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .mvf-glass {
@@ -160,7 +162,7 @@ body {
 
 /* Drawer e painéis com <dialog> nativo. */
 dialog::backdrop {
-  background: rgb(36 8 18 / 0.5);
+  background: rgb(164 5 45 / 0.35);
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -82,9 +82,9 @@ export function MaterialsView() {
           options={[{ value: "todas" as const, label: "Todas" }, ...(Object.keys(MATERIAL_CATEGORY_LABEL) as MaterialCategory[]).map((c) => ({ value: c, label: MATERIAL_CATEGORY_LABEL[c] }))]}
         />
         <Chip active={onlyFav} onClick={() => setOnlyFav((v) => !v)}>
-          <Star aria-hidden className={cn("size-4", onlyFav && "fill-white")} />
+          <Star aria-hidden className={cn("size-4", onlyFav && "fill-paper")} />
           Favoritos
-          <span className={cn("text-xs", onlyFav ? "text-white/80" : "text-subtle")}>{favs.length}</span>
+          <span className={cn("text-xs", onlyFav ? "text-on-wine-muted" : "text-subtle")}>{favs.length}</span>
         </Chip>
       </div>
 
@@ -137,7 +137,7 @@ function MaterialTile({ material, fav, onOpen, onFav }: { material: Material; fa
       >
         <span className="relative aspect-[2/3] w-14 shrink-0 overflow-hidden rounded-xl bg-blush">
           {material.cover ? <Image src={material.cover} alt="" fill sizes="56px" className="object-cover" /> : null}
-          <span className="absolute bottom-1 left-1 grid size-6 place-items-center rounded-md bg-white/95 text-brand">
+          <span className="absolute bottom-1 left-1 grid size-6 place-items-center rounded-md bg-paper/95 text-brand">
             <K.icon aria-hidden className="size-3.5" />
           </span>
         </span>

@@ -436,6 +436,20 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   (`on-glass-muted`) ≥ 4,6:1. Sem suporte a blur, cai para 97% de opacidade. Destino ativo da barra: cápsula
   clara em relevo e ícone 10% maior. Desktop mantém a moldura vinho sólida.
 
+## 25/11/2026 — Correção visual: paleta restrita, topo limpo, barra flutuante
+
+- **D122 · Só duas famílias de cor.** Bordô `#a4052d`/`#b8002e` e bege `#fffbf8`/`#f6efe0`. Todos os
+  tokens são essas cores ou misturas/transparências delas (pré-calculadas em `globals.css`). Sem branco,
+  rosa claro, cinza, verde ou amarelo: `success`/`warning` passam a bordô (o ícone e o texto dizem o
+  estado). Classes `*-white`/`*-black` trocadas por `*-paper`/`*-wine-deep`; degradês sobre fotos e
+  medalhas do ranking também. Substitui D117 (paleta) e o vidro “rosado” da D121.
+- **D123 · Topo sem marca.** Removidos faixa, logo, nome, trilha e cartão do usuário do topo (também
+  na lateral do desktop). Fica só o sino (e o aviso de sincronização das contas reais, funcional).
+  Sair da conta e identificação ficam no Perfil.
+- **D124 · Barra inferior flutuante.** Retângulo com cantos de 12 px, afastado 4–12 px das laterais e
+  8 px acima da área segura, vidro bordô principal a 85% com blur 16 px; bolha ativa em vidro
+  (bege 15% + borda clara). Barras fixas (Plano, Estúdio, Tribo) sobem para `5.25rem + safe area`.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a

@@ -170,9 +170,9 @@ test("acessibilidade da barra: nome contém o rótulo visível, alvo ≥ 44 px, 
   assert.ok(sizes.length > 0 && sizes.every((rem) => rem * 16 >= 11), `fonte da barra < 11 px: ${sizes}`);
 });
 
-test("botões fixos do Plano e do Estúdio ficam acima da barra (64 px + safe area)", () => {
-  // A barra tem h-16 (4rem); as barras fixas ficam a 4.75rem + safe area.
+test("botões fixos do Plano e do Estúdio ficam acima da barra flutuante (72 px + safe area)", () => {
+  // A barra flutua 0,5rem acima da área segura e tem h-16 (4rem): topo a 4,5rem; as barras fixas ficam a 5.25rem + safe area.
   for (const f of ["src/components/plan/journey-step.tsx", "src/components/estudio/studio-ui.tsx", "src/components/comunidade/community-view.tsx"]) {
-    assert.match(read(f), /bottom-\[calc\(4\.75rem\+env\(safe-area-inset-bottom\)\)\]/, f);
+    assert.match(read(f), /bottom-\[calc\(5\.25rem\+env\(safe-area-inset-bottom\)\)\]/, f);
   }
 });

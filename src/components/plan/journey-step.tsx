@@ -125,7 +125,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
                 }}
                 className={cn("flex min-h-16 items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors", on ? "border-brand bg-blush/70" : "border-line bg-card hover:border-line-strong")}
               >
-                <span className={cn("grid size-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand bg-brand text-white" : "border-line-strong")}>{on ? <Check aria-hidden className="size-4" /> : null}</span>
+                <span className={cn("grid size-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand bg-brand text-paper" : "border-line-strong")}>{on ? <Check aria-hidden className="size-4" /> : null}</span>
                 <span>
                   <span className="block font-semibold text-fg">{o.label}</span>
                   {o.hint ? <span className="block text-sm text-muted">{o.hint}</span> : null}
@@ -215,13 +215,13 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
       </nav>
 
       {/* Ação principal, sempre ao alcance do polegar (acima da barra inferior) */}
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 mt-6 lg:bottom-4">
+      <div className="sticky bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 mt-6 lg:bottom-4">
         <div className="rounded-2xl border border-line-strong/60 bg-card/95 p-3 shadow-raised backdrop-blur supports-[backdrop-filter]:bg-card/90">
           {justDone ? (
             // Empilhado: a mensagem tem a linha inteira (nunca fica sob os botões) e as ações vêm abaixo.
             <div role="status" className="space-y-3">
               <p className="flex items-center gap-2.5 text-sm font-semibold leading-snug text-success">
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-success text-white motion-safe:animate-[mvf-pop_240ms_ease-out]">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-success text-paper motion-safe:animate-[mvf-pop_240ms_ease-out]">
                   <Check aria-hidden className="size-4" />
                 </span>
                 <span className="min-w-0">{justDone.phaseDone ? `Fase concluída: ${justDone.phaseDone}` : s.kind === "decisao" ? "Resposta registrada" : "Etapa concluída"}</span>

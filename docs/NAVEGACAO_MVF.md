@@ -57,14 +57,15 @@ Regras & FAQ aceita `?secao=regras | faq | <tema>` (ex.: `conta` = Orientações
 
 ## Telas pequenas
 
-- 320 px: 7 × 45,7 px por item, altura 64 px: alvo ≥ 44 × 44 px. Fonte de 11 px (nunca menor).
+- 320 px: (320 − 8) / 7 = 44,6 px por item, altura 64 px: alvo ≥ 44 × 44 px. Fonte de 11 px (nunca menor).
 - Abaixo de 360 px, “Estúdio” → “IA” e “Produtos” → “Loja” (mesma fonte, menos letras). O nome
   acessível não muda. Não há fallback para “Mais”: se algum dia não couber, documentar e reduzir
   ícone/espaçamento, nunca esconder destino.
-- Barra fixa com `env(safe-area-inset-bottom)`; o conteúdo reserva `6rem + safe area`.
+- Barra FLUTUANTE: 0,5rem acima de `env(safe-area-inset-bottom)`, afastada 4 px (< 360 px) ou 12 px
+  das laterais, cantos de 12 px, vidro bordô (`.mvf-glass`). O conteúdo reserva `6.5rem + safe area`.
 - Barras de ação fixas (Plano, Estúdio, botão flutuante da Tribo) ficam em
-  `bottom: calc(4.75rem + safe area)`, acima da barra de 4rem. Se a altura da barra mudar, ajuste
-  as três (há teste).
+  `bottom: calc(5.25rem + safe area)`, acima da barra (topo a 4,5rem). Se a altura ou o afastamento
+  mudar, ajuste as três (há teste).
 - ≥ 1024 px: sem barra inferior; lateral com os mesmos sete destinos (recolhível).
 
 ## Quando a navegação some

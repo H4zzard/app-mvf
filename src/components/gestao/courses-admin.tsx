@@ -229,7 +229,7 @@ function ModuleEditor({ id, onClose }: { id: string; onClose: () => void }) {
                   type="button"
                   aria-pressed={on}
                   onClick={() => (setTags((x) => (on ? x.filter((y) => y !== t) : [...x, t])), setSaved(false))}
-                  className={cn("min-h-9 rounded-full border px-3 text-xs font-medium", on ? "border-brand bg-brand text-white" : "border-line bg-card text-fg hover:border-brand/30")}
+                  className={cn("min-h-9 rounded-full border px-3 text-xs font-medium", on ? "border-brand bg-brand text-paper" : "border-line bg-card text-fg hover:border-brand/30")}
                 >
                   {TAG_LABEL[t] ?? t}
                 </button>

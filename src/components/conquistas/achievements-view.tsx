@@ -31,24 +31,24 @@ export function AchievementsView() {
       />
       <GameTabs />
 
-      <section aria-labelledby="level-title" className="relative overflow-hidden rounded-2xl bg-ink p-5 text-white shadow-raised sm:p-6">
+      <section aria-labelledby="level-title" className="relative overflow-hidden rounded-2xl bg-ink p-5 text-paper shadow-raised sm:p-6">
         <div className="relative flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">Nível {xp.level.number}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-on-wine-muted">Nível {xp.level.number}</p>
             <h2 id="level-title" className="mt-1 font-serif text-2xl font-semibold">
               {xp.level.name}
             </h2>
           </div>
-          <span className="grid size-12 place-items-center rounded-2xl bg-white/10">
+          <span className="grid size-12 place-items-center rounded-2xl bg-paper/10">
             <Trophy aria-hidden className="size-6" />
           </span>
         </div>
         <p className="relative mt-4 flex items-end gap-2">
           <span className="font-serif text-5xl font-semibold">{xp.xp}</span>
-          <span className="pb-2 text-sm text-white/70">XP</span>
+          <span className="pb-2 text-sm text-on-wine-muted">XP</span>
         </p>
         <ProgressBar value={xp.levelPercent} label="Progresso até o próximo nível" tone="inverse" size="sm" className="relative mt-3" />
-        <p className="relative mt-2 text-xs text-white/70">
+        <p className="relative mt-2 text-xs text-on-wine-muted">
           {xp.nextLevel ? `${xp.xpToNext} XP para ${xp.nextLevel.name}` : "Nível máximo desta demonstração"}
         </p>
       </section>
@@ -125,7 +125,7 @@ export function AchievementsView() {
                 key={b.id}
                 className={cn("flex flex-col items-center rounded-2xl border p-3.5 text-center", on ? "border-brand/30 bg-blush/60" : "border-line bg-canvas/60")}
               >
-                <span className={cn("grid size-11 place-items-center rounded-full", on ? "bg-brand text-white" : "bg-paper text-subtle ring-1 ring-line")}>
+                <span className={cn("grid size-11 place-items-center rounded-full", on ? "bg-brand text-paper" : "bg-paper text-subtle ring-1 ring-line")}>
                   {on ? <Medal aria-hidden className="size-5" /> : <Lock aria-hidden className="size-4" />}
                 </span>
                 <span className={cn("mt-2 text-sm font-semibold", on ? "text-fg" : "text-muted")}>{b.title}</span>

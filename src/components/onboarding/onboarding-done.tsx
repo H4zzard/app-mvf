@@ -24,7 +24,7 @@ export function OnboardingDone({
     <div className="mvf-step mx-auto max-w-2xl">
       <section className="overflow-hidden rounded-3xl border border-line bg-card shadow-raised">
         <div className="bg-blush/60 px-6 py-8 text-center sm:px-10">
-          <span className="mx-auto grid size-14 place-items-center rounded-full bg-success text-white">
+          <span className="mx-auto grid size-14 place-items-center rounded-full bg-success text-paper">
             <CircleCheckBig aria-hidden className="size-7" />
           </span>
           <h1

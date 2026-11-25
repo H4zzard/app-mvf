@@ -112,7 +112,7 @@ export function MarketplaceView() {
               >
                 <SlidersHorizontal aria-hidden className="size-4" />
                 <span className="hidden min-[380px]:inline">Filtros</span>
-                {activeCount ? <span className="grid size-5 place-items-center rounded-full bg-brand text-[0.7rem] text-white">{activeCount}</span> : null}
+                {activeCount ? <span className="grid size-5 place-items-center rounded-full bg-brand text-[0.7rem] text-paper">{activeCount}</span> : null}
               </Button>
             </div>
             <ChipGroup

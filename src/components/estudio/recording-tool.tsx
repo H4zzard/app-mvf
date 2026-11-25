@@ -299,7 +299,7 @@ function ScriptCard({
   return (
     <Card className="space-y-3 p-4 sm:p-5">
       <div className="flex items-start gap-3">
-        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand text-sm font-semibold text-white">{index}</span>
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand text-sm font-semibold text-paper">{index}</span>
         <div className="min-w-0 flex-1">
           <h3 className="font-serif text-lg font-semibold leading-snug text-fg">{s.title}</h3>
           <p className="text-xs text-muted">

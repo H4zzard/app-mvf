@@ -101,7 +101,7 @@ function JourneyMap() {
             {allDone ? "Todas as etapas do seu caminho estão concluídas." : "Nenhuma etapa disponível agora."}
           </p>
         )}
-        <div className="mt-5 space-y-2 border-t border-white/12 pt-4">
+        <div className="mt-5 space-y-2 border-t border-paper/12 pt-4">
           <div className="flex items-baseline justify-between text-sm">
             <span className="text-on-wine-muted">Progresso total</span>
             <span className="font-semibold text-on-wine">
@@ -163,7 +163,7 @@ function PhaseBlock({ view, number, isCurrent }: { view: PhaseView; number: numb
   return (
     <li aria-labelledby={`fase-${view.phase.id}`}>
       <div className={cn("flex items-center gap-3 rounded-xl border p-3", isCurrent ? "border-brand/35 bg-card shadow-card" : "border-line bg-surface")}>
-        <span className={cn("grid size-10 shrink-0 place-items-center rounded-lg text-sm font-bold tabular-nums", view.complete ? "bg-success text-white" : isCurrent ? "bg-wine text-on-wine" : "bg-card text-muted ring-1 ring-line")}>
+        <span className={cn("grid size-10 shrink-0 place-items-center rounded-lg text-sm font-bold tabular-nums", view.complete ? "bg-success text-paper" : isCurrent ? "bg-wine text-on-wine" : "bg-card text-muted ring-1 ring-line")}>
           {view.complete ? <Check aria-hidden className="size-5" /> : number}
         </span>
         <div className="min-w-0 flex-1">
@@ -230,7 +230,7 @@ function StepNode({ view: v, offset, last }: { view: StepView; offset: string; l
           aria-current={current ? "step" : undefined}
           className={cn(
             "relative z-10 grid shrink-0 place-items-center rounded-full font-semibold transition-transform focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand motion-safe:active:scale-95",
-            current ? "size-14 bg-brand text-white shadow-raised ring-4 ring-brand/15" : "size-12",
+            current ? "size-14 bg-brand text-paper shadow-raised ring-4 ring-brand/15" : "size-12",
             v.state === "concluida" && "bg-wine text-on-wine",
             v.state === "disponivel" && "bg-card text-brand ring-2 ring-brand/60",
             v.state === "bloqueada" && "bg-surface text-subtle ring-1 ring-line-strong/70",
@@ -246,7 +246,7 @@ function StepNode({ view: v, offset, last }: { view: StepView; offset: string; l
         tabIndex={-1}
         className={cn("min-w-0 flex-1", current ? "mb-5 mt-0.5 self-start rounded-xl border border-brand/30 bg-card px-3.5 py-3 shadow-card" : "pb-5 pt-2")}
       >
-        {current ? <span className="mb-1.5 inline-block rounded-md bg-brand px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wider text-white">Você está aqui</span> : null}
+        {current ? <span className="mb-1.5 inline-block rounded-md bg-brand px-2 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wider text-paper">Você está aqui</span> : null}
         <span className={cn("block leading-snug", current ? "text-base font-semibold text-fg" : v.state === "bloqueada" ? "text-sm text-muted" : v.state === "concluida" ? "text-sm text-muted" : "text-sm font-medium text-fg")}>
           {v.step.title}
         </span>

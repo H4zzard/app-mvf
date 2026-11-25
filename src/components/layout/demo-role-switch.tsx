@@ -62,11 +62,11 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
               onClick={() => pick(s.id)}
               className={cn(
                 "flex min-h-11 w-full flex-col items-start justify-center rounded-xl px-3 py-1.5 text-left transition-colors",
-                active ? "bg-brand text-white" : "bg-paper text-fg ring-1 ring-line hover:bg-blush",
+                active ? "bg-brand text-paper" : "bg-paper text-fg ring-1 ring-line hover:bg-blush",
               )}
             >
               <span className="text-sm font-semibold">{s.label}</span>
-              <span className={cn("text-[0.7rem]", active ? "text-white/80" : "text-muted")}>{s.description}</span>
+              <span className={cn("text-[0.7rem]", active ? "text-on-wine-muted" : "text-muted")}>{s.description}</span>
             </button>
           );
         })}
@@ -84,7 +84,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
               onClick={() => setDemoRole(opt.role)}
               className={cn(
                 "min-h-9 flex-1 rounded-full text-xs font-semibold transition-colors",
-                active ? "bg-ink text-white" : "text-muted hover:text-fg",
+                active ? "bg-ink text-paper" : "text-muted hover:text-fg",
               )}
             >
               {opt.label}
@@ -108,7 +108,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
           className="grid min-h-11 min-w-12 shrink-0 place-items-center"
         >
           <span className={cn("relative h-7 w-12 rounded-full transition-colors", persist ? "bg-brand" : "bg-line-strong")}>
-            <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-white shadow transition-transform", persist ? "translate-x-6" : "translate-x-1")} />
+            <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-paper shadow transition-transform", persist ? "translate-x-6" : "translate-x-1")} />
           </span>
         </button>
       </div>
@@ -119,7 +119,7 @@ export function DemoControls({ onAction }: { onAction?: () => void }) {
         onBlur={() => setConfirmReset(false)}
         className={cn(
           "mt-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl text-xs font-semibold transition-colors",
-          confirmReset ? "bg-brand text-white" : "text-fg ring-1 ring-line hover:bg-blush",
+          confirmReset ? "bg-brand text-paper" : "text-fg ring-1 ring-line hover:bg-blush",
         )}
       >
         <RotateCcw aria-hidden className="size-3.5" />

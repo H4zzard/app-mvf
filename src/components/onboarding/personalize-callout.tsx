@@ -54,7 +54,7 @@ export function PersonalizeHero({ titleId = "personalize-hero-title" }: { titleI
         <ol className="mt-5 grid gap-3 sm:grid-cols-3">
           {steps.map(({ icon: Icon, text }, i) => (
             <li key={text} className="flex gap-3 rounded-lg bg-wine-soft/60 p-3 text-sm text-on-wine">
-              <span className="grid size-8 shrink-0 place-items-center rounded-md bg-wine text-accent ring-1 ring-white/10">
+              <span className="grid size-8 shrink-0 place-items-center rounded-md bg-wine text-accent ring-1 ring-paper/10">
                 <Icon aria-hidden className="size-4" />
                 <span className="sr-only">Passo {i + 1}</span>
               </span>

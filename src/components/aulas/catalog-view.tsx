@@ -78,7 +78,7 @@ export function CatalogView() {
       {/* Hero */}
       <section
         aria-labelledby="catalog-hero-title"
-        className="relative -mx-4 -mt-5 overflow-hidden bg-wine-deep text-white sm:-mx-6 sm:-mt-8 lg:mx-0 lg:mt-0 lg:rounded-3xl"
+        className="relative -mx-4 -mt-2 overflow-hidden bg-wine-deep text-paper sm:-mx-6 sm:-mt-3 lg:mx-0 lg:mt-0 lg:rounded-3xl"
       >
         <div className="relative flex min-h-[clamp(260px,70vw,320px)] flex-col justify-end sm:min-h-[400px] lg:block lg:aspect-[2000/700] lg:min-h-0">
           <Image
@@ -89,26 +89,26 @@ export function CatalogView() {
             sizes="(max-width: 1024px) 100vw, 1200px"
             className="object-cover object-[70%_20%] lg:object-center"
           />
-          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(52_11_24/0.96)_8%,rgb(74_19_35/0.62)_48%,rgb(52_11_24/0.05)_80%)] lg:bg-[linear-gradient(to_right,rgb(52_11_24/0.92)_10%,rgb(74_19_35/0.55)_45%,transparent_72%)]" />
+          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(164_5_45/0.96)_8%,rgb(164_5_45/0.62)_48%,rgb(164_5_45/0.05)_80%)] lg:bg-[linear-gradient(to_right,rgb(164_5_45/0.92)_10%,rgb(164_5_45/0.55)_45%,transparent_72%)]" />
           <button
             type="button"
             onClick={toggleSearch}
             aria-expanded={searchOpen}
             aria-controls="catalog-search"
-            className="absolute right-3 top-3 z-10 inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-black/30 px-3.5 text-sm font-semibold text-white ring-1 ring-white/25 backdrop-blur transition-colors hover:bg-black/45 sm:right-5 sm:top-5"
+            className="absolute right-3 top-3 z-10 inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-wine-deep/30 px-3.5 text-sm font-semibold text-paper ring-1 ring-paper/25 backdrop-blur transition-colors hover:bg-wine-deep/45 sm:right-5 sm:top-5"
           >
             {searchOpen ? <X aria-hidden className="size-4" /> : <Search aria-hidden className="size-4" />}
             {searchOpen ? "Fechar busca" : "Buscar"}
           </button>
           <div className="relative px-5 pb-5 pt-14 sm:p-8 sm:pt-20 lg:absolute lg:inset-y-0 lg:left-0 lg:flex lg:max-w-xl lg:flex-col lg:justify-center lg:p-12">
             <div className="flex items-center gap-2.5">
-              <Image src={MEMBER_ASSETS.logo} alt="NUMI" width={64} height={64} className="size-8 rounded-full ring-2 ring-white/20" />
-              <span className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/80">Área de membros</span>
+              <Image src={MEMBER_ASSETS.logo} alt="NUMI" width={64} height={64} className="size-8 rounded-full ring-2 ring-paper/20" />
+              <span className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-on-wine-muted">Área de membros</span>
             </div>
             <h1 id="catalog-hero-title" className="mt-2.5 font-serif text-[2.25rem] font-semibold leading-[1.02] tracking-tight sm:mt-3 sm:text-5xl lg:text-6xl">
               {catalog.course.title}
             </h1>
-            <p className="mt-1.5 max-w-md text-[0.95rem] leading-relaxed text-white/80 sm:mt-2 sm:text-base">
+            <p className="mt-1.5 max-w-md text-[0.95rem] leading-relaxed text-on-wine-muted sm:mt-2 sm:text-base">
               {catalog.course.subtitle}
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
@@ -123,7 +123,7 @@ export function CatalogView() {
               ) : null}
               <a
                 href="#modulos"
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-white/12 px-4 text-sm font-semibold text-white ring-1 ring-white/25 backdrop-blur transition-colors hover:bg-white/20 min-[360px]:px-5"
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-paper/12 px-4 text-sm font-semibold text-paper ring-1 ring-paper/25 backdrop-blur transition-colors hover:bg-paper/20 min-[360px]:px-5"
               >
                 Ver módulos
                 <ArrowDown aria-hidden className="size-4" />
@@ -245,25 +245,25 @@ function ContinueCard({
       </h2>
       <Link
         href={`/aulas/${lessonId}`}
-        className="group relative flex overflow-hidden rounded-3xl bg-wine-deep text-white shadow-raised outline-none ring-1 ring-black/5 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+        className="group relative flex overflow-hidden rounded-3xl bg-wine-deep text-paper shadow-raised outline-none ring-1 ring-wine-deep/5 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
       >
         <span className="relative min-h-[132px] w-[25%] max-w-[180px] shrink-0 self-stretch sm:min-h-0 sm:w-[34%]">
           <Image src={cover} alt="" fill sizes="180px" className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-          <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,transparent_55%,rgb(52_11_24))]" />
+          <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,transparent_55%,rgb(164_5_45))]" />
         </span>
         <span className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3.5 sm:gap-2 sm:p-6">
           <span className="flex flex-wrap items-center gap-1.5">
-            <span className="rounded-md bg-white/12 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-white/90">{moduleTitle}</span>
+            <span className="rounded-md bg-paper/12 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-paper/90">{moduleTitle}</span>
             {inPlan ? <span className="rounded-md bg-paper px-2 py-0.5 text-[0.65rem] font-semibold text-brand">No seu plano</span> : null}
           </span>
           <span id="continue-title" className="line-clamp-2 font-serif text-[1.05rem] font-semibold leading-snug sm:line-clamp-none sm:text-2xl">
             {title}
           </span>
-          <span className="flex items-center gap-1.5 text-xs text-white/70">
+          <span className="flex items-center gap-1.5 text-xs text-on-wine-muted">
             <Clock aria-hidden className="size-3.5" />
             {formatDuration(minutes)} · módulo {progress.done}/{progress.total}
           </span>
-          <span aria-hidden className="h-1 w-full overflow-hidden rounded-full bg-white/20">
+          <span aria-hidden className="h-1 w-full overflow-hidden rounded-full bg-paper/20">
             <span className="block h-full rounded-full bg-paper" style={{ width: `${pct}%` }} />
           </span>
           <span className="mt-1 hidden min-h-10 w-fit items-center gap-2 rounded-lg bg-paper px-4 text-sm font-semibold text-wine-deep transition-colors group-hover:bg-blush sm:inline-flex">
