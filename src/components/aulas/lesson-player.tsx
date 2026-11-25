@@ -35,7 +35,7 @@ export function LessonPlayer({ media, availability, cover, title }: { media: Med
   return (
     <div className="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl bg-ink text-center text-paper shadow-raised">
       <Image src={cover} alt="" fill sizes="(max-width: 1024px) 100vw, 700px" className="scale-110 object-cover opacity-30 blur-md" />
-      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgb(164_5_45/0.35),rgb(164_5_45/0.85))]" />
+      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgb(128_0_32/0.35),rgb(128_0_32/0.85))]" />
       <div className="relative px-6">
         <span className="mx-auto grid size-14 place-items-center rounded-full bg-paper/12 ring-1 ring-paper/25 backdrop-blur">
           <Icon aria-hidden className="size-6" />

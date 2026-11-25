@@ -50,7 +50,6 @@ export function LivesView() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<DemoBadge label="Agenda de exemplo" />}
         title="Lives e encontros"
         description="Encontros ao vivo com a equipe para tirar dúvidas, praticar e rever o que passou."
       />
@@ -178,7 +177,6 @@ function FeaturedEvent({ ev, now, going, onToggle, onOpen }: { ev: CommunityEven
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge tone="brand">{KIND_LABEL[ev.kind]}</Badge>
-            {ev.origin === "demonstrativo" ? <DemoBadge label="Exemplo" /> : null}
           </div>
           <h2 className="mt-1.5 font-serif text-xl font-semibold leading-tight text-fg">{ev.title}</h2>
           <p className="mt-1 text-sm text-muted">{ev.description}</p>
@@ -207,7 +205,6 @@ function EventCard({ ev, now, going, onToggle, onOpen }: { ev: CommunityEvent; n
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge tone={phase === "ao_vivo" ? "brand" : "neutral"}>{phase === "ao_vivo" ? PHASE_LABEL.ao_vivo : KIND_LABEL[ev.kind]}</Badge>
-            {ev.origin === "demonstrativo" ? <DemoBadge label="Exemplo" /> : null}
             <AudienceBadge ev={ev} />
           </div>
           <h3 className="mt-1.5 font-semibold leading-snug text-fg">{ev.title}</h3>

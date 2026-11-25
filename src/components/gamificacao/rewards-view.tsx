@@ -39,7 +39,6 @@ export function RewardsView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={<DemoBadge label="Loja de demonstração" />}
         title="Recompensas"
         description="Troque seus pontos de engajamento por benefícios. Nesta demonstração, os resgates são simulados."
       />

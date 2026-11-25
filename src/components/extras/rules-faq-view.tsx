@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, FileWarning, LifeBuoy, MessagesSquare, SearchX, ShieldCheck, ThumbsDown, ThumbsUp } from "lucide-react";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -46,7 +46,6 @@ export function RulesFaqView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={<DemoBadge label="Conteúdo demonstrativo · pendente de revisão" />}
         title="Regras & FAQ"
         description="Combinados da comunidade e respostas para as dúvidas mais comuns."
       />

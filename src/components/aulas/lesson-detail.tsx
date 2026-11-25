@@ -81,7 +81,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
       {/* Cabeçalho com a capa do módulo */}
       <section className="relative -mx-4 -mt-2 overflow-hidden bg-ink text-paper sm:-mx-6 sm:-mt-3 lg:mx-0 lg:mt-0 lg:rounded-3xl">
         <Image src={cover} alt="" fill priority sizes="100vw" className="scale-125 object-cover opacity-45 blur-2xl" />
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(164_5_45/0.35),rgb(164_5_45/0.92))]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(128_0_32/0.35),rgb(128_0_32/0.92))]" />
         <div className="relative px-4 pb-6 pt-3 sm:px-8 sm:pb-8 sm:pt-6">
           {fromStep ? (
             <Link href={`/meu-plano/etapa/${fromStep.id}`} className="-ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-paper hover:text-on-wine-muted">
@@ -95,7 +95,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
             </Link>
           )}
           <div className="mt-3 flex items-end gap-4 sm:gap-6">
-            <span className="relative aspect-[2/3] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-[0_16px_32px_-12px_rgb(164_5_45/0.7)] ring-1 ring-paper/15 sm:w-36">
+            <span className="relative aspect-[2/3] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-[0_16px_32px_-12px_rgb(128_0_32/0.7)] ring-1 ring-paper/15 sm:w-36">
               <Image src={cover} alt={mod ? `Capa do módulo ${mod.title}` : ""} fill sizes="144px" className="object-cover" />
             </span>
             <div className="min-w-0 pb-1">

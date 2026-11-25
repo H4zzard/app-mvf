@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, BookOpen, Check, CircleCheck, CirclePlay, ImageOff, Info, Lock, Map as MapIcon, Undo2, Zap } from "lucide-react";
-import { rememberStep, useJourney } from "@/components/plan/use-journey";
+import { useJourney } from "@/components/plan/use-journey";
 import { Badge, DemoBadge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -25,10 +25,7 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
   const { journey, complete, undo, choose } = useJourney();
   const [justDone, setJustDone] = useState<{ next: StepView | null; phaseDone: string | null } | null>(null);
   const [zoom, setZoom] = useState<StepPrint | null>(null);
-  useLayoutEffect(() => {
-    rememberStep(stepId);
-    return () => setZoom(null);
-  }, [stepId]);
+  useLayoutEffect(() => () => setZoom(null), [stepId]);
   const prints = useMemo(() => printsFor(stepId, STEP_IDS), [stepId]);
 
   if (!journey) {
@@ -40,9 +37,8 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
   const phase = journey.phases.find((p) => p.phase.id === v.step.phase);
   const s = v.step;
   const lessons = s.lessons.map((id) => catalog.getLesson(id)).filter((l) => l !== undefined);
-  // Volta ao mapa já posicionado nesta etapa (rolagem por âncora, feita pelo roteador).
+  // Volta ao mapa já posicionado nesta etapa: a âncora `#no-<etapa>` é o único gatilho (ver JourneyMap).
   const goMap = () => {
-    rememberStep(stepId);
     router.push(`/meu-plano#no-${stepId}`);
   };
   const go = (id: string) => {
@@ -171,7 +167,6 @@ export function JourneyStepView({ stepId }: { stepId: string }) {
                 <li key={l.id}>
                   <Link
                     href={`/aulas/${l.id}?etapa=${stepId}`}
-                    onClick={() => rememberStep(stepId)}
                     className="flex items-center gap-3 rounded-2xl border border-line bg-card p-3 transition-colors hover:border-brand/30"
                   >
                     <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-wine text-on-wine">

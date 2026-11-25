@@ -4,12 +4,12 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronDown, Info } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { CopyButton } from "@/components/ui/copy-button";
 import type { Choice } from "@/lib/studio/contracts";
 import type { StudioDrafts, StudioTool } from "@/lib/studio/drafts";
 import { FREE, type PresetOption } from "@/lib/studio/presets";
-import { localDemoTextGenerator } from "@/lib/studio/provider";
+
 import type { StudioSeed } from "@/lib/demo/store";
 import { cn } from "@/lib/cn";
 
@@ -63,10 +63,7 @@ export function ToolHeader({ title, description, step }: { title: string; descri
         <ArrowLeft aria-hidden className="size-4" />
         Voltar ao Estúdio
       </Link>
-      <div className="flex flex-wrap items-center gap-2">
-        <DemoBadge label={localDemoTextGenerator.label} />
-        {step ? <span className="text-xs font-medium text-muted">{step}</span> : null}
-      </div>
+      {step ? <p className="text-xs font-medium text-muted">{step}</p> : null}
       <h1 className="font-serif text-[1.75rem] font-semibold leading-tight tracking-tight text-fg sm:text-4xl">{title}</h1>
       <p className="max-w-2xl text-[0.95rem] text-muted sm:text-base">{description}</p>
     </header>
@@ -293,7 +290,11 @@ export function OutputBlock({ title, text, copyLabel = "Copiar", onCopied, mono 
   return (
     <div className="min-w-0 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-fg">{title}</h3>
+        <h3 className="text-sm font-semibold text-fg">
+          {title}
+          {/* Honestidade no ponto certo: todo texto gerado aqui vem do modelo local. */}
+          <span className="ml-1.5 text-xs font-normal text-muted">· modelo local (sem IA)</span>
+        </h3>
         <CopyButton text={text} label={copyLabel} variant="secondary" className="min-h-10 px-4 text-sm" onCopied={onCopied} />
       </div>
       <pre

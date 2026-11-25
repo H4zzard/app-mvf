@@ -61,7 +61,6 @@ export function ViralsView() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<DemoBadge label="Referências de exemplo" />}
         title="Vídeos Virais"
         description="Referências de ganchos e estruturas para inspirar seus próximos vídeos."
       />

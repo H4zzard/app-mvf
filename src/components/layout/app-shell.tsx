@@ -6,6 +6,7 @@ import { ChevronUp, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { AppHeader } from "@/components/layout/app-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { ScrollReset } from "@/components/layout/scroll-reset";
 import { DemoControls } from "@/components/layout/demo-role-switch";
 import { usePlan } from "@/components/plan/plan-provider";
 import { isAppNavHidden } from "@/lib/navigation/destinations";
@@ -95,6 +96,8 @@ export function AppShell({ children, demo = false }: { children: React.ReactNode
       </div>
 
       {focus ? null : <BottomNav />}
+      {/* Por último: decide a rolagem depois dos efeitos da página e do roteador. */}
+      <ScrollReset />
     </div>
   );
 }

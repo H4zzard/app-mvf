@@ -6,9 +6,9 @@ import { ArrowRight, BookOpen, Check, ChevronDown, CircleDashed, GitBranch, List
 import { usePlan } from "@/components/plan/plan-provider";
 import { AnswersDialog } from "@/components/plan/answers-dialog";
 import { PersonalizeBanner } from "@/components/onboarding/personalize-callout";
-import { rememberStep, takeRememberedStep, useJourney } from "@/components/plan/use-journey";
+import { useJourney } from "@/components/plan/use-journey";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { EmptyState } from "@/components/ui/empty-state";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { greetingName } from "@/lib/greeting";
@@ -43,12 +43,14 @@ function JourneyMap() {
   const [answersOpen, setAnswersOpen] = useState(false);
   const personalized = mode === "personalized";
 
-  // Ao voltar de uma etapa, rola até ela (a tela fica escondida por <Activity>; o efeito roda de novo ao reaparecer).
+  // “Mapa” na tela da etapa abre `/meu-plano#no-<etapa>`: só nesse caso o mapa centraliza a etapa.
+  // Navegação normal (barra, links) abre no topo — regra global em <ScrollReset />. O efeito roda de
+  // novo quando a tela reaparece (ela fica escondida por <Activity>).
   useLayoutEffect(() => {
-    const id = takeRememberedStep();
-    // Depois da rolagem automática da navegação (que leva ao topo), centraliza a etapa visitada.
+    const hash = window.location.hash;
+    const id = hash.startsWith("#no-") ? decodeURIComponent(hash.slice(4)) : null;
     let raf = 0;
-    if (id) raf = requestAnimationFrame(() => (raf = requestAnimationFrame(() => document.getElementById(`no-${id}`)?.scrollIntoView({ block: "center" }))));
+    if (id) raf = requestAnimationFrame(() => (raf = requestAnimationFrame(() => document.getElementById(`no-${id}`)?.scrollIntoView({ block: "center", behavior: "instant" }))));
     return () => {
       cancelAnimationFrame(raf);
       setAnswersOpen(false);
@@ -64,7 +66,6 @@ function JourneyMap() {
       <header>
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Meu Plano</span>
-          {persistence === "memory" ? <DemoBadge label={personalized ? "Plano personalizado · demonstração" : "Exemplo de plano · demonstração"} /> : null}
         </div>
         <p className="mt-3 text-sm text-muted">Olá, {greetingName(profile)}</p>
         <h1 className="mt-0.5 font-serif text-[1.65rem] font-semibold leading-tight text-fg sm:text-[2.1rem]">
@@ -90,7 +91,7 @@ function JourneyMap() {
             <p className="mt-1 text-sm text-on-wine-muted">
               {current.phase.title} · etapa {current.number} de {currentPhase?.total}
             </p>
-            <ButtonLink href={`/meu-plano/etapa/${current.step.id}`} variant="inverse" size="lg" className="mt-5 w-full sm:w-auto" onClick={() => rememberStep(current.step.id)}>
+            <ButtonLink href={`/meu-plano/etapa/${current.step.id}`} variant="inverse" size="lg" className="mt-5 w-full sm:w-auto">
               Continuar
               <ArrowRight aria-hidden className="size-4" />
             </ButtonLink>
@@ -225,7 +226,6 @@ function StepNode({ view: v, offset, last }: { view: StepView; offset: string; l
       <div className="relative flex w-14 shrink-0 flex-col items-center">
         <Link
           href={`/meu-plano/etapa/${v.step.id}`}
-          onClick={() => rememberStep(v.step.id)}
           aria-label={`Etapa ${v.number}: ${v.step.title} — ${STATE_LABEL[v.state]}`}
           aria-current={current ? "step" : undefined}
           className={cn(
@@ -242,7 +242,6 @@ function StepNode({ view: v, offset, last }: { view: StepView; offset: string; l
       </div>
       <Link
         href={`/meu-plano/etapa/${v.step.id}`}
-        onClick={() => rememberStep(v.step.id)}
         tabIndex={-1}
         className={cn("min-w-0 flex-1", current ? "mb-5 mt-0.5 self-start rounded-xl border border-brand/30 bg-card px-3.5 py-3 shadow-card" : "pb-5 pt-2")}
       >

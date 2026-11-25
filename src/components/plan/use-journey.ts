@@ -31,16 +31,4 @@ export function useJourney() {
   return { plan, journey, complete, undo, choose };
 }
 
-/**
- * Última etapa aberta (memória da sessão, nunca gravada): ao voltar ao mapa,
- * ele rola até ela. Não é progresso — é só a posição de leitura.
- */
-let lastStep: string | null = null;
-export const rememberStep = (id: string) => {
-  lastStep = id;
-};
-export const takeRememberedStep = () => {
-  const id = lastStep;
-  lastStep = null;
-  return id;
-};
+

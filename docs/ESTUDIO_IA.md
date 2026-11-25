@@ -143,3 +143,9 @@ Fazer **depois** do MVP mock aprovado:
 9. **Escopo:** sem SDK de imagem, vídeo, áudio ou embeddings. O DeepSeek recebe e devolve só texto.
 10. **Rótulos:** trocar o rótulo “modelo local” pelo do provedor real só quando ele estiver de fato
     respondendo.
+
+## Rótulo do modelo local (25/11/2026)
+
+O rótulo “modelo local (sem IA)” fica no próprio bloco de resultado (`OutputBlock` em
+`src/components/estudio/studio-ui.tsx`), ao lado do título de cada texto gerado, e no aviso dos
+Roteiros. O selo decorativo do cabeçalho foi removido (D129).

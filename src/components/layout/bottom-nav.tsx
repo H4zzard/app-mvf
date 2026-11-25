@@ -4,9 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PRIMARY_NAV } from "@/config/navigation";
 import { destinationForPath } from "@/lib/navigation/destinations";
+import { scrollTopIfSamePath } from "@/components/layout/scroll-reset";
 import { cn } from "@/lib/cn";
 
 /**
+ * COMPONENTE VISUAL CONGELADO (D127): usa só os tokens --nav-* e literais próprios;
+ * mudanças na paleta global não podem alterá-lo.
+ *
  * Barra inferior do celular/tablet (< 1024 px): os SETE destinos, lado a lado,
  * sem menu “Mais”. FLUTUANTE: retângulo com cantos levemente arredondados,
  * vidro bordô translúcido (fundo embaçado aparece por trás), afastado das bordas
@@ -22,7 +26,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="mvf-on-wine mvf-glass fixed inset-x-1 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 mx-auto max-w-2xl rounded-xl min-[360px]:inset-x-3 lg:hidden"
+      className="mvf-nav mvf-glass fixed inset-x-1 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 mx-auto max-w-2xl rounded-xl min-[360px]:inset-x-3 lg:hidden"
     >
       <ul className="grid h-16 grid-cols-7 px-0.5">
         {PRIMARY_NAV.map((item) => {
@@ -35,10 +39,11 @@ export function BottomNav() {
                 aria-label={item.a11yLabel}
                 aria-current={active ? "page" : undefined}
                 data-nav={item.id}
+                onClick={() => scrollTopIfSamePath(pathname, item.href)}
                 className={cn(
                   "relative flex h-full min-w-11 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium leading-none tracking-tight transition-colors",
-                  "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent",
-                  active ? "text-paper" : "text-on-glass-muted hover:text-on-wine",
+                  "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-nav-accent",
+                  active ? "text-nav-fg" : "text-nav-fg-muted hover:text-nav-fg",
                 )}
               >
                 {/* Destino ativo: bolha de vidro (bege translúcido sobre o bordô = bordô mais claro), em relevo. */}
@@ -47,7 +52,7 @@ export function BottomNav() {
                   className={cn(
                     "absolute inset-x-0.5 inset-y-1.5 rounded-lg backdrop-blur-sm transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
                     active
-                      ? "scale-100 bg-paper/15 opacity-100 ring-1 ring-paper/30 shadow-[inset_0_1px_0_rgb(255_251_248/0.28),0_6px_16px_-8px_rgb(164_5_45/0.9)]"
+                      ? "scale-100 bg-nav-fg/15 opacity-100 ring-1 ring-nav-fg/30 shadow-[inset_0_1px_0_rgb(255_251_248/0.28),0_6px_16px_-8px_rgb(164_5_45/0.9)]"
                       : "scale-90 opacity-0",
                   )}
                 />

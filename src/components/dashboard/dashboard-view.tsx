@@ -10,7 +10,7 @@ import { ToolShortcuts } from "@/components/dashboard/quick-access";
 import { HelpFooter } from "@/components/layout/help-footer";
 import { MemberAreaBanner } from "@/components/dashboard/member-area-banner";
 import { Card, CardHeader } from "@/components/ui/card";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -27,11 +27,10 @@ export function DashboardView() {
 }
 
 /** Primeiro acesso: sem plano, o destaque é montar o plano. */
-function FirstAccessDashboard({ name, demo }: { name: string; demo: boolean }) {
+function FirstAccessDashboard({ name }: { name: string; demo: boolean }) {
   return (
     <div className="space-y-5 sm:space-y-8">
       <PageHeader
-        eyebrow={demo ? <DemoBadge label="Primeiro acesso simulado" /> : undefined}
         title={`Boas-vindas, ${name}`}
         description="Comece montando o seu plano: ele vai responder qual é o seu próximo passo."
       />
@@ -43,7 +42,7 @@ function FirstAccessDashboard({ name, demo }: { name: string; demo: boolean }) {
   );
 }
 
-function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersonalized: boolean; demo: boolean }) {
+function PlanDashboard({ name, isPersonalized }: { name: string; isPersonalized: boolean; demo: boolean }) {
   const { plan, statusMap } = useActivePlan();
   // Meu Plano 2.0: o próximo passo é a próxima MICROETAPA da jornada (mesmo statusMap, mesmo progresso).
   const { journey } = useJourney();
@@ -60,17 +59,6 @@ function PlanDashboard({ name, isPersonalized, demo }: { name: string; isPersona
   return (
     <div className="space-y-6 sm:space-y-8">
       <PageHeader
-        eyebrow={
-          <DemoBadge
-            label={
-              !demo
-                ? "Conteúdo das aulas em preparação"
-                : isPersonalized
-                  ? "Plano personalizado · demonstração"
-                  : "Trilha de exemplo · demonstração"
-            }
-          />
-        }
         title={`Olá, ${name}`}
         description={
           phase && next && journey
@@ -201,10 +189,7 @@ function AnnouncementsCard() {
       <ul className="mt-4 space-y-3 sm:mt-5">
         {DEMO_ANNOUNCEMENTS.map((a) => (
           <li key={a.id} className="border-l-2 border-brand/40 py-0.5 pl-3.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="font-medium text-fg">{a.title}</p>
-              {a.isDemo ? <DemoBadge label="Aviso do protótipo" /> : null}
-            </div>
+            <p className="font-medium text-fg">{a.title}</p>
             <p className="mt-1 text-sm text-muted">{a.body}</p>
           </li>
         ))}

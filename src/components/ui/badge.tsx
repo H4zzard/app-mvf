@@ -1,4 +1,4 @@
-import { FlaskConical, Hammer } from "lucide-react";
+import { Hammer } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 type Tone = "neutral" | "brand" | "success" | "warning" | "demo" | "soon" | "inverse";
@@ -37,12 +37,9 @@ export function Badge({
 
 /** Rótulo padrão para qualquer dado de demonstração. */
 export function DemoBadge({ label = "Demonstração", inverse }: { label?: string; inverse?: boolean }) {
-  return (
-    <Badge tone={inverse ? "inverse" : "demo"}>
-      <FlaskConical aria-hidden className="size-3" />
-      {label}
-    </Badge>
-  );
+  // Identidade final: nada de selo/pílula de desenvolvimento. É uma nota discreta, só onde
+  // a informação importa (honestidade), nunca como enfeite de cabeçalho.
+  return <span className={cn("inline-flex items-center text-xs font-medium", inverse ? "text-on-wine-muted" : "text-muted")}>{label}</span>;
 }
 
 /** Rótulo padrão para recursos ainda não implementados. */

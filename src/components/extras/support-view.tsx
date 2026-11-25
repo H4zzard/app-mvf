@@ -76,7 +76,7 @@ export function SupportView() {
 
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow={<DemoBadge label="Central de ajuda de exemplo" />} title="Central de ajuda" description="Encontre a resposta rápido ou prepare uma solicitação para a equipe." />
+      <PageHeader title="Central de ajuda" description="Encontre a resposta rápido ou prepare uma solicitação para a equipe." />
 
       <SearchField value={query} onChange={setQuery} placeholder="Ex.: não consigo entrar, vídeo da aula, comissão" label="Buscar na central de ajuda" />
 
@@ -462,7 +462,7 @@ function TicketList({ tickets, onEdit }: { tickets: SupportTicket[]; onEdit: (t:
   return (
     <section aria-labelledby="sup-minhas" className="space-y-3">
       <h2 id="sup-minhas" className="flex flex-wrap items-center gap-2 font-serif text-xl font-semibold text-fg">
-        Minhas solicitações <DemoBadge label="Só nesta sessão" />
+        Minhas solicitações <DemoBadge label="· só nesta sessão, nada foi enviado" />
       </h2>
       <ul className="space-y-2.5">
         {tickets.map((t) => (

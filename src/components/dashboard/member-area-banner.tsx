@@ -23,7 +23,7 @@ export function MemberAreaBanner() {
           sizes="(max-width: 1024px) 100vw, 1100px"
           className="object-cover object-[80%_30%] transition-transform duration-700 group-hover:scale-[1.03]"
         />
-        <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,rgb(164_5_45/0.94)_15%,rgb(164_5_45/0.6)_55%,transparent_85%)]" />
+        <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,rgb(128_0_32/0.94)_15%,rgb(128_0_32/0.6)_55%,transparent_85%)]" />
         <span className="absolute inset-y-0 left-0 flex max-w-[70%] flex-col justify-center gap-1.5 p-5 sm:p-7">
           <span className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-on-wine-muted">Área de membros</span>
           <span className="font-serif text-2xl font-semibold leading-tight sm:text-3xl">Formação MVF</span>

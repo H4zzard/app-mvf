@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ArrowRight, CalendarDays, CalendarRange, Check, Flag, History, Sparkles, Star, Target } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { GameTabs, PointsStrip } from "@/components/gamificacao/game-shell";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -37,7 +37,6 @@ export function ChallengesView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={<DemoBadge label="Desafios de demonstração" />}
         title="Desafios"
         description="Missões curtas para manter o ritmo. Participe, faça a ação e resgate o XP."
       />

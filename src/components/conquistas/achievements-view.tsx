@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Award, CalendarCheck, Check, Lock, Medal, Sparkles, Trophy } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
@@ -25,7 +25,6 @@ export function AchievementsView() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<DemoBadge label="Pontos de demonstração" />}
         title="Conquistas"
         description="Seu progresso vira XP, níveis e selos. Pontos não são dinheiro nem resultado de vendas."
       />

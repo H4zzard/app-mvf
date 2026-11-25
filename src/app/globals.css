@@ -1,52 +1,60 @@
 @import "tailwindcss";
 
 /*
- * Design tokens do App MVF — paleta restrita (correção 25/11/2026).
+ * Design tokens do App MVF — PALETA DEFINITIVA (D127, 25/11/2026).
  *
- * DUAS famílias, nada além delas:
- *   Bordô  #a4052d (principal) · #b8002e (realce)
- *   Bege   #fffbf8 (claro)     · #f6efe0 (fundo)
- * Todo o resto é MISTURA dessas cores (pré-calculada aqui para não somar
- * transparências) ou transparência delas. Sem branco puro, sem rosa claro,
- * sem cinza, sem verde/amarelo de estado. Texto em fundo claro = bordô;
- * texto em fundo bordô = bege. Contraste conferido (todo texto ≥ 4,5:1).
+ * Duas cores-base, nada além delas:
+ *   BORGONHA  #800020   ·   OFF-WHITE  #FAF9F6
+ * Tudo o mais é transparência/mistura dessas duas (pré-calculada aqui para não
+ * somar camadas de alpha). Sem branco puro, sem rosa, sem cinza, sem cores de
+ * estado: o estado se lê por ícone, texto, borda e opacidade.
+ *   Fundo claro → off-white · texto nele → borgonha.
+ *   Superfície escura → borgonha · texto nela → off-white.
+ * Contraste conferido: todo texto ≥ 4,5:1.
+ *
+ * EXCEÇÃO CONGELADA: o menu inferior (bottom-nav + .mvf-glass) usa os tokens
+ * --nav-* abaixo, com os valores aprovados anteriormente. Não altere.
  */
 :root {
-  /* Bege */
-  --mvf-canvas: #f6efe0; /* fundo das páginas */
-  --mvf-surface: #fbf5ec; /* bege intermediário (faixas, campos desabilitados) */
-  --mvf-card: #fffbf8; /* cartões */
-  --mvf-paper: #fffbf8; /* “claro” do app (substitui o branco) */
-  --mvf-blush: #f0dfd3; /* bordô 7% sobre o fundo: seleção suave */
-  --mvf-blush-strong: #ebcec7; /* bordô 14% sobre o fundo: trilhos, realces */
+  /* Semânticos — off-white */
+  --mvf-canvas: #faf9f6; /* background */
+  --mvf-card: #faf9f6; /* surface neutra (cards, campos) */
+  --mvf-paper: #faf9f6; /* “claro” do app (no lugar do branco) */
+  --mvf-surface: #f6f2f0; /* surface sutil: borgonha 3% */
+  --mvf-blush: #f3eae9; /* interactive hover / seleção: borgonha 6% */
+  --mvf-blush-strong: #ebdbdc; /* trilhos e realces: borgonha 12% */
 
-  /* Bordô */
-  --mvf-brand: #a4052d; /* ação: botões, links, ativo */
-  --mvf-brand-hover: #b8002e;
-  --mvf-coral: #b8002e;
-  --mvf-wine: #b8002e; /* bordô de realce em superfícies escuras */
-  --mvf-wine-deep: #a4052d; /* blocos de destaque, lateral, login */
-  --mvf-wine-soft: #b12749; /* bege 14% sobre bordô: realce dentro de blocos bordô */
-  --mvf-on-wine: #fffbf8; /* texto sobre bordô */
-  --mvf-on-wine-muted: #f1d6da; /* bege 85% sobre bordô: texto secundário */
-  --mvf-accent: #f6efe0; /* destaque sobre bordô (indicadores, foco) */
-  --mvf-glass: 164 5 45; /* vidro da barra inferior: bordô principal translúcido */
-  --mvf-on-glass-muted: #f2d9dc; /* rótulo inativo sobre o vidro (≥ 4,7:1 no pior caso) */
-  --mvf-ink: #a4052d; /* blocos escuros (prompts, cartões especiais) */
-  --mvf-ink-soft: #b8002e;
+  /* Semânticos — borgonha */
+  --mvf-brand: #800020; /* primary / interactive */
+  --mvf-brand-hover: #8f1e3a; /* off-white 12% sobre borgonha */
+  --mvf-coral: #800020;
+  --mvf-wine: #800020; /* superfície destacada */
+  --mvf-wine-deep: #800020; /* superfície destacada */
+  --mvf-wine-soft: #8f1e3a; /* realce dentro da superfície borgonha (off-white 12%) */
+  --mvf-on-wine: #faf9f6; /* foreground sobre borgonha */
+  --mvf-on-wine-muted: #e4cccf; /* muted sobre borgonha (off-white 82%) */
+  --mvf-accent: #faf9f6; /* accent/focus sobre borgonha */
+  --mvf-ink: #800020;
+  --mvf-ink-soft: #8f1e3a;
 
-  /* Texto e linhas (bordô sobre bege) */
-  --mvf-fg: #a4052d;
-  --mvf-muted: #ae2142; /* bordô 88% */
-  --mvf-subtle: #b32f4d; /* bordô 82% */
-  --mvf-border: #e9cac3; /* bordô 16% */
-  --mvf-border-strong: #dfadae; /* bordô 28% */
+  /* Texto e linhas sobre off-white */
+  --mvf-fg: #800020; /* foreground */
+  --mvf-muted: #98324b; /* muted: borgonha 80% */
+  --mvf-subtle: #9c3c53; /* rótulos: borgonha 76% */
+  --mvf-border: #e6d1d4; /* border: borgonha 16% */
+  --mvf-border-strong: #d5aeb6; /* border forte: borgonha 30% */
 
-  /* Estados: mesma paleta (sem cor extra). O ícone/rótulo diz o estado. */
-  --mvf-success: #a4052d;
-  --mvf-success-soft: #f0dfd3;
-  --mvf-warning: #a4052d;
-  --mvf-warning-soft: #f0dfd3;
+  /* Estados — mesma paleta */
+  --mvf-success: #800020;
+  --mvf-success-soft: #f3eae9;
+  --mvf-warning: #800020;
+  --mvf-warning-soft: #f3eae9;
+
+  /* ===== MENU INFERIOR — CONGELADO (valores aprovados; não derivar da paleta) ===== */
+  --nav-glass: 164 5 45;
+  --nav-fg: #fffbf8;
+  --nav-fg-muted: #f2d9dc;
+  --nav-accent: #f6efe0;
 }
 
 @theme inline {
@@ -65,7 +73,10 @@
   --color-on-wine: var(--mvf-on-wine);
   --color-on-wine-muted: var(--mvf-on-wine-muted);
   --color-accent: var(--mvf-accent);
-  --color-on-glass-muted: var(--mvf-on-glass-muted);
+  /* Menu inferior (congelado) */
+  --color-nav-fg: var(--nav-fg);
+  --color-nav-fg-muted: var(--nav-fg-muted);
+  --color-nav-accent: var(--nav-accent);
   --color-ink: var(--mvf-ink);
   --color-ink-soft: var(--mvf-ink-soft);
   --color-fg: var(--mvf-fg);
@@ -83,8 +94,8 @@
   --font-serif: var(--font-body);
 
   /* Sombras discretas e neutras (nada de brilho rosado). */
-  --shadow-card: 0 1px 2px rgb(164 5 45 / 0.06);
-  --shadow-raised: 0 1px 2px rgb(164 5 45 / 0.08), 0 12px 28px -14px rgb(164 5 45 / 0.35);
+  --shadow-card: 0 1px 2px rgb(128 0 32 / 0.06);
+  --shadow-raised: 0 1px 2px rgb(128 0 32 / 0.08), 0 12px 28px -14px rgb(128 0 32 / 0.32);
 }
 
 /* Raios mais sóbrios no app inteiro (menos “candy”): xl 10 px, 2xl 12 px, 3xl 16 px. */
@@ -126,7 +137,7 @@ body {
  */
 @layer components {
   .mvf-glass {
-    background-color: rgb(var(--mvf-glass) / 0.85);
+    background-color: rgb(var(--nav-glass) / 0.85);
     -webkit-backdrop-filter: blur(16px) saturate(150%);
     backdrop-filter: blur(16px) saturate(150%);
     border: 1px solid rgb(255 251 248 / 0.14);
@@ -136,9 +147,14 @@ body {
   }
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .mvf-glass {
-      background-color: rgb(var(--mvf-glass) / 0.97);
+      background-color: rgb(var(--nav-glass) / 0.97);
     }
   }
+}
+
+/* Menu inferior (congelado): foco no bege aprovado. */
+.mvf-nav :focus-visible {
+  outline-color: var(--nav-accent);
 }
 
 /* Sobre a moldura vinho, o foco usa o rosa de destaque (bordô some no vinho). */
@@ -162,7 +178,7 @@ body {
 
 /* Drawer e painéis com <dialog> nativo. */
 dialog::backdrop {
-  background: rgb(164 5 45 / 0.35);
+  background: rgb(128 0 32 / 0.35);
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -63,7 +63,6 @@ export function MarketplaceView() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<DemoBadge label="Demonstração" />}
         title="Produtos"
         description="Descubra produtos, consulte as informações e prepare seus vídeos no Estúdio IA."
         actions={
@@ -189,7 +188,7 @@ export function MarketplaceView() {
                 <section aria-labelledby="mk-demo" className="space-y-3">
                   <div>
                     <h2 id="mk-demo" className="flex flex-wrap items-center gap-2 font-serif text-xl font-semibold text-fg">
-                      Para treinar <DemoBadge label="Demonstrativos" />
+                      Para treinar
                     </h2>
                     <p className="text-sm text-muted">Produtos de exemplo, sem marca real, para praticar o caminho até o Estúdio IA.</p>
                   </div>

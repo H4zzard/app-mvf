@@ -9,7 +9,7 @@ import { useDemo } from "@/components/demo/demo-provider";
 import { usePlan } from "@/components/plan/plan-provider";
 import { LEVEL_LABEL, ModuleCard, ModuleSheet, Rail, formatDuration } from "@/components/aulas/catalog-parts";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { MEMBER_ASSETS, MEMBER_RAILS, getModule, moduleOfLesson, modulesOfRail, recommendModules } from "@/demo/member-area";
@@ -80,7 +80,7 @@ export function CatalogView() {
         aria-labelledby="catalog-hero-title"
         className="relative -mx-4 -mt-2 overflow-hidden bg-wine-deep text-paper sm:-mx-6 sm:-mt-3 lg:mx-0 lg:mt-0 lg:rounded-3xl"
       >
-        <div className="relative flex min-h-[clamp(260px,70vw,320px)] flex-col justify-end sm:min-h-[400px] lg:block lg:aspect-[2000/700] lg:min-h-0">
+        <div className="relative flex min-h-[clamp(285px,70vw,320px)] flex-col justify-end sm:min-h-[400px] lg:block lg:aspect-[2000/700] lg:min-h-0">
           <Image
             src={MEMBER_ASSETS.banner}
             alt=""
@@ -89,7 +89,7 @@ export function CatalogView() {
             sizes="(max-width: 1024px) 100vw, 1200px"
             className="object-cover object-[70%_20%] lg:object-center"
           />
-          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(164_5_45/0.96)_8%,rgb(164_5_45/0.62)_48%,rgb(164_5_45/0.05)_80%)] lg:bg-[linear-gradient(to_right,rgb(164_5_45/0.92)_10%,rgb(164_5_45/0.55)_45%,transparent_72%)]" />
+          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(128_0_32/0.96)_8%,rgb(128_0_32/0.62)_48%,rgb(128_0_32/0.05)_80%)] lg:bg-[linear-gradient(to_right,rgb(128_0_32/0.92)_10%,rgb(128_0_32/0.55)_45%,transparent_72%)]" />
           <button
             type="button"
             onClick={toggleSearch}
@@ -128,9 +128,6 @@ export function CatalogView() {
                 Ver módulos
                 <ArrowDown aria-hidden className="size-4" />
               </a>
-            </div>
-            <div className="mt-3 sm:mt-4">
-              <DemoBadge inverse label="Demonstração · aulas de exemplo" />
             </div>
           </div>
         </div>
@@ -249,7 +246,7 @@ function ContinueCard({
       >
         <span className="relative min-h-[132px] w-[25%] max-w-[180px] shrink-0 self-stretch sm:min-h-0 sm:w-[34%]">
           <Image src={cover} alt="" fill sizes="180px" className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-          <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,transparent_55%,rgb(164_5_45))]" />
+          <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,transparent_55%,rgb(128_0_32))]" />
         </span>
         <span className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3.5 sm:gap-2 sm:p-6">
           <span className="flex flex-wrap items-center gap-1.5">

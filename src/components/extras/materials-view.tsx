@@ -60,7 +60,6 @@ export function MaterialsView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={<DemoBadge label="Materiais de exemplo · arquivos pendentes" />}
         title="Materiais"
         description="Checklists, modelos e guias que acompanham as aulas e os produtos NUMI."
       />

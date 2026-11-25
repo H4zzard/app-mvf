@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PRIMARY_NAV } from "@/config/navigation";
 import { destinationForPath } from "@/lib/navigation/destinations";
+import { scrollTopIfSamePath } from "@/components/layout/scroll-reset";
 import { cn } from "@/lib/cn";
 
 /**
@@ -29,6 +30,7 @@ export function SidebarNav({ collapsed = false }: { /** Modo trilho: apenas íco
                 aria-current={active ? "page" : undefined}
                 title={collapsed ? item.a11yLabel : undefined}
                 data-nav={item.id}
+                onClick={() => scrollTopIfSamePath(pathname, item.href)}
                 className={cn(
                   "group relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors",
                   collapsed && "justify-center px-0",

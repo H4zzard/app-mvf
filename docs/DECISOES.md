@@ -450,6 +450,32 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   8 px acima da área segura, vidro bordô principal a 85% com blur 16 px; bolha ativa em vidro
   (bege 15% + borda clara). Barras fixas (Plano, Estúdio, Tribo) sobem para `5.25rem + safe area`.
 
+## 25/11/2026 — Rolagem ao trocar de página
+
+- **D125 · Nova rota abre no topo (regra única).** `ScrollReset` (`src/components/layout/scroll-reset.tsx`),
+  montado uma vez no App Shell depois do `<main>`: mudou o pathname → `window.scrollTo(0)` instantâneo.
+  Causa: quem rola é a janela, o `<Link>` do Next mantém a posição quando a nova página ainda aparece
+  na viewport e as telas visitadas ficam vivas no `<Activity>`. Voltar/avançar também vão ao topo
+  (`history.scrollRestoration = "manual"` + reforço após o quadro). Exceções: primeira carga e URL com
+  âncora. Tocar no destino atual da barra/lateral volta ao topo.
+- **D126 · Mapa só centraliza a etapa pela âncora.** Removida a “última etapa” em memória (gravada a cada
+  visita, fazia qualquer ida ao Plano pular para a etapa). Agora só “Mapa” na tela da etapa
+  (`/meu-plano#no-<etapa>`) posiciona o mapa; navegação normal para o Plano abre no topo.
+
+## 25/11/2026 — Identidade visual definitiva
+
+- **D127 · Paleta definitiva: borgonha `#800020` + off-white `#FAF9F6`.** Substitui D117 e D122. Tokens
+  semânticos em `globals.css` (todos derivados das duas cores); `success`/`warning` em borgonha. Referência:
+  `docs/IDENTIDADE_VISUAL.md`. Teste `src/lib/design/palette.test.ts` barra hex/rgb fora da paleta.
+- **D128 · Menu inferior congelado.** Tokens próprios `--nav-*` com os valores aprovados (vidro 164 5 45 a
+  85%, rótulos `#FFFBF8`/`#F2D9DC`, foco `#F6EFE0`) e classe `.mvf-nav`; a paleta global não o altera
+  (verificado por estilo computado e teste).
+- **D129 · Sem selos de desenvolvimento.** `DemoBadge` virou nota de texto discreta; removidos os selos de
+  cabeçalho (Início, Plano, Aulas, Estúdio, Produtos, Tribo, Lives, Desafios, Ranking, Conquistas,
+  Recompensas, Perfil, Suporte, Regras/FAQ, Materiais, Virais) e os repetidos por item (posts, lives).
+  Honestidade mantida em contexto: resultado do Estúdio rotulado “modelo local (sem IA)” no próprio bloco
+  de saída, “Produto demonstrativo”, “Aula de exemplo”, avisos de Lives/Marketplace/Regras, ações simuladas.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a

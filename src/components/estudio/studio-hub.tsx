@@ -4,12 +4,11 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight, Clapperboard, Flame, Library, Trash2, UserRound, Video, Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDemo } from "@/components/demo/demo-provider";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/copy-button";
 import { PageHeader } from "@/components/ui/page-header";
-import { localDemoTextGenerator } from "@/lib/studio/provider";
 
 const TOOLS = [
   {
@@ -53,7 +52,6 @@ export function StudioHub() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={<DemoBadge label={localDemoTextGenerator.label} />}
         title="Estúdio IA"
         description="Três ferramentas que escrevem texto para você: prompts para criar imagem e vídeo no Google Flow, e roteiros para gravar aparecendo."
       />

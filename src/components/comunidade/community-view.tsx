@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import { FlaskConical, Lock, LockOpen, MessageCircle, PenSquare, Plus, Radio, SearchX, SlidersHorizontal } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { ChipGroup, SearchField } from "@/components/ui/chips";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -64,7 +64,6 @@ export function CommunityView() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<DemoBadge label="Comunidade de demonstração" />}
         title="Comunidade MVF"
         description="Troque dúvidas, aprendizados e marcos da sua jornada com outras alunas."
         actions={

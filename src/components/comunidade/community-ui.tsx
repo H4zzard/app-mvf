@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BookOpen, EyeOff, Flag, Heart, MessageCircle, Pencil, Target, Trash2 } from "lucide-react";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SPACES, type CommunityPost, type PostLink, type SpaceId } from "@/demo/community";
@@ -51,7 +51,7 @@ export function AuthorLine({ post }: { post: CommunityPost }) {
     <div className="min-w-0 flex-1">
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="text-sm font-semibold text-fg">{post.author.name}</span>
-        {post.author.isMe ? <Badge tone="brand">Você</Badge> : <DemoBadge label="Exemplo" />}
+        {post.author.isMe ? <Badge tone="brand">Você</Badge> : null}
       </p>
       <p className="text-xs text-muted">
         {spaceLabel(post.spaceId)}

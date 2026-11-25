@@ -10,7 +10,7 @@ import { useSession } from "@/components/layout/session-provider";
 import { DemoControls } from "@/components/layout/demo-role-switch";
 import { usePointsSummary } from "@/components/dashboard/points-card";
 import { AnswersSummary } from "@/components/onboarding/answers-summary";
-import { Badge, DemoBadge, SoonBadge } from "@/components/ui/badge";
+import { Badge, SoonBadge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { getNavItem, isItemSoon, isNavItemVisible } from "@/config/navigation";
@@ -49,7 +49,7 @@ export function ProfileView() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader eyebrow={demo ? <DemoBadge label="Conta de demonstração" /> : undefined} title="Perfil" />
+      <PageHeader title="Perfil" />
 
       {/* Identificação */}
       <section aria-label="Sua conta" className="mvf-on-wine flex items-center gap-4 rounded-2xl bg-wine-deep p-4 text-on-wine shadow-raised sm:p-5">

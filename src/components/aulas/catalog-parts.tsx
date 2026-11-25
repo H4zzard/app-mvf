@@ -110,7 +110,7 @@ export function ModuleCard({
         aria-haspopup="dialog"
         className="group block w-full rounded-2xl text-left outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
       >
-        <span className="relative block aspect-[2/3] overflow-hidden rounded-2xl bg-ink shadow-[0_10px_24px_-12px_rgb(164_5_45/0.55)] ring-1 ring-wine-deep/5 transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-[0_18px_32px_-14px_rgb(164_5_45/0.45)]">
+        <span className="relative block aspect-[2/3] overflow-hidden rounded-2xl bg-ink shadow-[0_10px_24px_-12px_rgb(128_0_32/0.55)] ring-1 ring-wine-deep/5 transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-[0_18px_32px_-14px_rgb(128_0_32/0.45)]">
           <Image
             src={module.cover}
             alt=""

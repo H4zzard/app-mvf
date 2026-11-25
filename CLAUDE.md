@@ -50,9 +50,10 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - `src/demo/` — **fixtures de demonstração**, isoladas. Nada de dado real aqui.
 - `src/lib/` — funções puras (seletores do plano, `cn`).
 - Tokens de design: `src/app/globals.css` (`:root` + `@theme`). Não espalhe hex pelas páginas.
-  PALETA RESTRITA (D122): só bordô `#a4052d`/`#b8002e` e bege `#fffbf8`/`#f6efe0` (e misturas/alpha delas).
-  Nada de branco, preto, cinza, rosa claro ou cores do Tailwind: use `paper`, `canvas`, `card`, `brand`, `wine*`, `on-wine`.
-  Topo sem marca (só o sino); barra inferior flutuante em vidro bordô `.mvf-glass`. Fonte única Inter.
+  PALETA DEFINITIVA (D127, `docs/IDENTIDADE_VISUAL.md`): só borgonha `#800020` e off-white `#FAF9F6` (e misturas/alpha).
+  Nada de branco, preto, cinza, rosa, cores do Tailwind ou hex soltos (há teste). Use os tokens semânticos.
+  MENU INFERIOR CONGELADO (D128): usa só `--nav-*`/`.mvf-nav`/`.mvf-glass`; não alterar. Topo sem marca (só o sino).
+  Sem selos de demonstração decorativos (D129): `DemoBadge` é nota discreta, só onde evita confundir simulação com realidade.
   Se o CSS novo não aparecer no dev, o cache do Turbopack está velho: pare o servidor e apague `.next`.
 
 ## Acesso e dados (Prompt 03)

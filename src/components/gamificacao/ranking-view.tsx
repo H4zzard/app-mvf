@@ -5,7 +5,7 @@ import { Crown, Info, Medal, Users } from "lucide-react";
 import { useDemo } from "@/components/demo/demo-provider";
 import { usePlan } from "@/components/plan/plan-provider";
 import { GameTabs } from "@/components/gamificacao/game-shell";
-import { DemoBadge } from "@/components/ui/badge";
+
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -33,7 +33,6 @@ export function RankingView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={<DemoBadge label="Ranking de demonstração" />}
         title="Ranking"
         description="Classificação por XP de engajamento: aulas, prática, comunidade e desafios."
       />
