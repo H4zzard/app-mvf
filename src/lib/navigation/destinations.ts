@@ -70,7 +70,10 @@ export function getDestination(id: DestinationId): Destination {
  * Para o futuro primeiro acesso com vídeo, basta acrescentar o prefixo da rota
  * aqui (ex.: "/primeiro-acesso") — sem reconstruir o shell.
  */
-export const FOCUS_ROUTE_PREFIXES: readonly string[] = [];
+export const FOCUS_ROUTE_PREFIXES: readonly string[] = [
+  // Atendimento do Assistente MVF: tela cheia (o design da barra não muda; ela só não aparece).
+  "/suporte/chat",
+];
 
 /**
  * A navegação do app fica oculta:

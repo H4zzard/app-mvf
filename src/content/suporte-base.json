@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "note": "Guias do USO DO APP escritos a partir do que o app faz hoje. Status rascunho: só entram no atendimento real depois de aprovados pela equipe (troque status para aprovado). Conteúdo do curso (transcrições, PDFs, materiais) NÃO fica no repositório: importe pelo pipeline (npm run support-kb).",
+  "documents": [
+    {
+      "id": "app-acesso-login",
+      "title": "Como entrar no app MVF",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "O app MVF não usa senha. Para entrar, abra a tela de login e digite o mesmo e-mail usado na compra. O app envia um link de acesso para esse e-mail. Abra o link e toque no botão Entrar na página Quase lá.\n\nSe aparecer a mensagem de que o e-mail não foi encontrado em nenhuma compra, confira se é o mesmo e-mail da compra, sem espaços e sem erro de digitação. Se o link não chegar, olhe a caixa de spam e a aba promoções e peça um novo link depois de alguns minutos.\n\nSe a tela de acesso indisponível aparecer mesmo com o e-mail certo, ou se o problema continuar, isso precisa da equipe, porque envolve a verificação da compra."
+    },
+    {
+      "id": "app-navegacao",
+      "title": "Como navegar pelo app",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "A barra de baixo tem sete destinos: Início, Plano, Aulas, Estúdio, Produtos, Tribo e Perfil. No computador, os mesmos sete ficam na lateral.\n\nO Início mostra a sua próxima ação na jornada. Vídeos Virais fica no Início e no Estúdio. Desafios, Ranking, Conquistas, Recompensas, Central de ajuda, Perguntas frequentes e Regras ficam no Perfil. Lives fica na Tribo. Materiais fica no fim da página de Aulas. Minhas vendas fica em Produtos."
+    },
+    {
+      "id": "app-meu-plano",
+      "title": "Como funciona o Meu Plano",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "O Meu Plano é a sua jornada em fases, com uma ação por vez. No mapa, a etapa marcada com Você está aqui é a próxima. Toque nela para abrir a tela da etapa, com a instrução, o print quando existir, o resultado esperado e a aula de apoio.\n\nQuando terminar a ação, toque em Concluí esta etapa e depois em Próxima etapa. Etapas com cadeado são liberadas quando as anteriores terminam. Assistir à aula de apoio não marca a ação prática como feita.\n\nO plano é montado a partir das suas respostas. Para ajustar, vá em Perfil e depois em Ajustar meu plano. O progresso que você já fez é mantido."
+    },
+    {
+      "id": "app-configurar-tiktok-jornada",
+      "title": "Configurar a conta do TikTok pela jornada",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "A primeira fase do Meu Plano é preparar a sua conta no TikTok. A jornada pergunta primeiro se você já tem uma conta. Se ainda não tem, as etapas mostram instalar o aplicativo e criar a conta. Se já tem, você vai direto para a configuração do perfil.\n\nA configuração do perfil segue etapas curtas: abrir a edição do perfil, criar a foto de avatar, definir nome e usuário, escrever a bio e conferir o perfil. Cada etapa tem a instrução e o resultado esperado. Os passos dentro do TikTok podem mudar com atualizações do aplicativo, por isso a equipe ainda vai confirmar os detalhes de cada procedimento."
+    },
+    {
+      "id": "app-estudio-ia",
+      "title": "Como funciona o Estúdio IA",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "O Estúdio IA tem três ferramentas que escrevem texto para você. Criar Personagem monta um prompt para criar a imagem de um personagem no Google Flow. Animar Personagem usa esse personagem e a sua fala para gerar prompts de vídeo por cena, para colar no Google Flow. Roteiros para Gravar Aparecendo gera dez roteiros para você gravar com o seu próprio rosto.\n\nO app só escreve texto. Imagens e vídeos são feitos fora do app, no Google Flow. Para quem quer fazer vídeo sem aparecer, o caminho é Criar Personagem e depois Animar Personagem. Para referências, use Explorar vídeos virais, no próprio Estúdio."
+    },
+    {
+      "id": "app-aulas",
+      "title": "Como usar a área de Aulas",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "Em Aulas ficam os módulos da Formação MVF organizados em trilhos. O botão Continuar leva à próxima aula. O botão Buscar no topo encontra aulas por tema ou módulo. Toque na capa de um módulo para ver as aulas dele.\n\nA biblioteca completa fica sempre disponível, independentemente do seu plano. Arquivos de apoio ficam em Materiais, no fim da página de Aulas."
+    },
+    {
+      "id": "app-produtos",
+      "title": "Como funciona a área de Produtos",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "Em Produtos você consulta os produtos e prepara conteúdo no Estúdio IA a partir deles. Preço, comissão e condição de afiliação só aparecem depois de confirmados pela equipe. Até lá, aparecem como A confirmar.\n\nSalvar um produto ou colocar em Meus produtos não significa afiliação no TikTok Shop. A afiliação acontece no próprio TikTok Shop."
+    },
+    {
+      "id": "app-tribo-lives",
+      "title": "Tribo e Lives",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "A Tribo é a comunidade das alunas MVF, com espaços como Boas-vindas, Avisos NUMI, Mural de conquistas, Dúvidas e dicas e Bastidores. Você pode publicar e comentar.\n\nAs Lives e encontros ficam na Tribo, no botão Lives e encontros. As datas e os links oficiais aparecem quando a equipe divulgar a agenda."
+    },
+    {
+      "id": "app-perfil-ajuda",
+      "title": "Perfil, evolução e ajuda",
+      "origin": "equipe-tecnica",
+      "type": "tutorial_app",
+      "version": 1,
+      "updatedAt": "2026-11-26",
+      "status": "rascunho",
+      "access": "alunas",
+      "text": "No Perfil ficam a sua conta, a sua evolução e a ajuda. Em Minha evolução estão nível, XP, Desafios, Ranking, Conquistas e Recompensas. Em Ajuda e informações estão a Central de ajuda, as Perguntas frequentes, as Regras da plataforma e as Orientações de acesso. Em Conta você ajusta o plano e sai da conta."
+    }
+  ]
+}

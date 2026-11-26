@@ -476,7 +476,28 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
   Honestidade mantida em contexto: resultado do Estúdio rotulado “modelo local (sem IA)” no próprio bloco
   de saída, “Produto demonstrativo”, “Aula de exemplo”, avisos de Lives/Marketplace/Regras, ações simuladas.
 
+## 26/11/2026 — Assistente MVF (suporte com IA)
+
+- **D130 · Arquitetura real, ativação por portão.** `src/lib/support-ai/` (puro) + `server.ts` (server-only) +
+  Server Actions em `/suporte/chat`. Contas reais só veem o chat com `MVF_SUPPORT_AI_ENABLED=true`,
+  `MVF_SUPPORT_STORE=supabase`, DeepSeek e service role. Demo: adaptador em memória por aba + modelo local
+  rotulado. Detalhes e portões em `docs/SUPORTE_IA.md`.
+- **D131 · DeepSeek só no servidor.** `deepseek-flash` (conferido na doc em 26/11/2026), sem raciocínio, sem
+  ferramentas, `user_id` anônimo. Chave nunca `NEXT_PUBLIC_`; há teste de que nenhum cliente importa o servidor.
+- **D132 · RAG textual primeiro.** Postgres FTS português (GIN) e BM25 em memória; pgvector depois (a DeepSeek
+  não tem embeddings). Só documentos aprovados chegam às alunas; trechos com instruções ao modelo são descartados.
+- **D133 · Conversas no banco + TXT no campo TEXT.** Mensagens individuais com `seq` único; encerramento em duas
+  fases (`closing` → TXT gerado no servidor → `closed` só se a contagem bater), idempotente. Respostas do
+  assistente e arquivamento só via service_role. Retenção sem prazo até política aprovada.
+- **D134 · Chat em modo foco.** `/suporte/chat` entra em `FOCUS_ROUTE_PREFIXES`: barra e lateral somem pela regra
+  existente, sem alterar o design congelado (D128). Altura acompanha o `visualViewport` (teclado).
+- **D135 · Encaminhamento honesto.** Assuntos sensíveis oferecem “Falar com a equipe”; registra o pedido e mostra
+  só canal oficial configurado (`MVF_SUPPORT_CONTACT_URL`). Nunca “atendente acionado”, protocolo ou prazo.
+
 ## Em aberto (não decidir sem o operador/expert)
+
+- Assistente MVF: autorizar a migration do suporte (portões A–E em `docs/SUPORTE_IA.md`), política de
+  retenção das conversas, canal humano oficial e aprovação dos guias/base do curso.
 
 - Restauração da demo ao recarregar (D59): manter como opcional, ligar por padrão (exige ajustar a
   proibição 4 do `CLAUDE.md`) ou remover.

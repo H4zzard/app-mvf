@@ -54,6 +54,7 @@ export const SECRET_ENV_NAMES = [
   "KIWIFY_CLIENT_SECRET",
   "KIWIFY_WEBHOOK_TOKEN",
   "KIWIFY_WEBHOOK_TOKEN_PREVIOUS",
+  "DEEPSEEK_API_KEY",
 ] as const;
 
 export function checkEnv(env: Env, target: PreflightTarget): Finding[] {
@@ -176,6 +177,22 @@ export function checkEnv(env: Env, target: PreflightTarget): Finding[] {
   if (products.length === 0) add(remote ? "warn" : "ok", "KIWIFY_ALLOWED_PRODUCT_IDS", "Vazio: nenhuma compra libera acesso (falha fechada).");
   else if (products.some((p) => !/^[A-Za-z0-9_-]{1,100}$/.test(p))) add("error", "KIWIFY_ALLOWED_PRODUCT_IDS", "Há ID com caracteres inválidos.");
   else add("ok", "KIWIFY_ALLOWED_PRODUCT_IDS", `${products.length} produto(s) permitido(s).`);
+
+
+  // --- Assistente MVF (suporte com IA) — só nomes/formato, nunca valores ---
+  const supportOn = val(env, "MVF_SUPPORT_AI_ENABLED") === "true";
+  const dsKey = val(env, "DEEPSEEK_API_KEY");
+  const dsBase = val(env, "DEEPSEEK_BASE_URL");
+  if (dsBase && !dsBase.startsWith("https://")) add("error", "DEEPSEEK_BASE_URL", "Precisa ser https.");
+  if (!supportOn) {
+    add("ok", "MVF_SUPPORT_AI_ENABLED", "Desligado: alunas reais não veem o chat (falha fechada).");
+  } else {
+    if (!dsKey) add("error", "DEEPSEEK_API_KEY", "Suporte ligado sem chave da DeepSeek.");
+    else add("ok", "DEEPSEEK_API_KEY", "Presente (valor não exibido).");
+    if (val(env, "MVF_SUPPORT_STORE") !== "supabase") add("error", "MVF_SUPPORT_STORE", "Suporte ligado exige MVF_SUPPORT_STORE=supabase (migration do suporte aplicada).");
+    if (!val(env, "SUPABASE_SERVICE_ROLE_KEY")) add("error", "SUPABASE_SERVICE_ROLE_KEY", "O suporte grava respostas e transcrições pelo servidor: chave de serviço obrigatória.");
+    if (!val(env, "MVF_SUPPORT_RETENTION_DAYS")) add("warn", "MVF_SUPPORT_RETENTION_DAYS", "Sem política de retenção aprovada: nada é apagado automaticamente.");
+  }
 
   return out;
 }

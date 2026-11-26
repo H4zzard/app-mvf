@@ -65,6 +65,13 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 - **Pendente:** paleta e fonte oficiais da marca (substituir só os tokens), revisão da expert em
   celular físico, capas das Aulas sobre o novo fundo.
 
+## 🟡 Assistente MVF — suporte com IA (26/11/2026) — pronto localmente, AGUARDANDO AUTORIZAÇÃO
+- Chat em tela cheia na Central de ajuda, memória do atendimento, base de conhecimento (RAG textual),
+  encaminhamento humano honesto, encerramento com TXT arquivado, migration + RLS + testes (PGlite), pipeline
+  `npm run support-kb`. Ver `docs/SUPORTE_IA.md`.
+- **Pendente (operador):** portões A–E (migration, base, chave DeepSeek, homologação, produção), política de
+  retenção, canal humano oficial, material do curso e aprovação dos guias, job de inatividade, tela da equipe.
+
 ## ✅ Painel administrativo — estrutura e conteúdo (Prompt 13A, demonstrativo local)
 - `/gestao` só no desenvolvimento (três condições, 404 no servidor fora disso): visão geral com
   números reais, cursos e aulas, produtos NUMI, roteiros e presets, fluxo editorial, revisão e

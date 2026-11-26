@@ -12,6 +12,7 @@ export type Permission =
   | "integration:read"
   | "community:moderate"
   | "support:assign"
+  | "support:history"
   | "content:edit"
   | "content:review"
   | "content:publish";
@@ -25,6 +26,8 @@ const MATRIX: Record<Permission, UserRole[]> = {
   "community:moderate": ["admin", "moderator"],
   /** Atribuir e responder solicitações de suporte (futuro backend). */
   "support:assign": ["admin", "support"],
+  /** Consultar atendimentos do Assistente MVF, ler mensagens e baixar o TXT (auditado no banco). */
+  "support:history": ["admin", "support"],
   /** Criar e editar rascunhos de conteúdo (aulas, produtos, roteiros). */
   "content:edit": ["admin", "expert"],
   /** Revisar: aprovar ou devolver conteúdo em revisão. */

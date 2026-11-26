@@ -132,6 +132,15 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - Tickets bloqueiam senha, código, CPF e cartão; tickets e denúncias nunca vão para o armazenamento local.
 - XP da comunidade só por `participationCounts` + tetos de `XP_RULES` (sem pontos repetidos).
 
+## Assistente MVF — suporte com IA
+
+- Regras em `docs/SUPORTE_IA.md`. Puro: `src/lib/support-ai/` (imports relativos `.ts`); servidor: `server.ts`,
+  `supabase-store.ts` (server-only); Actions em `src/app/(app)/suporte/chat/actions.ts` (reautorizam sempre).
+- DeepSeek só no servidor; nenhum componente de cliente importa servidor/prompt/chave (há teste). Sem `NEXT_PUBLIC_`.
+- Só documentos APROVADOS chegam às alunas; nunca inventar aula/link/política; dado sensível bloqueado antes de enviar.
+- Encerramento em duas fases e idempotente; nunca dizer “salvo/arquivado” sem confirmação; nunca “atendente acionado”.
+- Migration `20261126120000_suporte_ia.sql` NÃO aplicada: aplicar só com autorização (portões A–E). Contas reais sem chat até lá.
+
 ## Painel administrativo (Prompt 13A)
 
 - `/gestao` é DEMONSTRATIVO e LOCAL: só com NODE_ENV=development + MVF_DEMO_MODE=true + MVF_ADMIN_DEMO=true

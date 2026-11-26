@@ -100,6 +100,7 @@ O que a tela faz:
   - **Salvar rascunho** ou **Simular envio**, com o status “Simulação · não enviado”. Nunca “recebido”;
   - “Minhas solicitações” permite continuar um rascunho ou excluir.
 - **Canais oficiais:** `SUPPORT_CHANNELS` está **vazio** até a equipe informar.
+- **Assistente MVF (chat):** seção “Ainda precisa de ajuda?” no fim da Central → `/suporte/chat`. Ver `docs/SUPORTE_IA.md`.
 
 ## Ajustes gerais (Prompt 12)
 
