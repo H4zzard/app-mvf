@@ -39,17 +39,22 @@ describe("configuração", () => {
     assert.equal(c.deepseek, null);
     assert.equal(c.retentionDays, null, "sem política aprovada não há prazo inventado");
     assert.equal(readSupportConfig({ DEEPSEEK_API_KEY: "k", DEEPSEEK_BASE_URL: "http://inseguro" }).deepseek, null);
-    const on = readSupportConfig({ DEEPSEEK_API_KEY: "k", MVF_SUPPORT_AI_ENABLED: "true" });
+    const on = readSupportConfig({ DEEPSEEK_API_KEY: "k", MVF_SUPPORT_PROVIDER: "deepseek" });
     assert.equal(on.deepseek?.model, "deepseek-flash");
     assert.equal(remoteModelEnabled(on), true);
+    assert.equal(remoteModelEnabled(readSupportConfig({ DEEPSEEK_API_KEY: "k" })), false, "sem seleção explícita, não chama a API");
     assert.equal(readSupportConfig({ NEXT_PUBLIC_DEEPSEEK_API_KEY: "k" }).deepseek, null, "NEXT_PUBLIC_ é ignorado");
   });
 
-  test("conta real só com flag + banco; demo sempre (adaptador em memória)", () => {
+  test("conta real só com flag + banco + DeepSeek pronta; demo com o provedor escolhido", () => {
     assert.deepEqual(chatAvailability(readSupportConfig({}), "member"), { available: false, reason: "disabled" });
     assert.deepEqual(chatAvailability(readSupportConfig({ MVF_SUPPORT_AI_ENABLED: "true" }), "member"), { available: false, reason: "no_store" });
-    assert.equal(chatAvailability(readSupportConfig({ MVF_SUPPORT_AI_ENABLED: "true", MVF_SUPPORT_STORE: "supabase" }), "member").available, true);
+    assert.deepEqual(chatAvailability(readSupportConfig({ MVF_SUPPORT_AI_ENABLED: "true", MVF_SUPPORT_STORE: "supabase" }), "member"), { available: false, reason: "local_provider" });
+    const real = { MVF_SUPPORT_AI_ENABLED: "true", MVF_SUPPORT_STORE: "supabase", MVF_SUPPORT_PROVIDER: "deepseek" };
+    assert.deepEqual(chatAvailability(readSupportConfig(real), "member"), { available: false, reason: "missing_key" });
+    assert.equal(chatAvailability(readSupportConfig({ ...real, DEEPSEEK_API_KEY: "k" }), "member").available, true);
     assert.equal(chatAvailability(readSupportConfig({}), "demo").available, true);
+    assert.deepEqual(chatAvailability(readSupportConfig({ MVF_SUPPORT_PROVIDER: "deepseek" }), "demo"), { available: false, reason: "missing_key" }, "DeepSeek pedida sem chave: avisa, não usa o local escondido");
   });
 
   test("limites com faixa segura", () => {
@@ -102,11 +107,12 @@ describe("base de conhecimento", () => {
     assert.deepEqual(usableDocuments(docs, { includeDrafts: true, audience: "alunas" }).map((d) => d.id), ["guia-perfil", "rascunho-doc"]);
   });
 
-  test("guias do repositório são válidos, em rascunho até aprovação, e aulas só com link existente", () => {
+  test("guias do repositório são válidos, com status de aprovação explícito, e aulas só com link existente", () => {
     const { docs, errors } = repoGuides();
     assert.deepEqual(errors, []);
     assert.ok(docs.length >= 8);
-    assert.ok(docs.every((d) => d.status === "rascunho"), "a equipe precisa aprovar antes do uso real");
+    // Aprovados pelo operador em 26/11/2026 (D141). Exemplos do catálogo seguem em rascunho (teste abaixo).
+    assert.ok(docs.every((d) => d.status === "aprovado" || d.status === "rascunho"));
     assert.equal(lessonHref("aula-que-nao-existe"), null);
     const lessonDocs = allRepoKnowledge().filter((d) => d.lessonId);
     for (const d of lessonDocs) assert.ok(lessonHref(d.lessonId!)?.startsWith("/aulas/"));
@@ -189,6 +195,7 @@ describe("transcrição TXT", () => {
     handoffTopic: null,
     startedAt: "2026-11-26T18:23:10.000Z",
     closedAt: null,
+    closeReason: null,
     pendingSince: null,
     transcript: null,
     transcriptGeneratedAt: null,
@@ -204,12 +211,12 @@ describe("transcrição TXT", () => {
     const txt = buildTranscript(conv, [ms[2], ms[0], ms[1]], "2026-11-26T18:35:42.000Z");
     assert.equal(formatRecife("2026-11-26T18:23:10.000Z"), "26/11/2026 15:23:10");
     assert.ok(txt.startsWith(`ATENDIMENTO MVF\nID: ${conv.id}\nAluna: Ana\nInício: 26/11/2026 15:23:10\nEncerramento: 26/11/2026 15:35:42\n`));
-    const order = ["[26/11/2026 15:23:10] ASSISTENTE MVF", "[26/11/2026 15:24:03] ALUNA", "[26/11/2026 15:24:08] ASSISTENTE MVF"].map((l) => txt.indexOf(l));
+    const order = ["[26/11/2026 15:23:10] NINA (ASSISTENTE MVF)", "[26/11/2026 15:24:03] ALUNA", "[26/11/2026 15:24:08] NINA (ASSISTENTE MVF)"].map((l) => txt.indexOf(l));
     assert.deepEqual([...order].sort((a, b) => a - b), order);
     assert.ok(order.every((i) => i > 0));
     assert.ok(txt.includes("Oii! Tudo bem? 💗 Como posso te ajudar?"), "emoji/UTF-8 preservado");
     assert.ok(txt.includes("Claro! Vamos resolver isso juntas.\nPrimeiro, abra o perfil."), "texto não é alterado");
-    assert.ok(txt.trimEnd().endsWith("FIM DO ATENDIMENTO\nStatus: Encerrado"));
+    assert.ok(txt.trimEnd().endsWith("FIM DO ATENDIMENTO\nStatus: Encerrado\nMotivo: Encerrado pela aluna"));
     assert.equal(Buffer.from(txt, "utf8").toString("utf8"), txt);
   });
 
@@ -305,7 +312,7 @@ describe("cliente DeepSeek", () => {
       }) as unknown as typeof fetch,
     });
     const r = await p.complete([{ role: "user", content: "oi" }], { userKey: "uuid-da-aluna" });
-    assert.deepEqual(r, { ok: true, text: "Oi!", usage: { input: 10, output: 3 } });
+    assert.deepEqual(r, { ok: true, text: "Oi!", model: "deepseek-flash", usage: { input: 10, output: 3 } });
     const s = seen as unknown as { url: string; init: RequestInit };
     assert.equal(s.url, "https://api.deepseek.com/chat/completions");
     const body = JSON.parse(String(s.init.body));
@@ -342,6 +349,7 @@ function deps(over: Partial<EngineDeps> & { store: EngineDeps["store"] }): Engin
     recentWindow: 12,
     timeoutMs: 2000,
     lessonHref: (id) => (id === "l-estudio" ? "/aulas/l-estudio" : null),
+    resolveLesson: (id) => (id === "l-estudio" ? { title: "Aula do Estúdio", moduleTitle: "Avatar de IA", href: "/aulas/l-estudio" } : null),
     demo: true,
     ...over,
   };
@@ -364,7 +372,8 @@ describe("orquestração da resposta", () => {
     const id = (await store.start("ana", "Ana", "Oi!")).conversation.id;
     await store.appendStudent("ana", id, "Qual o melhor horário para postar receitas de bolo?", LIMITS);
     const r = await generateReply(deps({ store }), "ana", id);
-    assert.ok(r.ok && /Ainda não tenho uma orientação confirmada/.test(r.message.content));
+    assert.ok(r.ok && /ainda não tenho uma orientação confirmada/.test(r.message.content));
+    assert.equal(r.message.actions, undefined, "sem base, sem botão");
     assert.equal(r.message.sources, undefined);
   });
 
@@ -404,7 +413,8 @@ describe("orquestração da resposta", () => {
     await store.appendStudent("ana", id, "Quero reembolso, fui cobrada duas vezes", LIMITS);
     const r = await generateReply(deps({ store }), "ana", id);
     assert.ok(r.ok && r.handoff === "reembolso");
-    assert.match(r.message.content, /precisa ser visto pela equipe MVF[\s\S]*Falar com a equipe/);
+    assert.match(r.message.content, /quem consegue verificar direitinho é nossa equipe[\s\S]*Falar com a equipe/);
+    assert.doesNotMatch(r.message.content, /💗|💛|😊|🥰/, "sem emoji em assunto financeiro");
     assert.doesNotMatch(r.message.content, /atendente (foi )?acionad|protocolo|prazo/i);
     assert.equal(r.message.sources, undefined, "encaminhamento não exibe fontes da base");
     await store.close("ana", id);

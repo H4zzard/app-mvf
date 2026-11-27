@@ -65,6 +65,11 @@ Prazo meta (não garantia) do brief: versão utilizável em 2–3 dias.
 - **Pendente:** paleta e fonte oficiais da marca (substituir só os tokens), revisão da expert em
   celular físico, capas das Aulas sobre o novo fundo.
 
+## 🟡 Nina 2.0 (26/11/2026) — DeepSeek real pronta para teste LOCAL (chave do operador)
+- Persona e prompt definitivos, provedor explícito, 27 guias do app, registro dos 23 módulos oficiais, botão
+  “Abrir aula” validado, encerramento automático, suíte de referência. Guia: `docs/CONFIGURACAO_NINA.md`.
+- **Pendente (equipe):** transcrições e aulas oficiais no catálogo (hoje 0), aprovação dos guias, canal humano oficial.
+
 ## 🟡 Assistente MVF — suporte com IA (26/11/2026) — pronto localmente, AGUARDANDO AUTORIZAÇÃO
 - Chat em tela cheia na Central de ajuda, memória do atendimento, base de conhecimento (RAG textual),
   encaminhamento humano honesto, encerramento com TXT arquivado, migration + RLS + testes (PGlite), pipeline

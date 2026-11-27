@@ -167,6 +167,13 @@ describe("suporte: base de conhecimento", () => {
     assert.ok(withDrafts.includes("doc-rascunho") && !withDrafts.includes("doc-equipe"));
   });
 
+  test("pergunta natural acha o trecho (qualquer palavra, por relevância) e devolve o tipo", async () => {
+    const r = (await db.query<{ document_id: string; type: string }>("select document_id, type from public.support_search_knowledge('como eu faço pra trocar a foto do meu perfil no tiktok?', 5, false)")).rows;
+    assert.deepEqual(r, [{ document_id: "doc-aprovado", type: "tutorial_app" }]);
+    assert.equal((await db.query("select * from public.support_search_knowledge('que a de o', 5, true)")).rows.length, 0);
+    assert.equal((await db.query("select * from public.support_search_knowledge($1, 5, true)", ["perfil' | ! & :* ("])).rows.length >= 1, true);
+  });
+
   test("alunas não leem a base direto nem chamam a busca", async () => {
     assert.match(await expectError(asUser(db, ana, (tx) => tx.query("select * from public.support_knowledge_chunks"))), /permission denied/);
     assert.match(await expectError(asUser(db, ana, (tx) => tx.query("select * from public.support_search_knowledge('perfil')"))), /permission denied/);
@@ -184,5 +191,64 @@ describe("suporte: equipe", () => {
     assert.ok(log >= 2);
     assert.match(await expectError(asUser(db, ana, (tx) => tx.query("select * from public.support_admin_list()"))), /forbidden/);
     assert.match(await expectError(asUser(db, mod, (tx) => tx.query("select public.support_admin_get($1)", [id]))), /forbidden/);
+  });
+});
+
+describe("suporte: Nina 2.0 (motivo de encerramento, eventos e botões)", () => {
+  test("motivo registrado; aluna não consegue gravar “resolvido”; o primeiro motivo vale", async () => {
+    const id = await start(ana);
+    await rpc(ana, "select public.support_begin_close($1, 'resolvido') as r", [id]);
+    const row = (await db.query<{ close_reason: string }>("select close_reason from public.support_conversations where id = $1", [id])).rows[0];
+    assert.equal(row.close_reason, "manual", "“resolvido” vindo da aluna vira manual");
+    const id2 = await start(ana);
+    await db.query("select public.support_set_close_reason($1, 'resolvido')", [id2]);
+    await rpc(ana, "select public.support_begin_close($1, 'abriu_aula') as r", [id2]);
+    assert.equal((await db.query<{ close_reason: string }>("select close_reason from public.support_conversations where id = $1", [id2])).rows[0].close_reason, "resolvido");
+    assert.match(await expectError(asUser(db, ana, (tx) => tx.query("select public.support_set_close_reason($1, 'resolvido')", [id2]))), /permission denied/);
+  });
+
+  test("evento do sistema só pelo servidor e só com atendimento aberto; botões gravados na mensagem", async () => {
+    const id = await start(bia);
+    await send(bia, id, "qual aula de roteiro?");
+    const actions = JSON.stringify([{ type: "open_lesson", lessonId: "l-roteiro", title: "Roteiro", moduleTitle: null, href: "/aulas/l-roteiro" }]);
+    await db.query("select public.support_append_assistant_message($1, 'Achei!', '[]', '{\"provider\":\"local\"}', $2::jsonb)", [id, actions]);
+    const saved = (await db.query<{ actions: { lessonId: string }[]; meta: { provider: string } }>("select actions, meta from public.support_messages where conversation_id = $1 and seq = 3", [id])).rows[0];
+    assert.equal(saved.actions[0].lessonId, "l-roteiro");
+    assert.equal(saved.meta.provider, "local");
+    assert.match(await expectError(asUser(db, bia, (tx) => tx.query("select public.support_append_system_message($1, 'falso')", [id]))), /permission denied/);
+    const ev = (await db.query<{ r: J }>("select public.support_append_system_message($1, 'A aluna abriu a aula “Roteiro”.') as r", [id])).rows[0].r;
+    assert.equal(ev.seq, 4);
+    await rpc(bia, "select public.support_begin_close($1, 'abriu_aula') as r", [id]);
+    const after = (await db.query<{ r: J }>("select public.support_append_system_message($1, 'depois') as r", [id])).rows[0].r;
+    assert.equal(after.error, "closed");
+  });
+});
+
+describe("suporte: upgrade de banco com a versão anterior da migration", () => {
+  test("versão antiga + complemento Nina 2.0 = mesmas colunas e funções do banco novo", async () => {
+    const { PGlite } = await import("@electric-sql/pglite");
+    const { readFileSync, readdirSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const dir = join(import.meta.dirname, "..", "migrations");
+    const fresh = await createTestDb();
+    const stub = readFileSync(join(import.meta.dirname, "pg-harness.ts"), "utf8").match(/const SUPABASE_STUB = `([\s\S]*?)`;/)![1];
+    const old = new PGlite();
+    await old.exec(stub);
+    for (const f of readdirSync(dir).filter((x) => x.endsWith(".sql")).sort()) {
+      const sql = f === "20261126120000_suporte_ia.sql" ? readFileSync(join(import.meta.dirname, "fixtures", "suporte_ia_v1.sql"), "utf8") : readFileSync(join(dir, f), "utf8");
+      if (f === "20261127120000_nina_2_complemento.sql") continue;
+      await old.exec(sql);
+    }
+    // Banco antigo: falta a coluna nova.
+    await assert.rejects(old.query("select close_reason from public.support_conversations limit 0"));
+    const complement = readFileSync(join(dir, "20261127120000_nina_2_complemento.sql"), "utf8");
+    await old.exec(complement);
+    await old.exec(complement); // idempotente
+    const shape = async (db: PGlite) => ({
+      cols: (await db.query<{ c: string }>("select table_name || '.' || column_name as c from information_schema.columns where table_schema = 'public' and table_name like 'support_%' order by 1")).rows.map((r) => r.c),
+      fns: (await db.query<{ f: string }>("select p.oid::regprocedure::text as f from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'support_%' order by 1")).rows.map((r) => r.f),
+      grants: (await db.query<{ g: string }>("select routine_name || ':' || grantee as g from information_schema.routine_privileges where routine_schema = 'public' and routine_name like 'support_%' order by 1")).rows.map((r) => r.g),
+    });
+    assert.deepEqual(await shape(old), await shape(fresh));
   });
 });

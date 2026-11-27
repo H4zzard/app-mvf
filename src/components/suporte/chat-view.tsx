@@ -2,19 +2,24 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowUp, BookOpen, CircleAlert, Download, LifeBuoy, LoaderCircle, MessageSquarePlus, RotateCcw, ShieldCheck, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowUp, BookOpen, CircleAlert, Download, LifeBuoy, LoaderCircle, MessageSquarePlus, PlayCircle, RotateCcw, ShieldCheck, X } from "lucide-react";
 import {
   closeConversationAction,
   exportTranscriptAction,
   listMyConversationsAction,
+  openLessonAction,
   requestHandoffAction,
   retryReplyAction,
   sendMessageAction,
   startConversationAction,
   type ChatError,
   type ClientMessage,
+  type ClosedInfo,
 } from "@/app/(app)/suporte/chat/actions";
 import { Button } from "@/components/ui/button";
+import { ASSISTANT } from "@/lib/support-ai/persona";
+import type { ChatAction } from "@/lib/support-ai/types";
 import { cn } from "@/lib/cn";
 
 /**
@@ -34,6 +39,8 @@ const ERROR_TEXT: Record<ChatError, string> = {
   forbidden: "Seu acesso não está ativo no momento.",
   unavailable: "O atendimento não está disponível agora. Tente mais tarde.",
   invalid_tab: "Recarregue a página para iniciar um atendimento.",
+  provider_not_configured: "A conversa está configurada para usar a DeepSeek, mas a chave não foi encontrada no servidor.",
+  lesson_unavailable: "Essa aula não está disponível para abrir agora.",
   invalid: "Escreva sua mensagem antes de enviar.",
   too_long: "Sua mensagem ficou longa demais. Tente resumir um pouco.",
   sensitive: "Por segurança, não envie",
@@ -69,7 +76,17 @@ function useViewportBox() {
 
 type Phase = "starting" | "ready" | "closing" | "closed" | "failed";
 
+const REASON_TEXT: Record<ClosedInfo["reason"], string> = {
+  manual: "Atendimento encerrado",
+  resolvido: "Que bom que resolveu! Atendimento encerrado",
+  abriu_aula: "Atendimento encerrado para abrir a aula",
+  inatividade: "Atendimento encerrado por inatividade",
+};
+
 export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel: string }) {
+  const router = useRouter();
+  const [opening, setOpening] = useState<string | null>(null);
+  const [pendingClose, setPendingClose] = useState(false);
   const [phase, setPhase] = useState<Phase>("starting");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ClientMessage[]>([]);
@@ -79,7 +96,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
   const [error, setError] = useState<{ code: ChatError; detail?: string; retry?: boolean } | null>(null);
   const [handoff, setHandoff] = useState<{ topic: string | null; label: string | null; state: "offer" | "sent"; contactUrl: string | null } | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
-  const [closed, setClosed] = useState<{ closedAt: string; fileName: string; persistent: boolean } | null>(null);
+  const [closed, setClosed] = useState<ClosedInfo | null>(null);
   const [history, setHistory] = useState<{ id: string; startedAt: string; closedAt: string | null; status: string }[]>([]);
   const scroller = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -101,6 +118,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
     setHandoff(null);
     setClosed(null);
     setConfirmClose(false);
+    setPendingClose(false);
     const r = await startConversationAction(tabId());
     if (!r.ok) {
       setError({ code: r.error });
@@ -151,6 +169,17 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
       return;
     }
     setMessages((m) => [...m.filter((x) => x.id !== temp.id), r.student, ...(r.reply ? [r.reply] : [])]);
+    // Encerramento automático decidido pelo servidor (resolução confirmada pela aluna).
+    if (r.closed) {
+      await finishClosed(r.closed);
+      return;
+    }
+    if (r.closeError) {
+      setPhase("closing");
+      setPendingClose(true);
+      setError({ code: r.closeError });
+      return;
+    }
     if (r.handoff) setHandoff((h) => h ?? { topic: r.handoff!.topic, label: r.handoff!.label, state: "offer", contactUrl: null });
     if (!r.reply) setError({ code: r.replyError ?? "reply_failed", retry: true });
     requestAnimationFrame(() => input.current?.focus({ preventScroll: true }));
@@ -173,6 +202,15 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
     setHandoff((h) => ({ topic: h?.topic ?? null, label: h?.label ?? null, state: "sent", contactUrl: r.contactUrl }));
   }
 
+  async function finishClosed(info: ClosedInfo) {
+    setClosed(info);
+    setPhase("closed");
+    setPendingClose(false);
+    setHandoff(null);
+    const list = await listMyConversationsAction(tabId());
+    if (list.ok) setHistory(list.conversations.filter((c) => c.status === "closed"));
+  }
+
   async function close() {
     if (!conversationId) return;
     setConfirmClose(false);
@@ -180,14 +218,24 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
     setError(null);
     const r = await closeConversationAction(tabId(), conversationId);
     if (!r.ok) {
-      setPhase("ready");
+      // Se o encerramento já começou (ex.: automático), continua bloqueado até arquivar.
+      setPhase(pendingClose ? "closing" : "ready");
       setError({ code: r.error });
       return;
     }
-    setClosed({ closedAt: r.closedAt, fileName: r.fileName, persistent: r.persistent });
-    setPhase("closed");
-    const list = await listMyConversationsAction(tabId());
-    if (list.ok) setHistory(list.conversations.filter((c) => c.status === "closed"));
+    await finishClosed(r);
+  }
+
+  /** “Abrir aula”: o servidor valida, arquiva o atendimento e só então devolve o destino. */
+  async function openLesson(action: ChatAction) {
+    if (!conversationId || opening) return;
+    setOpening(action.lessonId);
+    setError(null);
+    const r = await openLessonAction(tabId(), conversationId, action.lessonId);
+    setOpening(null);
+    if (!r.ok) return setError({ code: r.error });
+    await finishClosed(r.closed);
+    router.push(r.href);
   }
 
   async function download(id: string) {
@@ -215,8 +263,10 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
           <ArrowLeft aria-hidden className="size-5" />
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-semibold text-fg">Assistente MVF</h1>
-          <p className="truncate text-xs text-muted">Atendimento automatizado{demo ? " · demonstração" : ""}</p>
+          <h1 className="truncate text-base font-semibold text-fg">{ASSISTANT.name}</h1>
+          <p className="truncate text-xs text-muted">
+            {ASSISTANT.role} · atendimento automatizado{demo ? ` · demonstração (${providerLabel})` : ""}
+          </p>
         </div>
         {phase === "ready" || phase === "closing" ? (
           <Button variant="secondary" size="sm" className="shrink-0 px-3" onClick={() => setConfirmClose(true)} disabled={phase !== "ready" || waiting} aria-haspopup="dialog">
@@ -233,7 +283,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
             <ShieldCheck aria-hidden className="mt-0.5 size-3.5 shrink-0" />
             <span>
               Atendimento automatizado do MVF. As conversas podem ser guardadas para suporte e qualidade. Não envie senha, código, CPF ou cartão.
-              {demo ? ` Demonstração: respostas do ${providerLabel} com base em revisão; a conversa existe só nesta aba.` : ""}
+              {demo ? ` Demonstração: respostas de ${providerLabel}, com base em revisão. A conversa existe só nesta aba.` : ""}
             </span>
           </p>
 
@@ -244,7 +294,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
           ) : null}
 
           {messages.map((m) => (
-            <Bubble key={m.id} m={m} demo={demo} />
+            <Bubble key={m.id} m={m} demo={demo} onOpenLesson={phase === "ready" ? openLesson : undefined} opening={opening} />
           ))}
 
           {waiting ? (
@@ -297,6 +347,11 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
                     <RotateCcw aria-hidden className="size-4" /> Tentar de novo
                   </button>
                 ) : null}
+                {pendingClose ? (
+                  <button type="button" onClick={close} className="mt-1.5 inline-flex min-h-10 items-center gap-1.5 font-semibold text-brand hover:underline">
+                    <RotateCcw aria-hidden className="size-4" /> Tentar arquivar de novo
+                  </button>
+                ) : null}
                 {phase === "failed" ? (
                   <button type="button" onClick={start} className="mt-1.5 inline-flex min-h-10 items-center gap-1.5 font-semibold text-brand hover:underline">
                     <RotateCcw aria-hidden className="size-4" /> Tentar abrir de novo
@@ -313,8 +368,8 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
             <section aria-label="Atendimento encerrado" className="space-y-3 rounded-xl border border-line bg-card p-4 text-sm">
               <p className="font-semibold text-fg">
                 {closed.persistent
-                  ? `Atendimento encerrado e arquivado às ${timeOf(closed.closedAt)}.`
-                  : `Atendimento encerrado às ${timeOf(closed.closedAt)}. Na demonstração, a transcrição fica só nesta aba.`}
+                  ? `${REASON_TEXT[closed.reason]} e arquivado às ${timeOf(closed.closedAt)}.`
+                  : `${REASON_TEXT[closed.reason]} às ${timeOf(closed.closedAt)}. Na demonstração, a transcrição fica só nesta aba.`}
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" size="sm" onClick={() => conversationId && download(conversationId)}>
@@ -393,8 +448,19 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
   );
 }
 
-function Bubble({ m, demo }: { m: ClientMessage; demo: boolean }) {
+function Bubble({ m, demo, onOpenLesson, opening }: { m: ClientMessage; demo: boolean; onOpenLesson?: (a: ChatAction) => void; opening: string | null }) {
+  if (m.sender === "system") {
+    return <p className="mx-auto max-w-md text-center text-xs text-muted">{m.content}</p>;
+  }
   const mine = m.sender === "student";
+  const via =
+    demo && !mine && m.meta
+      ? m.meta.provider === "deepseek"
+        ? `via DeepSeek · ${m.meta.model ?? ""}${m.meta.tokensIn !== undefined ? ` · ${m.meta.tokensIn}/${m.meta.tokensOut} tokens` : ""}`
+        : m.meta.provider === "local"
+          ? "modelo local (sem IA)"
+          : null
+      : null;
   return (
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
       <div className={cn("max-w-[85%] sm:max-w-[75%]")}>
@@ -404,28 +470,43 @@ function Bubble({ m, demo }: { m: ClientMessage; demo: boolean }) {
             mine ? "rounded-br-md bg-brand text-on-wine" : "rounded-bl-md border border-line bg-card text-fg",
           )}
         >
-          <span className="sr-only">{mine ? "Você: " : "Assistente MVF: "}</span>
+          <span className="sr-only">{mine ? "Você: " : `${ASSISTANT.name}: `}</span>
           {m.content}
         </div>
-        {m.sources?.length ? (
-          <ul className="mt-1.5 flex flex-wrap gap-1.5" aria-label="Fontes usadas">
-            {m.sources.map((s) => (
-              <li key={s.docId}>
-                {s.href ? (
-                  <Link href={s.href} className="inline-flex min-h-8 items-center gap-1 rounded-md border border-line bg-card px-2 text-xs font-medium text-brand hover:bg-blush">
-                    <BookOpen aria-hidden className="size-3.5" /> {s.title}
-                  </Link>
-                ) : (
-                  <span className="inline-flex min-h-8 items-center gap-1 rounded-md bg-surface px-2 text-xs text-muted">
-                    {s.title}
-                    {demo && s.draft ? " · em revisão" : ""}
-                  </span>
-                )}
+        {m.actions?.length ? (
+          <ul className="mt-2 space-y-2" aria-label="Aulas sugeridas">
+            {m.actions.map((a) => (
+              <li key={a.lessonId} className="flex items-center gap-3 rounded-xl border border-line bg-card p-3 shadow-card">
+                <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-lg bg-wine text-on-wine">
+                  <PlayCircle className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-fg">{a.title}</span>
+                  {a.moduleTitle ? <span className="block text-xs text-muted">Módulo {a.moduleTitle}</span> : null}
+                </span>
+                <Button size="sm" className="shrink-0 px-3" disabled={!onOpenLesson || opening !== null} onClick={() => onOpenLesson?.(a)} aria-label={`Abrir aula ${a.title}`}>
+                  {opening === a.lessonId ? <LoaderCircle aria-hidden className="size-4 animate-spin motion-reduce:animate-none" /> : null}
+                  Abrir aula
+                </Button>
               </li>
             ))}
           </ul>
         ) : null}
-        <p className={cn("mt-1 text-[0.7rem] text-subtle", mine ? "text-right" : "text-left")}>{timeOf(m.createdAt)}</p>
+        {m.sources?.length ? (
+          <ul className="mt-1.5 flex flex-wrap gap-1.5" aria-label="Fontes usadas">
+            {m.sources.map((s) => (
+              <li key={s.docId} className="inline-flex min-h-8 items-center gap-1 rounded-md bg-surface px-2 text-xs text-muted">
+                <BookOpen aria-hidden className="size-3.5" />
+                {s.title}
+                {demo && s.draft ? " · em revisão" : ""}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <p className={cn("mt-1 text-[0.7rem] text-subtle", mine ? "text-right" : "text-left")}>
+          {timeOf(m.createdAt)}
+          {via ? ` · ${via}` : ""}
+        </p>
       </div>
     </div>
   );

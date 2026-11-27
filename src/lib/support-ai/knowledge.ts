@@ -92,7 +92,15 @@ export function parseKnowledgeFile(fileName: string, raw: string): ParseResult {
   if (!(ACCEPTED_EXTENSIONS as readonly string[]).includes(ext)) return { ok: false, errors: [`Formato não aceito: ${ext}. Use ${ACCEPTED_EXTENSIONS.join(", ")}.`] };
   if (raw.includes("�")) return { ok: false, errors: ["O arquivo não está em UTF-8 válido."] };
   const { meta, body } = parseFrontMatter(raw);
-  const text = cleanText(ext === ".vtt" || ext === ".srt" ? stripSubtitles(body) : body);
+  const content = cleanText(ext === ".vtt" || ext === ".srt" ? stripSubtitles(body) : body);
+  // Campos pedagógicos opcionais da aula/módulo entram no texto indexado (melhoram a busca).
+  const header = [
+    meta.objective ? `Objetivo. ${meta.objective}` : "",
+    meta.topics ? `Assuntos abordados. ${meta.topics}` : "",
+    meta.keywords ? `Palavras-chave e dúvidas relacionadas. ${meta.keywords}` : "",
+    meta.prerequisites ? `Pré-requisitos. ${meta.prerequisites}` : "",
+  ].filter(Boolean);
+  const text = header.length ? `${header.join("\n\n")}\n\n${content}` : content;
   return validateDocument({
     id: meta.id ?? "",
     title: meta.title ?? "",
@@ -119,6 +127,7 @@ export function validateDocument(d: KnowledgeDocument): ParseResult {
   if (!ACCESS.includes(d.access)) errors.push("access deve ser alunas ou equipe.");
   if (d.text.length < 40) errors.push("texto vazio ou curto demais depois da extração.");
   if (/https?:\/\/\S+\.(mp4|m3u8|mov)\b/i.test(d.text)) errors.push("não coloque URL de vídeo no texto (só referência à aula).");
+  if (/\((cole aqui|escreva|descreva|objetivo da aula|assuntos, separados|palavras e d[uú]vidas|m[oó]dulos ou aulas que v[eê]m antes)/i.test(d.text)) errors.push("modelo ainda não preenchido: troque os textos entre parênteses pelo conteúdo real.");
   return errors.length ? { ok: false, errors } : { ok: true, doc: d };
 }
 

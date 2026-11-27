@@ -10,16 +10,18 @@ import "server-only";
  *   (migration aplicada) + DeepSeek configurada + chave de serviço. Senão: indisponível.
  *   Nada de “IA de mentira” para alunas reais.
  */
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
 import { getViewer } from "@/lib/auth/viewer";
 import { can } from "@/lib/auth/permissions";
 import { readConfig } from "@/lib/config/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { allRepoKnowledge, lessonHref } from "./base";
-import { chatAvailability, readSupportConfig, remoteModelEnabled, type SupportConfig } from "./config";
+import { allRepoKnowledge, lessonHref, resolveLessonForSession } from "./base";
+import { chatAvailability, providerStatus, readSupportConfig, remoteModelEnabled, type SupportConfig } from "./config";
 import { createDeepSeekProvider } from "./deepseek";
 import type { EngineDeps } from "./engine";
-import { usableDocuments } from "./knowledge";
+import { parseKnowledgeFile, usableDocuments } from "./knowledge";
 import { createLocalProvider } from "./local-provider";
 import { createMemoryRetriever, type Retriever, type RetrievedChunk } from "./retrieval";
 import { createMemoryStore, type Limits, type SupportStore } from "./store";
@@ -27,7 +29,7 @@ import { createSupabaseStore } from "./supabase-store";
 import { SUMMARY_PROMPT, SYSTEM_PROMPT } from "./system-prompt";
 import type { KnowledgeDocument } from "./types";
 
-export type RuntimeError = "unauthenticated" | "forbidden" | "unavailable" | "invalid_tab";
+export type RuntimeError = "unauthenticated" | "forbidden" | "unavailable" | "invalid_tab" | "provider_not_configured";
 
 export interface SupportRuntime {
   ownerId: string;
@@ -58,8 +60,33 @@ function demoStore() {
   return g.__mvfSupportMemory;
 }
 
+/**
+ * Só em desenvolvimento: MVF_SUPPORT_LOCAL_KB=<pasta> soma à demo uma base local fora do Git
+ * (ex.: modulos/base-nina), para testar o conteúdo do curso antes de importar no banco.
+ * Em produção a base vem SEMPRE do banco (só aprovados).
+ */
+function localCourseBase(): KnowledgeDocument[] {
+  const dir = process.env.MVF_SUPPORT_LOCAL_KB;
+  if (!dir || process.env.NODE_ENV !== "development") return [];
+  const root = resolve(dir);
+  if (!existsSync(root)) return [];
+  const files: string[] = [];
+  const walk = (d: string) => {
+    for (const f of readdirSync(d)) {
+      const p = join(d, f);
+      if (statSync(p).isDirectory()) walk(p);
+      else if (/\.(md|txt|vtt|srt)$/i.test(f) && !/^LEIA-ME|^modelo/i.test(f)) files.push(p);
+    }
+  };
+  walk(root);
+  return files.flatMap((f) => {
+    const r = parseKnowledgeFile(relative(root, f), readFileSync(f, "utf8"));
+    return r.ok ? [r.doc] : [];
+  });
+}
+
 function demoRetriever(): Retriever {
-  g.__mvfSupportDemoRetriever ??= createMemoryRetriever(usableDocuments(allRepoKnowledge(), { includeDrafts: true, audience: "alunas" }));
+  g.__mvfSupportDemoRetriever ??= createMemoryRetriever(usableDocuments([...allRepoKnowledge(), ...localCourseBase()], { includeDrafts: true, audience: "alunas" }));
   return g.__mvfSupportDemoRetriever;
 }
 
@@ -70,13 +97,13 @@ function supabaseRetriever(service: ReturnType<typeof createSupabaseAdminClient>
       if (!service || !query.trim()) return [];
       const { data, error } = await service.rpc("support_search_knowledge", { p_query: query, p_limit: opts.limit ?? 4, p_include_drafts: false });
       if (error || !Array.isArray(data)) return [];
-      return (data as { chunk_id: string; document_id: string; title: string; lesson_id: string | null; status: string; content: string; rank: number }[]).map(
+      return (data as { chunk_id: string; document_id: string; title: string; lesson_id: string | null; status: string; content: string; rank: number; type?: string | null }[]).map(
         (r, ord): RetrievedChunk => {
           const doc: KnowledgeDocument = {
             id: r.document_id,
             title: r.title,
             origin: "banco",
-            type: "material",
+            type: (r.type ?? "material") as KnowledgeDocument["type"],
             ...(r.lesson_id ? { lessonId: r.lesson_id } : {}),
             version: 1,
             updatedAt: "2026-01-01",
@@ -112,13 +139,16 @@ export async function getSupportRuntime(tabId: string | null): Promise<{ ok: tru
     pendingStaleMs: config.timeoutMs * 2,
   };
   const remote = remoteModelEnabled(config);
+  // Seleção EXPLÍCITA: com MVF_SUPPORT_PROVIDER=deepseek nunca cai no modelo local escondido.
   const provider = remote && config.deepseek
     ? createDeepSeekProvider({ ...config.deepseek, maxOutputTokens: config.maxOutputTokens })
     : createLocalProvider();
-  const base = { systemPrompt: SYSTEM_PROMPT, summaryPrompt: SUMMARY_PROMPT, recentWindow: config.recentWindow, timeoutMs: config.timeoutMs, lessonHref };
+  const log = (line: string) => console.info(line); // sem conteúdo, sem chave
+  const base = { systemPrompt: SYSTEM_PROMPT, summaryPrompt: SUMMARY_PROMPT, recentWindow: config.recentWindow, timeoutMs: config.timeoutMs, lessonHref, log, humanChannel: Boolean(app.supportContactUrl) };
 
   if (viewer.kind === "demo") {
     if (!tabId || !TAB_RE.test(tabId)) return { ok: false, error: "invalid_tab" };
+    if (!providerStatus(config).ready) return { ok: false, error: "provider_not_configured" };
     const store = demoStore();
     return {
       ok: true,
@@ -129,7 +159,7 @@ export async function getSupportRuntime(tabId: string | null): Promise<{ ok: tru
         store,
         limits,
         config,
-        engine: { ...base, store, provider, retriever: demoRetriever(), demo: true },
+        engine: { ...base, store, provider, retriever: demoRetriever(), demo: true, resolveLesson: (id) => resolveLessonForSession(id, { demo: true }) },
         providerLabel: provider.label,
         contactUrl: app.supportContactUrl,
       },
@@ -151,7 +181,7 @@ export async function getSupportRuntime(tabId: string | null): Promise<{ ok: tru
       store,
       limits,
       config,
-      engine: { ...base, store, provider, retriever: supabaseRetriever(service), demo: false },
+      engine: { ...base, store, provider, retriever: supabaseRetriever(service), demo: false, resolveLesson: (id) => resolveLessonForSession(id, { demo: false }) },
       providerLabel: provider.label,
       contactUrl: app.supportContactUrl,
     },
@@ -159,14 +189,20 @@ export async function getSupportRuntime(tabId: string | null): Promise<{ ok: tru
 }
 
 /** O chat aparece para esta sessão? (decisão no servidor, para a página). */
-export async function supportChatStatus(): Promise<{ available: boolean; demo: boolean; providerLabel: string }> {
+export async function supportChatStatus(): Promise<{ available: boolean; demo: boolean; providerLabel: string; providerKind: "deepseek" | "local"; reason?: string }> {
   const viewer = await getViewer();
   const config = readSupportConfig();
-  const label = remoteModelEnabled(config) ? "Assistente com IA (DeepSeek)" : "modelo local (sem IA)";
-  if (viewer.kind === "demo") return { available: true, demo: true, providerLabel: label };
-  if (viewer.kind !== "member") return { available: false, demo: false, providerLabel: label };
-  const ok = chatAvailability(config, "member").available && remoteModelEnabled(config) && Boolean(readConfig().serviceRoleKey);
-  return { available: ok, demo: false, providerLabel: label };
+  const remote = remoteModelEnabled(config);
+  const providerLabel = remote && config.deepseek ? `DeepSeek (${config.deepseek.model})` : "modelo local (sem IA)";
+  const providerKind = remote ? ("deepseek" as const) : ("local" as const);
+  if (viewer.kind === "demo") {
+    const a = chatAvailability(config, "demo");
+    return { available: a.available, demo: true, providerLabel, providerKind, ...(a.reason ? { reason: a.reason } : {}) };
+  }
+  if (viewer.kind !== "member") return { available: false, demo: false, providerLabel, providerKind };
+  const a = chatAvailability(config, "member");
+  const ok = a.available && Boolean(readConfig().serviceRoleKey);
+  return { available: ok, demo: false, providerLabel, providerKind, ...(a.reason ? { reason: a.reason } : {}) };
 }
 
 /* ------------------------------- Equipe ------------------------------- */

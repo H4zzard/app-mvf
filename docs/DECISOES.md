@@ -494,6 +494,31 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - **D135 · Encaminhamento honesto.** Assuntos sensíveis oferecem “Falar com a equipe”; registra o pedido e mostra
   só canal oficial configurado (`MVF_SUPPORT_CONTACT_URL`). Nunca “atendente acionado”, protocolo ou prazo.
 
+## 26/11/2026 — Nina 2.0
+
+- **D136 · Nina e prompt definitivo.** Persona em `persona.ts`, prompt versionado só no servidor com o núcleo da
+  equipe + proteções técnicas. Detalhes em `docs/SUPORTE_IA.md` §17 e `docs/CONFIGURACAO_NINA.md`.
+- **D137 · Provedor explícito.** `MVF_SUPPORT_PROVIDER=local|deepseek`; sem troca silenciosa para o modelo local.
+  Cada resposta registra provedor/modelo/tokens (meta) para comprovar a origem.
+- **D138 · Botão “Abrir aula” validado pelo servidor.** O modelo só sugere `[[aula:ID]]`; o servidor valida e monta
+  `/aulas/<id>`. Abrir arquiva o atendimento (motivo `abriu_aula`) antes de navegar. Alunas reais: só aulas oficiais
+  e só com `MEMBER_LESSONS_LIVE`.
+- **D139 · Encerramento automático só com confirmação explícita** (`decideAutoClose`), mesmo mecanismo do manual,
+  motivo registrado no banco e no TXT. Assunto da equipe pendente nunca encerra sozinho.
+- **D140 · Documentação do app versus código.** Guias estruturados com rotas e arquivos monitorados; teste barra rota
+  inexistente e disponibilidade divergente; `npm run nina -- docs-status|docs-stamp` detecta mudanças.
+- **D141 · Base do curso no banco (27/11/2026).** O operador entregou um documento único com as aulas
+  (`modulos/`, fora do Git). `support-kb split` gera um arquivo por aula (aprovado pelo operador) e `support-kb push`
+  grava no Supabase pela chave de serviço (prévia sem `--execute`). As aulas ainda não têm id no catálogo, então
+  chegam à Nina como “sem botão no app” e o servidor remove qualquer frase que prometa botão inexistente
+  (`dropButtonClaims`). Os 27 guias do app foram aprovados pelo operador e enviados com `--app`.
+- **D142 · Busca do banco por qualquer palavra.** `websearch_to_tsquery` exigia todas as palavras da pergunta e quase
+  nunca achava nada em perguntas naturais. Agora: lexemas da pergunta (dicionário português) unidos por OR, citados,
+  ordenados por `ts_rank`; a função também devolve o `type` do documento.
+- **D143 · Migration complementar `20261127120000_nina_2_complemento.sql`.** O banco publicado recebeu a versão
+  anterior da `20261126120000`. O complemento é idempotente (colunas, funções novas, troca de assinaturas e busca)
+  e um teste garante que “versão antiga + complemento” fica idêntico a um banco novo.
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Assistente MVF: autorizar a migration do suporte (portões A–E em `docs/SUPORTE_IA.md`), política de

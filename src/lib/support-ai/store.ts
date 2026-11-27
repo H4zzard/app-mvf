@@ -14,7 +14,13 @@
  *    É idempotente; se o arquivamento falhar, NÃO vira “closed” e pode ser repetido.
  */
 import { buildTranscript } from "./transcript.ts";
-import type { SourceRef, SupportConversation, SupportMessage } from "./types.ts";
+import type { ChatAction, CloseReason, MessageMeta, SourceRef, SupportConversation, SupportMessage } from "./types.ts";
+
+export interface AssistantExtras {
+  sources?: SourceRef[];
+  actions?: ChatAction[];
+  meta?: MessageMeta;
+}
 
 export type StoreError = "not_found" | "closed" | "busy" | "conversation_limit" | "daily_limit" | "archive_failed";
 export type StoreResult<T> = { ok: true; value: T } | { ok: false; error: StoreError };
@@ -47,11 +53,14 @@ export interface SupportStore {
   get(ownerId: string, conversationId: string): Promise<{ conversation: SupportConversation; messages: SupportMessage[] } | null>;
   appendStudent(ownerId: string, conversationId: string, content: string, limits: Limits): Promise<StoreResult<SupportMessage>>;
   /** Chamado só pelo servidor, depois da resposta do modelo. Libera a pendência. */
-  appendAssistant(conversationId: string, content: string, sources?: SourceRef[]): Promise<StoreResult<SupportMessage>>;
+  appendAssistant(conversationId: string, content: string, extras?: AssistantExtras): Promise<StoreResult<SupportMessage>>;
+  /** Evento do sistema registrado no histórico (ex.: “A aluna abriu a aula …”). Só com o atendimento aberto. */
+  appendSystem(ownerId: string, conversationId: string, content: string): Promise<StoreResult<SupportMessage>>;
   releasePending(conversationId: string): Promise<void>;
   setSummary(conversationId: string, summary: string, upToSeq: number): Promise<void>;
   requestHandoff(ownerId: string, conversationId: string, topic: string | null): Promise<StoreResult<SupportConversation>>;
-  close(ownerId: string, conversationId: string): Promise<StoreResult<CloseOutcome>>;
+  /** Mesmo mecanismo para manual, resolução automática e abertura de aula; o motivo é registrado. */
+  close(ownerId: string, conversationId: string, reason?: CloseReason): Promise<StoreResult<CloseOutcome>>;
   listMine(ownerId: string): Promise<ConversationSummary[]>;
   /** Só atendimentos ENCERRADOS têm TXT. */
   exportTranscript(ownerId: string, conversationId: string): Promise<StoreResult<{ text: string; conversation: SupportConversation }>>;
@@ -76,7 +85,7 @@ export function createMemoryStore(opts: {
     const c = conversations.get(id);
     return c && c.ownerId === ownerId ? c : null;
   };
-  const push = (conv: SupportConversation, sender: SupportMessage["sender"], content: string, sources?: SourceRef[]) => {
+  const push = (conv: SupportConversation, sender: SupportMessage["sender"], content: string, extras: AssistantExtras = {}) => {
     const list = messages.get(conv.id)!;
     const msg: SupportMessage = {
       id: newId(),
@@ -85,7 +94,9 @@ export function createMemoryStore(opts: {
       content,
       createdAt: now().toISOString(),
       seq: list.length + 1,
-      ...(sources?.length ? { sources } : {}),
+      ...(extras.sources?.length ? { sources: extras.sources } : {}),
+      ...(extras.actions?.length ? { actions: extras.actions } : {}),
+      ...(extras.meta ? { meta: extras.meta } : {}),
     };
     list.push(msg);
     return msg;
@@ -110,6 +121,7 @@ export function createMemoryStore(opts: {
         handoffTopic: null,
         startedAt: t,
         closedAt: null,
+        closeReason: null,
         pendingSince: null,
         transcript: null,
         transcriptGeneratedAt: null,
@@ -117,7 +129,7 @@ export function createMemoryStore(opts: {
       };
       conversations.set(conv.id, conv);
       messages.set(conv.id, []);
-      push(conv, "assistant", greeting);
+      push(conv, "assistant", greeting, { meta: { provider: "sistema" } });
       return snapshot(conv);
     },
 
@@ -145,16 +157,23 @@ export function createMemoryStore(opts: {
       return { ok: true, value: { ...msg } };
     },
 
-    async appendAssistant(id: string, content: string, sources?: SourceRef[]): Promise<StoreResult<SupportMessage>> {
+    async appendAssistant(id: string, content: string, extras?: AssistantExtras): Promise<StoreResult<SupportMessage>> {
       const c = conversations.get(id);
       if (!c) return { ok: false, error: "not_found" };
       if (c.status !== "open") {
         c.pendingSince = null;
         return { ok: false, error: "closed" };
       }
-      const msg = push(c, "assistant", content, sources);
+      const msg = push(c, "assistant", content, extras);
       c.pendingSince = null;
       return { ok: true, value: { ...msg } };
+    },
+
+    async appendSystem(ownerId: string, id: string, content: string): Promise<StoreResult<SupportMessage>> {
+      const c = own(ownerId, id);
+      if (!c) return { ok: false, error: "not_found" };
+      if (c.status !== "open") return { ok: false, error: "closed" };
+      return { ok: true, value: { ...push(c, "system", content, { meta: { provider: "sistema" } }) } };
     },
 
     async releasePending(id: string) {
@@ -182,7 +201,7 @@ export function createMemoryStore(opts: {
       return { ok: true, value: { ...c } };
     },
 
-    async close(ownerId: string, id: string): Promise<StoreResult<CloseOutcome>> {
+    async close(ownerId: string, id: string, reason: CloseReason = "manual"): Promise<StoreResult<CloseOutcome>> {
       const c = own(ownerId, id);
       if (!c) return { ok: false, error: "not_found" };
       if (c.status === "closed" && c.transcript) return { ok: true, value: { conversation: { ...c }, transcript: c.transcript, alreadyClosed: true } };
@@ -192,6 +211,7 @@ export function createMemoryStore(opts: {
       const job = (async (): Promise<StoreResult<CloseOutcome>> => {
         c.status = "closing"; // daqui em diante nenhuma mensagem nova entra
         c.pendingSince = null;
+        c.closeReason ??= reason;
         const closedAt = now().toISOString();
         let transcript: string;
         try {

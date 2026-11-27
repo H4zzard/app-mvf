@@ -20,7 +20,7 @@ export const HANDOFF_LABEL: Record<HandoffTopic, string> = {
 const RULES: [HandoffTopic, RegExp][] = [
   ["reembolso", /\b(reembols\w*|estorn\w*|devolu[cç][aã]o do (meu )?dinheiro|quero (meu )?dinheiro de volta|cancelar (a )?compra)\b/],
   ["cobranca", /\b(cobra(do|da|ram|ndo|nca|n[cç]a)|cobrou|cobran[cç]a|duas vezes|em dobro|fatura)\b/],
-  ["pagamento", /\b(pagamento (recusado|nao (foi )?aprovado|falhou|deu erro)|erro (no|de) pagamento|pix nao (caiu|compensou)|boleto)\b/],
+  ["pagamento", /\b((pagamento|cartao|compra)( \w+){0,2} (recusad[oa]|negad[oa]|nao (foi )?aprovad[oa]|falhou|deu erro)|erro (no|de|do) pagamento|pix nao (caiu|compensou)|boleto)\b/],
   ["matricula", /\b(matricula|compra) (nao (foi )?(reconhecida|encontrada|aparece|liberada)|sumiu)|nao (encontra|acha|reconhece) (minha )?(compra|matricula)\b/],
   ["acesso_persistente", /\b(continuo|continua|ainda|de novo|faz dias|ja tentei)\b.{0,40}\b(sem acesso|nao (consigo|da para|da pra) (entrar|acessar|logar)|acesso (bloqueado|negado|indisponivel))\b/],
   ["conta_sensivel", /\b(trocar|mudar|alterar) (o |meu )?(e-?mail|cpf|titular)|excluir (minha )?conta|apagar (meus )?dados\b/],

@@ -34,8 +34,9 @@ export const anonymousUserId = (userKey: string) => `mvf-${textHash(`mvf:${userK
 export function createDeepSeekProvider(opts: DeepSeekOptions): SupportProvider {
   const doFetch = opts.fetchImpl ?? fetch;
   return {
-    label: "Assistente com IA (DeepSeek)",
+    label: `DeepSeek (${opts.model})`,
     kind: "deepseek",
+    model: opts.model,
     async complete(turns: ChatTurn[], { userKey, signal }): Promise<ProviderResult> {
       let res: Response;
       try {
@@ -61,12 +62,13 @@ export function createDeepSeekProvider(opts: DeepSeekOptions): SupportProvider {
       if (!res.ok) return { ok: false, error: mapHttpError(res.status) };
       try {
         const data = (await res.json()) as {
+          model?: string;
           choices?: { message?: { content?: string | null } }[];
           usage?: { prompt_tokens?: number; completion_tokens?: number };
         };
         const text = data.choices?.[0]?.message?.content?.trim();
         if (!text) return { ok: false, error: "invalid" };
-        return { ok: true, text, usage: { input: data.usage?.prompt_tokens ?? 0, output: data.usage?.completion_tokens ?? 0 } };
+        return { ok: true, text, model: data.model ?? opts.model, usage: { input: data.usage?.prompt_tokens ?? 0, output: data.usage?.completion_tokens ?? 0 } };
       } catch (e) {
         if (e instanceof Error && e.name === "AbortError") return { ok: false, error: "timeout" };
         return { ok: false, error: "invalid" };

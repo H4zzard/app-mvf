@@ -1,16 +1,20 @@
 "use server";
 /**
- * Server Actions do Assistente MVF. Cada chamada reautoriza no servidor
+ * Server Actions da Nina (Assistente MVF). Cada chamada reautoriza no servidor
  * (getSupportRuntime → getViewer), valida a entrada e aplica limites ANTES de
  * qualquer chamada ao modelo. Nenhum segredo, prompt ou dado de outra aluna
- * volta para o navegador.
+ * volta para o navegador. Encerrar (manual, automático ou ao abrir aula) usa
+ * SEMPRE o mesmo mecanismo do repositório (`store.close`).
  */
 import { sensitiveFindings } from "@/lib/support/tickets";
+import { resolveLessonForSession } from "@/lib/support-ai/base";
+import { decideAutoClose, lessonWasOffered } from "@/lib/support-ai/decisions";
 import { generateReply } from "@/lib/support-ai/engine";
 import { HANDOFF_LABEL, detectHandoff, type HandoffTopic } from "@/lib/support-ai/escalation";
+import { FAREWELLS, GREETINGS } from "@/lib/support-ai/persona";
 import { getSupportRuntime, rateLimited } from "@/lib/support-ai/server";
 import { transcriptFileName } from "@/lib/support-ai/transcript";
-import type { SourceRef, SupportMessage } from "@/lib/support-ai/types";
+import type { ChatAction, CloseReason, MessageMeta, SourceRef, SupportMessage } from "@/lib/support-ai/types";
 
 export interface ClientMessage {
   id: string;
@@ -19,6 +23,8 @@ export interface ClientMessage {
   createdAt: string;
   seq: number;
   sources?: SourceRef[];
+  actions?: ChatAction[];
+  meta?: MessageMeta;
 }
 
 export type ChatError =
@@ -26,6 +32,7 @@ export type ChatError =
   | "forbidden"
   | "unavailable"
   | "invalid_tab"
+  | "provider_not_configured"
   | "invalid"
   | "too_long"
   | "sensitive"
@@ -37,18 +44,47 @@ export type ChatError =
   | "daily_limit"
   | "reply_failed"
   | "reply_timeout"
-  | "archive_failed";
+  | "archive_failed"
+  | "lesson_unavailable";
 
-const toClient = (m: SupportMessage): ClientMessage => ({ id: m.id, sender: m.sender, content: m.content, createdAt: m.createdAt, seq: m.seq, ...(m.sources ? { sources: m.sources } : {}) });
+export interface ClosedInfo {
+  closedAt: string;
+  fileName: string;
+  persistent: boolean;
+  reason: CloseReason;
+}
 
-const GREETINGS = [
-  "Oii! Tudo bem? 💗 Me conta, em que posso te ajudar?",
-  "Oi! Pode me contar sua dúvida, que eu te ajudo.",
-  "Olá! Como posso te ajudar hoje?",
-];
+const toClient = (m: SupportMessage): ClientMessage => ({
+  id: m.id,
+  sender: m.sender,
+  content: m.content,
+  createdAt: m.createdAt,
+  seq: m.seq,
+  ...(m.sources ? { sources: m.sources } : {}),
+  ...(m.actions ? { actions: m.actions } : {}),
+  ...(m.meta ? { meta: m.meta } : {}),
+});
+
+type Runtime = Extract<Awaited<ReturnType<typeof getSupportRuntime>>, { ok: true }>["runtime"];
+
+const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
+
+async function closeWith(runtime: Runtime, conversationId: string, reason: CloseReason): Promise<{ ok: true; closed: ClosedInfo } | { ok: false; error: ChatError }> {
+  const r = await runtime.store.close(runtime.ownerId, conversationId, reason);
+  if (!r.ok) return { ok: false, error: r.error === "archive_failed" ? "archive_failed" : "not_found" };
+  return {
+    ok: true,
+    closed: {
+      closedAt: r.value.conversation.closedAt!,
+      fileName: transcriptFileName(r.value.conversation),
+      persistent: runtime.store.persistent,
+      reason: r.value.conversation.closeReason ?? reason,
+    },
+  };
+}
 
 export async function startConversationAction(tabId: string | null): Promise<
-  | { ok: true; conversationId: string; messages: ClientMessage[]; providerLabel: string; demo: boolean; maxChars: number }
+  | { ok: true; conversationId: string; messages: ClientMessage[]; providerLabel: string; providerKind: "deepseek" | "local"; demo: boolean; maxChars: number }
   | { ok: false; error: ChatError }
 > {
   const rt = await getSupportRuntime(tabId);
@@ -56,9 +92,16 @@ export async function startConversationAction(tabId: string | null): Promise<
   const { runtime } = rt;
   if (rateLimited(`start:${runtime.ownerId}`)) return { ok: false, error: "rate_limited" };
   try {
-    const greeting = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
-    const { conversation, messages } = await runtime.store.start(runtime.ownerId, runtime.ownerLabel, greeting);
-    return { ok: true, conversationId: conversation.id, messages: messages.map(toClient), providerLabel: runtime.providerLabel, demo: runtime.demo, maxChars: runtime.config.maxMessageChars };
+    const { conversation, messages } = await runtime.store.start(runtime.ownerId, runtime.ownerLabel, pick(GREETINGS));
+    return {
+      ok: true,
+      conversationId: conversation.id,
+      messages: messages.map(toClient),
+      providerLabel: runtime.providerLabel,
+      providerKind: runtime.engine.provider.kind,
+      demo: runtime.demo,
+      maxChars: runtime.config.maxMessageChars,
+    };
   } catch {
     return { ok: false, error: "unavailable" };
   }
@@ -66,7 +109,7 @@ export async function startConversationAction(tabId: string | null): Promise<
 
 type ReplyOutcome = { ok: true; reply: ClientMessage; handoff: { topic: HandoffTopic; label: string } | null } | { ok: false; error: ChatError };
 
-async function reply(runtime: Extract<Awaited<ReturnType<typeof getSupportRuntime>>, { ok: true }>["runtime"], conversationId: string): Promise<ReplyOutcome> {
+async function reply(runtime: Runtime, conversationId: string): Promise<ReplyOutcome> {
   const r = await generateReply(runtime.engine, runtime.ownerId, conversationId);
   if (!r.ok) {
     if (r.error === "closed") return { ok: false, error: "closed" };
@@ -80,7 +123,19 @@ export async function sendMessageAction(
   tabId: string | null,
   conversationId: string,
   text: string,
-): Promise<{ ok: true; student: ClientMessage; reply: ClientMessage | null; replyError?: ChatError; handoff: { topic: HandoffTopic; label: string } | null } | { ok: false; error: ChatError; found?: string[] }> {
+): Promise<
+  | {
+      ok: true;
+      student: ClientMessage;
+      reply: ClientMessage | null;
+      replyError?: ChatError;
+      handoff: { topic: HandoffTopic; label: string } | null;
+      /** Encerramento automático por resolução confirmada (decidido pelo servidor). */
+      closed?: ClosedInfo;
+      closeError?: ChatError;
+    }
+  | { ok: false; error: ChatError; found?: string[] }
+> {
   const rt = await getSupportRuntime(tabId);
   if (!rt.ok) return { ok: false, error: rt.error };
   const { runtime } = rt;
@@ -94,10 +149,29 @@ export async function sendMessageAction(
 
   const saved = await runtime.store.appendStudent(runtime.ownerId, conversationId, content, runtime.limits);
   if (!saved.ok) return { ok: false, error: saved.error === "archive_failed" ? "unavailable" : saved.error };
+
+  // Encerramento automático: só com confirmação explícita da aluna (servidor decide e registra o motivo).
+  const current = await runtime.store.get(runtime.ownerId, conversationId);
+  if (current) {
+    const decision = decideAutoClose(content, current.conversation, current.messages.slice(0, -1));
+    if (decision.close) {
+      const bye = await runtime.store.appendAssistant(conversationId, pick(FAREWELLS), { meta: { provider: "sistema" } });
+      const done = await closeWith(runtime, conversationId, decision.reason);
+      return {
+        ok: true,
+        student: toClient(saved.value),
+        reply: bye.ok ? toClient(bye.value) : null,
+        handoff: null,
+        ...(done.ok ? { closed: done.closed } : { closeError: done.error }),
+      };
+    }
+  }
+
   const r = await reply(runtime, conversationId);
   if (!r.ok) {
     // A mensagem da aluna fica salva; a interface oferece “Tentar de novo”.
-    return { ok: true, student: toClient(saved.value), reply: null, replyError: r.error, handoff: detectHandoff(content) ? { topic: detectHandoff(content)!, label: HANDOFF_LABEL[detectHandoff(content)!] } : null };
+    const topic = detectHandoff(content);
+    return { ok: true, student: toClient(saved.value), reply: null, replyError: r.error, handoff: topic ? { topic, label: HANDOFF_LABEL[topic] } : null };
   }
   return { ok: true, student: toClient(saved.value), reply: r.reply, handoff: r.handoff };
 }
@@ -123,21 +197,37 @@ export async function requestHandoffAction(
   return { ok: true, contactUrl: rt.runtime.contactUrl };
 }
 
-export async function closeConversationAction(
+/**
+ * “Abrir aula”: valida de novo o acesso e a aula, registra o evento, arquiva o
+ * atendimento e SÓ ENTÃO devolve o destino. Idempotente (repetir não duplica).
+ * Não conclui aula, não dá XP e não marca etapa do plano.
+ */
+export async function openLessonAction(
   tabId: string | null,
   conversationId: string,
-): Promise<{ ok: true; closedAt: string; fileName: string; alreadyClosed: boolean; persistent: boolean } | { ok: false; error: ChatError }> {
+  lessonId: string,
+): Promise<{ ok: true; href: string; closed: ClosedInfo } | { ok: false; error: ChatError }> {
   const rt = await getSupportRuntime(tabId);
   if (!rt.ok) return { ok: false, error: rt.error };
-  const r = await rt.runtime.store.close(rt.runtime.ownerId, conversationId);
-  if (!r.ok) return { ok: false, error: r.error === "archive_failed" ? "archive_failed" : "not_found" };
-  return {
-    ok: true,
-    closedAt: r.value.conversation.closedAt!,
-    fileName: transcriptFileName(r.value.conversation),
-    alreadyClosed: r.value.alreadyClosed,
-    persistent: rt.runtime.store.persistent,
-  };
+  const { runtime } = rt;
+  const found = await runtime.store.get(runtime.ownerId, conversationId);
+  if (!found) return { ok: false, error: "not_found" };
+  const lesson = resolveLessonForSession(String(lessonId), { demo: runtime.demo });
+  if (!lesson || !lessonWasOffered(found.messages, String(lessonId))) return { ok: false, error: "lesson_unavailable" };
+  if (found.conversation.status === "open") {
+    const ev = await runtime.store.appendSystem(runtime.ownerId, conversationId, `A aluna abriu a aula “${lesson.title}”${lesson.moduleTitle ? ` (módulo ${lesson.moduleTitle})` : ""}.`);
+    if (!ev.ok && ev.error !== "closed") return { ok: false, error: "not_found" };
+  }
+  const done = await closeWith(runtime, conversationId, "abriu_aula");
+  if (!done.ok) return done;
+  return { ok: true, href: lesson.href, closed: done.closed };
+}
+
+export async function closeConversationAction(tabId: string | null, conversationId: string): Promise<({ ok: true; alreadyClosed?: boolean } & ClosedInfo) | { ok: false; error: ChatError }> {
+  const rt = await getSupportRuntime(tabId);
+  if (!rt.ok) return { ok: false, error: rt.error };
+  const done = await closeWith(rt.runtime, conversationId, "manual");
+  return done.ok ? { ok: true, ...done.closed } : done;
 }
 
 export async function exportTranscriptAction(tabId: string | null, conversationId: string): Promise<{ ok: true; fileName: string; text: string } | { ok: false; error: ChatError }> {

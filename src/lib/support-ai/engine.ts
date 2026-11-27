@@ -7,6 +7,7 @@
  * (dependências injetadas), testável.
  */
 import { buildTurns, needsSummary, retrievalQuery, sourcesOf } from "./context.ts";
+import { buildLessonActions, dropButtonClaims, extractLessonMarkers, type LessonInfo } from "./decisions.ts";
 import { detectHandoff, type HandoffTopic } from "./escalation.ts";
 import type { Retriever } from "./retrieval.ts";
 import type { SupportStore } from "./store.ts";
@@ -22,6 +23,12 @@ export interface EngineDeps {
   timeoutMs: number;
   /** Link interno de uma aula EXISTENTE no catálogo (ou null). */
   lessonHref: (lessonId: string) => string | null;
+  /** Valida aula para botão: existe, está disponível e a sessão pode abrir (servidor). */
+  resolveLesson: (lessonId: string) => LessonInfo | null;
+  /** Registro técnico mínimo (sem conteúdo). */
+  log?: (line: string) => void;
+  /** Existe canal humano oficial configurado? (a Nina não promete contato quando não existe). */
+  humanChannel?: boolean;
   /** Modo demonstração (mostra rascunhos rotulados). */
   demo: boolean;
 }
@@ -46,11 +53,13 @@ async function withTimeout<T>(ms: number, fn: (signal: AbortSignal) => Promise<T
   }
 }
 
-/** Remove marcadores internos que o modelo possa ter ecoado. */
+/** Remove marcadores internos que o modelo possa ter ecoado (os de ação são tratados à parte). */
 export function cleanReply(text: string): string {
   return text
     .replace(/<\s*\/?\s*(base_mvf|resumo_da_conversa|system)[^>]*>/gi, "")
     .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*([^*\n]+)\*\*/g, "$1") // o chat não formata markdown
+    .replace(/\s+[—–]\s+/g, ", ") // travessão vira vírgula (estilo da Nina)
     .trim();
 }
 
@@ -100,22 +109,48 @@ export async function generateReply(deps: EngineDeps, ownerId: string, conversat
   }
 
   const turns = buildTurns({ systemPrompt: deps.systemPrompt, summary, history: messages, retrieved, recentWindow: deps.recentWindow });
+  // Fatos do sistema que a Nina precisa saber para não prometer o que não existe.
+  turns.splice(1, 0, {
+    role: "system",
+    content: `<contexto_sistema>\n${
+      deps.humanChannel
+        ? "Canal humano oficial: configurado. Ao tocar em Falar com a equipe, o app mostra o link do canal oficial."
+        : "Canal humano oficial: AINDA NÃO EXISTE. O botão Falar com a equipe só registra o pedido no atendimento. Não diga que a aluna vai falar com uma pessoa, que a equipe vai ajudar ou responder, nem que algo foi encaminhado. Diga que os canais oficiais ainda vão ser divulgados pela equipe."
+    }\n</contexto_sistema>`,
+  });
+  const started = Date.now();
   const res = await withTimeout(deps.timeoutMs, (signal) => deps.provider.complete(turns, { userKey: ownerId, signal }), {
     ok: false as const,
     error: "timeout" as const,
   });
+  deps.log?.(
+    `[nina] provedor=${deps.provider.kind}${deps.provider.model ? ` modelo=${deps.provider.model}` : ""} status=${res.ok ? "ok" : res.error} ms=${Date.now() - started}${res.ok && res.usage ? ` tokens=${res.usage.input}/${res.usage.output}` : ""}`,
+  );
   if (!res.ok) {
     await deps.store.releasePending(conversationId);
     return { ok: false, error: res.error };
   }
-  const text = cleanReply(res.text);
-  if (!text) {
+  const { text: withoutMarkers, lessonIds } = extractLessonMarkers(res.text);
+  const draftText = cleanReply(withoutMarkers);
+  if (!draftText) {
     await deps.store.releasePending(conversationId);
     return { ok: false, error: "invalid" };
   }
   // Assunto da equipe: a resposta é de encaminhamento, não da base — sem fontes para não sugerir o contrário.
   const handoff = detectHandoff(lastStudent.content);
-  const saved = await deps.store.appendAssistant(conversationId, text, handoff ? [] : sourcesOf(retrieved, deps.lessonHref, deps.demo));
+  // Botões: o servidor valida cada id (existe, disponível, permitido). Assunto da equipe não leva botão de aula.
+  const actions = handoff ? [] : buildLessonActions({ modelLessonIds: lessonIds, retrieved, studentText: lastStudent.content, resolve: deps.resolveLesson });
+  // Sem botão validado, a resposta não pode dizer que deixou um botão.
+  const text = actions.length ? draftText : dropButtonClaims(draftText) || draftText;
+  const saved = await deps.store.appendAssistant(conversationId, text, {
+    sources: handoff ? [] : sourcesOf(retrieved, deps.lessonHref, deps.demo),
+    actions,
+    meta: {
+      provider: deps.provider.kind,
+      ...(deps.provider.model ? { model: res.model ?? deps.provider.model } : {}),
+      ...(res.usage ? { tokensIn: res.usage.input, tokensOut: res.usage.output } : {}),
+    },
+  });
   if (!saved.ok) return { ok: false, error: saved.error === "closed" ? "closed" : "not_found" };
   return { ok: true, message: saved.value, handoff };
 }

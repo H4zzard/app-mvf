@@ -5,7 +5,8 @@
  * - Mensagens completas, na ordem (`seq`), sem resumir nem alterar o texto.
  * - Saída em UTF-8 com quebras \n. Módulo puro.
  */
-import type { SupportConversation, SupportMessage } from "./types.ts";
+import { transcriptAssistantLabel } from "./persona.ts";
+import type { CloseReason, SupportConversation, SupportMessage } from "./types.ts";
 
 export const TRANSCRIPT_TIME_ZONE = "America/Recife";
 
@@ -26,10 +27,13 @@ export function formatRecife(iso: string): string {
   return `${parts.day}/${parts.month}/${parts.year} ${parts.hour}:${parts.minute}:${parts.second}`;
 }
 
-const SENDER_LABEL: Record<SupportMessage["sender"], string> = {
-  student: "ALUNA",
-  assistant: "ASSISTENTE MVF",
-  system: "SISTEMA",
+const senderLabel = (s: SupportMessage["sender"]) => (s === "student" ? "ALUNA" : s === "assistant" ? transcriptAssistantLabel() : "SISTEMA");
+
+export const CLOSE_REASON_LABEL: Record<CloseReason, string> = {
+  manual: "Encerrado pela aluna",
+  resolvido: "Resolvido (confirmado pela aluna)",
+  abriu_aula: "Encerrado ao abrir uma aula",
+  inatividade: "Encerrado por inatividade",
 };
 
 const STATUS_LABEL = { open: "Em andamento", closing: "Encerrando", closed: "Encerrado" } as const;
@@ -58,12 +62,13 @@ export function buildTranscript(conv: SupportConversation, messages: SupportMess
     "",
   ];
   for (const m of ordered) {
-    lines.push(`[${formatRecife(m.createdAt)}] ${SENDER_LABEL[m.sender]}`);
+    lines.push(`[${formatRecife(m.createdAt)}] ${senderLabel(m.sender)}`);
     lines.push(m.content);
     lines.push("");
   }
   lines.push("FIM DO ATENDIMENTO");
   lines.push(`Status: ${STATUS_LABEL.closed}`);
+  lines.push(`Motivo: ${CLOSE_REASON_LABEL[conv.closeReason ?? "manual"]}`);
   return `${lines.join("\n")}\n`;
 }
 

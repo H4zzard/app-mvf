@@ -1,4 +1,7 @@
-# Assistente MVF — suporte inteligente (DeepSeek + base do curso + histórico)
+# Assistente MVF (Nina) — suporte inteligente (DeepSeek + base do curso + histórico)
+
+> **Nina 2.0 (26/11/2026):** a atendente se chama Nina (`src/lib/support-ai/persona.ts`). Configuração
+> passo a passo para leigos em **`docs/CONFIGURACAO_NINA.md`**. Resumo das mudanças na seção 17.
 
 **Estado (26/11/2026):**
 - **Pronto e testado localmente:** interface, regras, memória, base de conhecimento, TXT, migration e testes.
@@ -357,3 +360,49 @@ autorização explícita do operador.
   - equipe com auditoria.
 - Navegador (QA local): entrada, chat, memória, sensível, encaminhamento, teclado, rolagem, encerrar, TXT,
   novo atendimento e volta, em 320, 375, 390, 414, 768 e 1440 px.
+
+## 17. Nina 2.0
+
+- **Persona e prompt:** `persona.ts` (nome, saudações, despedidas) e `system-prompt.ts` (versão
+  `2026-11-26.nina-2.0`). O núcleo de personalidade foi definido pela equipe. As proteções técnicas foram
+  mantidas: base como dados, nada inventado, privacidade, equipe humana e protocolo de botões.
+- **Provedor explícito:** `MVF_SUPPORT_PROVIDER=local|deepseek`. Com `deepseek` sem chave, o chat avisa e
+  nunca troca para o modelo local.
+- **Prova de origem da resposta:**
+  - cada resposta grava `meta` (provedor, modelo e tokens);
+  - a demo mostra "via DeepSeek · modelo · tokens";
+  - o servidor registra `[nina] provedor=… status=… tokens=…`, sem conteúdo.
+- **Base do app:**
+  - 27 guias estruturados em `src/content/nina/aplicativo.json`, cada um com rota, caminho, disponibilidade
+    (real ou demonstração), passos, dúvidas, limitações e arquivos monitorados;
+  - `npm run nina -- docs-status` aponta guias desatualizados e `docs-stamp` carimba;
+  - o teste falha se uma rota sumir ou se a disponibilidade não bater com a tela.
+- **Base do curso:**
+  - um registro por módulo oficial (23) e por aula do catálogo;
+  - `npm run support-kb -- scaffold ~/MVF-base` cria a estrutura com modelos;
+  - campos `objective`, `topics` e `keywords` entram na busca;
+  - modelos não preenchidos são recusados.
+  - `npm run nina -- report` mostra os números reais: hoje 0 aulas oficiais e 0 transcrições.
+- **Botão "Abrir aula":**
+  - o modelo sugere `[[aula:ID]]`, ou o servidor usa a busca quando a aluna procura uma aula;
+  - o servidor valida existência, visibilidade e permissão (`resolveLessonForSession`), no máximo 3, e
+    uma só quando a resposta é clara;
+  - ao tocar, a Action revalida, confere que a aula foi oferecida na conversa, registra o evento "A aluna
+    abriu a aula…", encerra com o motivo `abriu_aula` e só então navega;
+  - não conclui aula, não dá XP e não marca etapa.
+  - Para alunas reais, só aulas oficiais e só com `MEMBER_LESSONS_LIVE=true`.
+- **Encerramento automático:**
+  - `decideAutoClose` (servidor) só encerra com confirmação explícita ("deu certo", "consegui", "era só
+    isso", "já achei");
+  - não encerra com "ok", "obrigada" sozinho, negação, pergunta ou assunto da equipe pendente;
+  - a despedida é curta e usa o mesmo `store.close` com o motivo `resolvido`, registrado no TXT ("Motivo:").
+- **Migration (ainda não aplicada):** colunas `close_reason` e `actions`, e funções
+  `support_append_system_message` e `support_set_close_reason` (service_role). `support_begin_close`
+  aceita só `manual` ou `abriu_aula` vindos da aluna.
+- **Qualidade:**
+  - `reference-questions.ts` tem 23 casos (aulas, módulos, navegação, plano, TikTok Shop, sem aparecer,
+    Estúdio, produtos, comunidade, gamificação, regras, cotidiano, reembolso, pagamento, humano,
+    encerramento e ausência de informação, com escrita formal e com gírias);
+  - eles rodam no `npm test` com o modelo local e, com a DeepSeek real, via `npm run nina -- eval --yes`
+    (pago, só com autorização).
+

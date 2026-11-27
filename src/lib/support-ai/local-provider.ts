@@ -9,20 +9,22 @@
 import { normalize } from "../support/search.ts";
 import { terms } from "./retrieval.ts";
 import { detectHandoff, HANDOFF_LABEL } from "./escalation.ts";
+import { wantsLesson } from "./decisions.ts";
+import { ASSISTANT } from "./persona.ts";
 import type { ChatTurn, ProviderResult, SupportProvider } from "./types.ts";
 
-const OPENINGS = ["Entendi.", "Certo.", "Pode deixar.", "Claro!", "Tudo bem."];
+const OPENINGS = ["Ahh, entendi!", "Claro!", "Pode deixar!", "Entendi.", "Vamos resolver isso."];
 
 function pick<T>(list: T[], seed: number): T {
   return list[Math.abs(seed) % list.length];
 }
 
 /** Trechos do bloco <base_mvf> do contexto. */
-function baseEntries(turns: ChatTurn[]): { title: string; lesson: boolean; text: string }[] {
+function baseEntries(turns: ChatTurn[]): { title: string; lessonId: string | null; text: string }[] {
   const block = turns.find((t) => t.role === "system" && t.content.startsWith("<base_mvf>"))?.content ?? "";
   return [...block.matchAll(/\[\d+\] (.+?)\n([\s\S]*?)(?=\n\n\[\d+\] |\n<\/base_mvf>)/g)].map((m) => ({
     title: m[1].replace(/ \[aula: .*?\]/, "").replace(/ \(rascunho em revisão\)$/, ""),
-    lesson: m[1].includes("[aula:"),
+    lessonId: m[1].match(/id da aula: ([a-z0-9-]+)\]/)?.[1] ?? null,
     text: m[2].trim(),
   }));
 }
@@ -33,8 +35,16 @@ function baseEntries(turns: ChatTurn[]): { title: string; lesson: boolean; text:
  */
 function relevantSentences(text: string, question: string, max = 300): string {
   const q = new Set(terms(question));
-  const sentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
-  const scored = sentences.map((s, i) => ({ s, i, score: terms(s).filter((t) => q.has(t) || [...q].some((x) => x.length > 3 && (t.startsWith(x) || x.startsWith(t)))).length }));
+  // “?” não separa: mantém pergunta frequente + resposta juntas. Títulos de seção (“Onde fica no app.”) saem.
+  const sentences = text
+    .split(/(?<=[.!])\s+/)
+    .map((x) => x.replace(/^(Pergunta frequente|Onde fica no app|Quem pode usar|Passo a passo|Limitações)\.\s*/, "").replace(/^\d+\.\s*/, "").trim())
+    .filter((x) => x.length > 3 && !/^\d+\.?$/.test(x));
+  const scored = sentences.map((s, i) => {
+    let score = terms(s).filter((t) => q.has(t) || [...q].some((x) => x.length > 3 && (t.startsWith(x) || x.startsWith(t)))).length;
+    if (/^(Hoje as alunas|Para alunas, ainda|Disponível para|Na demonstração)/.test(s)) score -= 0.5; // aviso de disponibilidade não substitui a resposta
+    return { s, i, score };
+  });
   const best = [...scored].sort((a, b) => b.score - a.score || a.i - b.i);
   const chosen: typeof scored = [];
   let len = 0;
@@ -58,21 +68,24 @@ export function createLocalProvider(): SupportProvider {
       const seed = convo.length;
 
       if (/^(oi+|ola|bom dia|boa tarde|boa noite|e ai)[!. ]*$/.test(n)) {
-        return { ok: true, text: pick(["Oii! Me conta, em que posso te ajudar?", "Oi! Como posso te ajudar hoje?"], seed) };
+        // A saudação já foi feita na abertura: não se apresenta de novo.
+        return { ok: true, text: pick(["Oi! Me conta, em que posso te ajudar?", "Oii! Pode falar, tô aqui pra ajudar."], seed) };
       }
-      if (/\b(obrigad[ao]|valeu|resolvi|deu certo|consegui)\b/.test(n)) {
-        return { ok: true, text: pick(["Que bom! 💗 Precisa de mais alguma coisa?", "Fico feliz que deu certo. Posso ajudar em mais algo?"], seed) };
+      if (/^(obrigad[ao]|valeu|brigad[ao])[!. 💗]*$/.test(n)) {
+        return { ok: true, text: pick(["Imagina! Conseguiu resolver?", "Por nada! Deu certo por aí?"], seed) };
       }
-      if (/\b(robo|bot|ia|automatic|humano|pessoa de verdade)\b/.test(n) && /\?/.test(last)) {
-        return { ok: true, text: "Sou um atendimento automatizado do MVF. Se precisar de alguém da equipe, toque em “Falar com a equipe”." };
+      // Só quando a pergunta é SOBRE a Nina (“vc é um robô?”), não quando cita IA no assunto.
+      if (/\b(voce|vc|tu|ce)\s+(e|eh|seria)\s+(um |uma )?(robo|bot|ia|inteligencia artificial|humana|humano|pessoa|gente|de verdade|real)\b|\b(to|estou) falando com (um |uma )?(robo|bot|ia|pessoa|humano|humana)\b/.test(n)) {
+        return { ok: true, text: `Sou a ${ASSISTANT.name}, assistente virtual do MVF 😊 Se precisar de alguém da equipe, é só tocar em “Falar com a equipe”.` };
       }
 
       // Assunto da equipe (reembolso, cobrança…): não responde com a base, encaminha.
       const handoff = detectHandoff(last);
       if (handoff) {
+        const money = handoff === "reembolso" || handoff === "cobranca" || handoff === "pagamento";
         return {
           ok: true,
-          text: `Entendi. ${HANDOFF_LABEL[handoff]} precisa ser visto pela equipe MVF, porque eu não consigo alterar conta, matrícula, cobrança ou reembolso. Toque em “Falar com a equipe” aqui no chat.`,
+          text: `Entendi${money ? "." : " 💗"} Nesse caso (${HANDOFF_LABEL[handoff].toLowerCase()}), quem consegue verificar direitinho é nossa equipe responsável. Toque em “Falar com a equipe” aqui no chat, tá?`,
         };
       }
 
@@ -80,14 +93,17 @@ export function createLocalProvider(): SupportProvider {
       if (!entries.length) {
         return {
           ok: true,
-          text: "Ainda não tenho uma orientação confirmada sobre isso na base do MVF. Pode me contar um pouco mais do que está acontecendo? Se for algo de conta ou pagamento, posso te encaminhar para a equipe.",
+          text: "Hmm, sobre isso eu ainda não tenho uma orientação confirmada aqui no MVF. Me conta um pouquinho mais do que vc precisa? Se for algo da sua conta ou pagamento, te mostro como falar com a equipe.",
         };
       }
-      const [top] = entries;
+      // Junta os trechos do MESMO documento que veio em primeiro (um guia pode ter vários trechos).
+      const top = { ...entries[0], text: entries.filter((e) => e.title === entries[0].title).map((e) => e.text).join(" ") };
       const question = convo.filter((t) => t.role === "user").slice(-2).map((t) => t.content).join(" ");
       const parts = [pick(OPENINGS, seed), relevantSentences(top.text, question)];
-      // Só aponta aula quando ela É a fonte principal (sem afirmar relação que não foi confirmada).
-      if (top.lesson) parts.push(`Isso está na aula “${top.title}”.`);
+      // Aula como fonte principal: oferece o botão pelo protocolo (o servidor valida o id).
+      if (top.lessonId && wantsLesson(question)) {
+        return { ok: true, text: `${pick(["Achei!", "Encontrei aqui!"], seed)} A aula “${top.title}” fala disso. ${relevantSentences(top.text, question, 180)} Deixei o botão aqui embaixo pra vc abrir 😊\n[[aula:${top.lessonId}]]` };
+      }
       parts.push("Quer que eu explique algum passo com mais calma?");
       return { ok: true, text: parts.join(" ") };
     },

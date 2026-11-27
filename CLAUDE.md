@@ -139,7 +139,13 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - DeepSeek só no servidor; nenhum componente de cliente importa servidor/prompt/chave (há teste). Sem `NEXT_PUBLIC_`.
 - Só documentos APROVADOS chegam às alunas; nunca inventar aula/link/política; dado sensível bloqueado antes de enviar.
 - Encerramento em duas fases e idempotente; nunca dizer “salvo/arquivado” sem confirmação; nunca “atendente acionado”.
-- Migration `20261126120000_suporte_ia.sql` NÃO aplicada: aplicar só com autorização (portões A–E). Contas reais sem chat até lá.
+- Banco publicado recebeu a versão anterior da `20261126120000`; o complemento `20261127120000_nina_2_complemento.sql`
+  precisa estar aplicado antes de ligar o chat real. Base do curso: `modulos/` (fora do Git) → `support-kb split|push` (D141).
+- Busca do banco: OR de lexemas (D142). Sem botão validado, `dropButtonClaims` tira frases que prometem botão.
+- Nina 2.0: persona em `persona.ts`; provedor explícito `MVF_SUPPORT_PROVIDER` (sem troca silenciosa); botão “Abrir aula”
+  só com id validado pelo servidor e arquiva antes de navegar; encerramento automático só via `decideAutoClose`.
+- Guias do app em `src/content/nina/aplicativo.json`: mudou uma tela? atualize o guia e rode `npm run nina -- docs-stamp`.
+  Setup para leigos: `docs/CONFIGURACAO_NINA.md`.
 
 ## Painel administrativo (Prompt 13A)
 

@@ -10,8 +10,8 @@ import "server-only";
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildTranscript } from "./transcript";
-import type { ConversationSummary, StoreResult, SupportStore, CloseOutcome } from "./store";
-import type { SourceRef, SupportConversation, SupportMessage } from "./types";
+import type { AssistantExtras, ConversationSummary, StoreResult, SupportStore, CloseOutcome } from "./store";
+import type { ChatAction, CloseReason, MessageMeta, SourceRef, SupportConversation, SupportMessage } from "./types";
 
 type Row = Record<string, unknown>;
 
@@ -29,6 +29,7 @@ function toConversation(r: Row): SupportConversation {
     handoffTopic: (r.handoff_topic as string | null) ?? null,
     startedAt: String(r.started_at),
     closedAt: (r.closed_at as string | null) ?? null,
+    closeReason: (r.close_reason as CloseReason | null) ?? null,
     pendingSince: (r.pending_since as string | null) ?? null,
     transcript: (r.transcript as string | null) ?? null,
     transcriptGeneratedAt: (r.transcript_generated_at as string | null) ?? null,
@@ -38,6 +39,8 @@ function toConversation(r: Row): SupportConversation {
 
 function toMessage(r: Row): SupportMessage {
   const sources = Array.isArray(r.sources) ? (r.sources as SourceRef[]) : [];
+  const actions = Array.isArray(r.actions) ? (r.actions as ChatAction[]) : [];
+  const meta = r.meta && typeof r.meta === "object" && "provider" in (r.meta as object) ? (r.meta as MessageMeta) : undefined;
   return {
     id: String(r.id),
     conversationId: String(r.conversation_id),
@@ -46,6 +49,8 @@ function toMessage(r: Row): SupportMessage {
     createdAt: new Date(String(r.created_at)).toISOString(),
     seq: Number(r.seq),
     ...(sources.length ? { sources } : {}),
+    ...(actions.length ? { actions } : {}),
+    ...(meta ? { meta } : {}),
   };
 }
 
@@ -84,8 +89,25 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
       return { ok: true, value: toMessage(m as Row) };
     },
 
-    async appendAssistant(id, content, sources) {
-      const { data, error } = await service.rpc("support_append_assistant_message", { p_conversation: id, p_content: content, p_sources: sources ?? [], p_meta: {} });
+    async appendAssistant(id, content, extras: AssistantExtras = {}) {
+      const { data, error } = await service.rpc("support_append_assistant_message", {
+        p_conversation: id,
+        p_content: content,
+        p_sources: extras.sources ?? [],
+        p_meta: extras.meta ?? {},
+        p_actions: extras.actions ?? [],
+      });
+      if (error) return { ok: false, error: "not_found" };
+      const r = data as { ok: boolean; error?: string; seq?: number };
+      if (!r.ok) return asError(r.error);
+      const { data: m } = await service.from("support_messages").select("*").eq("conversation_id", id).eq("seq", r.seq!).single();
+      return { ok: true, value: toMessage(m as Row) };
+    },
+
+    async appendSystem(_ownerId, id, content) {
+      // Confere a dona pela sessão (RLS) antes de gravar pelo servidor.
+      if (!(await load(id))) return { ok: false, error: "not_found" };
+      const { data, error } = await service.rpc("support_append_system_message", { p_conversation: id, p_content: content });
       if (error) return { ok: false, error: "not_found" };
       const r = data as { ok: boolean; error?: string; seq?: number };
       if (!r.ok) return asError(r.error);
@@ -108,8 +130,10 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
       return found ? { ok: true, value: found.conversation } : { ok: false, error: "not_found" };
     },
 
-    async close(_ownerId, id): Promise<StoreResult<CloseOutcome>> {
-      const { data, error } = await user.rpc("support_begin_close", { p_conversation: id });
+    async close(_ownerId, id, reason: CloseReason = "manual"): Promise<StoreResult<CloseOutcome>> {
+      // "resolvido" só pelo servidor (a função da aluna aceita apenas manual/abriu_aula).
+      if (reason === "resolvido" && (await load(id))) await service.rpc("support_set_close_reason", { p_conversation: id, p_reason: reason });
+      const { data, error } = await user.rpc("support_begin_close", { p_conversation: id, p_reason: reason === "abriu_aula" ? "abriu_aula" : "manual" });
       if (error) return { ok: false, error: "not_found" };
       const begin = data as { ok: boolean; status?: string; error?: string };
       if (!begin.ok) return asError(begin.error);

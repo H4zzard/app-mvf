@@ -17,7 +17,11 @@ export function knowledgeBlock(chunks: RetrievedChunk[]): string {
   if (!chunks.length) return "<base_mvf>\nNenhum trecho oficial encontrado para esta pergunta. Não invente: diga que precisa ser confirmado ou peça mais detalhes.\n</base_mvf>";
   const body = chunks
     .map((r, i) => {
-      const tag = r.doc.lessonId ? ` [aula: ${r.doc.title}]` : "";
+      const tag = r.doc.lessonId
+        ? ` [aula: ${r.doc.title} | id da aula: ${r.doc.lessonId}]`
+        : r.doc.type === "transcricao"
+          ? ` [aula do curso: ${r.doc.title} | sem botão no app, cite pelo nome]`
+          : "";
       const draft = r.doc.status === "aprovado" ? "" : " (rascunho em revisão)";
       return `[${i + 1}] ${r.doc.title}${tag}${draft}\n${fence(r.chunk.text)}`;
     })
@@ -39,7 +43,11 @@ export function buildTurns(input: {
     turns.push({ role: "system", content: `<resumo_da_conversa>\n${fence(input.summary)}\n</resumo_da_conversa>` });
   }
   turns.push({ role: "system", content: knowledgeBlock(input.retrieved) });
-  for (const m of recent) turns.push({ role: m.sender === "student" ? "user" : "assistant", content: m.content });
+  for (const m of recent) {
+    // Memória das ações: o modelo sabe quais botões de aula já mostrou.
+    const shown = m.actions?.length ? `\n(Botões mostrados: ${m.actions.map((a) => `Abrir aula “${a.title}”`).join(", ")})` : "";
+    turns.push({ role: m.sender === "student" ? "user" : "assistant", content: m.content + shown });
+  }
   return turns;
 }
 

@@ -187,6 +187,7 @@ export function checkEnv(env: Env, target: PreflightTarget): Finding[] {
   if (!supportOn) {
     add("ok", "MVF_SUPPORT_AI_ENABLED", "Desligado: alunas reais não veem o chat (falha fechada).");
   } else {
+    if (val(env, "MVF_SUPPORT_PROVIDER") !== "deepseek") add("error", "MVF_SUPPORT_PROVIDER", "Suporte ligado para alunas exige MVF_SUPPORT_PROVIDER=deepseek.");
     if (!dsKey) add("error", "DEEPSEEK_API_KEY", "Suporte ligado sem chave da DeepSeek.");
     else add("ok", "DEEPSEEK_API_KEY", "Presente (valor não exibido).");
     if (val(env, "MVF_SUPPORT_STORE") !== "supabase") add("error", "MVF_SUPPORT_STORE", "Suporte ligado exige MVF_SUPPORT_STORE=supabase (migration do suporte aplicada).");

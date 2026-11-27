@@ -4,6 +4,26 @@
  */
 
 export type ConversationStatus = "open" | "closing" | "closed";
+/** Motivo do encerramento, decidido e registrado pelo SERVIDOR. */
+export type CloseReason = "manual" | "resolvido" | "abriu_aula" | "inatividade";
+
+/** Ação estruturada validada pelo servidor (o modelo só sugere; nunca vira link livre). */
+export interface ChatAction {
+  type: "open_lesson";
+  lessonId: string;
+  title: string;
+  moduleTitle: string | null;
+  /** Rota interna oficial, montada pelo servidor a partir do id real. */
+  href: string;
+}
+
+/** Metadados técnicos mínimos da resposta (nunca o prompt). Mostram de onde veio a resposta. */
+export interface MessageMeta {
+  provider: "deepseek" | "local" | "sistema";
+  model?: string;
+  tokensIn?: number;
+  tokensOut?: number;
+}
 export type Sender = "student" | "assistant" | "system";
 
 export interface SupportMessage {
@@ -17,6 +37,9 @@ export interface SupportMessage {
   seq: number;
   /** Fontes usadas na resposta (só do assistente). Nunca inventadas: vêm da recuperação. */
   sources?: SourceRef[];
+  /** Botões validados (ex.: Abrir aula). */
+  actions?: ChatAction[];
+  meta?: MessageMeta;
 }
 
 export interface SupportConversation {
@@ -36,6 +59,7 @@ export interface SupportConversation {
   handoffTopic: string | null;
   startedAt: string;
   closedAt: string | null;
+  closeReason: CloseReason | null;
   /** Resposta do assistente em andamento (bloqueia mensagens simultâneas). */
   pendingSince: string | null;
   transcript: string | null;
@@ -109,11 +133,13 @@ export interface ChatTurn {
 
 export type ProviderErrorCode = "disabled" | "timeout" | "rate_limited" | "unavailable" | "auth" | "budget" | "invalid" | "unknown";
 
-export type ProviderResult = { ok: true; text: string; usage?: { input: number; output: number } } | { ok: false; error: ProviderErrorCode };
+export type ProviderResult = { ok: true; text: string; usage?: { input: number; output: number }; model?: string } | { ok: false; error: ProviderErrorCode };
 
 export interface SupportProvider {
   /** Rótulo honesto mostrado na interface (ex.: “modelo local (sem IA)”). */
   readonly label: string;
   readonly kind: "deepseek" | "local";
+  /** Modelo usado (só DeepSeek). */
+  readonly model?: string;
   complete(turns: ChatTurn[], opts: { userKey: string; signal?: AbortSignal }): Promise<ProviderResult>;
 }

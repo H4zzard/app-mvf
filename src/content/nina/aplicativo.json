@@ -1,0 +1,856 @@
+{
+  "version": 2,
+  "note": "Guias do APP para a Nina (voltados à aluna, não à engenharia). Gerados a partir do código em 26/11/2026. Status rascunho até a equipe aprovar. 'watch' lista os arquivos da funcionalidade: se mudarem, `npm run nina -- docs-status` marca o guia como desatualizado. Depois de revisar, `npm run nina -- docs-stamp`.",
+  "guides": [
+    {
+      "id": "app-entrar",
+      "title": "Como entrar no aplicativo",
+      "description": "O MVF não usa senha. Você entra com um link de acesso enviado para o e-mail usado na compra.",
+      "navigation": "Tela de login",
+      "routes": [
+        "/login"
+      ],
+      "availability": "todas",
+      "access": "Ter uma compra ativa do MVF com o e-mail informado.",
+      "steps": [
+        "Abra a tela de login e digite o mesmo e-mail usado na compra.",
+        "Toque em Receber link de acesso.",
+        "Abra o e-mail e toque no link.",
+        "Na página Quase lá, toque em Entrar."
+      ],
+      "faq": [
+        {
+          "q": "O link não chegou",
+          "a": "Confira a caixa de spam e a aba promoções. Espere alguns minutos e peça um novo link."
+        },
+        {
+          "q": "Apareceu que meu e-mail não foi encontrado",
+          "a": "Confira se é exatamente o e-mail da compra, sem espaços. Se estiver certo e continuar assim, isso precisa da equipe, porque envolve a verificação da compra."
+        },
+        {
+          "q": "Apareceu Acesso indisponível",
+          "a": "Significa que não encontramos um acesso ativo para essa conta. Isso precisa ser verificado pela equipe."
+        }
+      ],
+      "limitations": [
+        "Não existe cadastro pelo app. O acesso vem da compra."
+      ],
+      "watch": [
+        "src/app/(public)/login/page.tsx",
+        "src/app/auth/confirm/page.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-primeiro-acesso",
+      "title": "Como funciona o primeiro acesso",
+      "description": "No primeiro acesso você responde perguntas rápidas e o app monta o seu plano.",
+      "navigation": "Abre sozinho depois do primeiro login",
+      "routes": [
+        "/onboarding"
+      ],
+      "availability": "todas",
+      "access": "Estar logada.",
+      "steps": [
+        "Responda as perguntas, uma por vez. São até 11 e levam cerca de 2 minutos.",
+        "No fim, revise o resumo das respostas.",
+        "Confirme para montar o seu plano. Depois disso, o Início mostra a sua próxima ação."
+      ],
+      "faq": [
+        {
+          "q": "Posso pular uma pergunta",
+          "a": "Algumas perguntas são opcionais e mostram a opção de pular."
+        },
+        {
+          "q": "Errei uma resposta",
+          "a": "Você pode ajustar depois, pelo Perfil, em Ajustar meu plano."
+        }
+      ],
+      "limitations": [
+        "A conversa do primeiro acesso é roteirizada, não é uma IA."
+      ],
+      "watch": [
+        "src/components/onboarding/onboarding-flow.tsx",
+        "src/config/onboarding-questions.ts"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-ajustar-respostas",
+      "title": "Como ajustar as respostas do plano",
+      "description": "Você pode refazer as perguntas e o plano é atualizado, mantendo o que você já concluiu.",
+      "navigation": "Perfil > Conta > Ajustar meu plano. Também no fim do mapa do Meu Plano.",
+      "routes": [
+        "/perfil",
+        "/onboarding"
+      ],
+      "availability": "todas",
+      "access": "Ter feito o primeiro acesso.",
+      "steps": [
+        "Vá em Perfil e toque em Ajustar meu plano.",
+        "Mude as respostas que quiser.",
+        "Veja a prévia do que muda no plano e confirme."
+      ],
+      "faq": [
+        {
+          "q": "Vou perder o que já fiz",
+          "a": "Não. O progresso já concluído é mantido."
+        },
+        {
+          "q": "Onde vejo minhas respostas",
+          "a": "No Perfil, em Minhas respostas, ou no Meu Plano em Ver minhas respostas."
+        }
+      ],
+      "limitations": [],
+      "watch": [
+        "src/components/extras/profile-view.tsx",
+        "src/components/onboarding/plan-change-dialog.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-inicio",
+      "title": "O que aparece no Início",
+      "description": "O Início mostra a sua próxima ação na jornada, o progresso, a rotina sugerida para hoje, ferramentas e avisos.",
+      "navigation": "Barra de baixo > Início",
+      "routes": [
+        "/inicio"
+      ],
+      "availability": "todas",
+      "access": "Ter montado o plano.",
+      "steps": [
+        "Veja o bloco Sua próxima ação.",
+        "Toque em Continuar minha jornada para abrir direto a etapa certa.",
+        "Em Para hoje fica a sugestão de rotina do dia."
+      ],
+      "faq": [
+        {
+          "q": "Onde estão os Vídeos Virais",
+          "a": "No Início, em Ferramentas para criar, e também dentro do Estúdio."
+        }
+      ],
+      "limitations": [],
+      "watch": [
+        "src/components/dashboard/dashboard-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-navegacao",
+      "title": "Como navegar pelo app",
+      "description": "A barra de baixo tem sete destinos. No computador, os mesmos sete ficam na lateral.",
+      "navigation": "Barra de baixo: Início, Plano, Aulas, Estúdio, Produtos, Tribo e Perfil",
+      "routes": [
+        "/inicio",
+        "/meu-plano",
+        "/aulas",
+        "/estudio-ia",
+        "/marketplace",
+        "/comunidade",
+        "/perfil"
+      ],
+      "availability": "todas",
+      "access": "Estar logada.",
+      "steps": [
+        "Toque no destino na barra de baixo.",
+        "Desafios, Ranking, Conquistas, Recompensas, Central de ajuda, Perguntas frequentes e Regras ficam no Perfil.",
+        "Lives fica na Tribo. Materiais fica no fim da página de Aulas. Minhas vendas fica em Produtos. Vídeos Virais fica no Início e no Estúdio."
+      ],
+      "faq": [
+        {
+          "q": "Sumiu o menu Mais",
+          "a": "Ele não existe mais. Tudo o que estava nele foi para o destino certo, principalmente o Perfil."
+        }
+      ],
+      "limitations": [
+        "Em telas bem pequenas, Estúdio aparece como IA e Produtos como Loja."
+      ],
+      "watch": [
+        "src/lib/navigation/destinations.ts",
+        "src/components/layout/bottom-nav.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-meu-plano",
+      "title": "Como usar o Meu Plano",
+      "description": "O Meu Plano é a sua jornada em fases, com uma ação por vez, mostrada como um mapa.",
+      "navigation": "Barra de baixo > Plano",
+      "routes": [
+        "/meu-plano"
+      ],
+      "availability": "todas",
+      "access": "Ter montado o plano.",
+      "steps": [
+        "No mapa, a etapa com Você está aqui é a próxima.",
+        "Toque em Continuar no bloco Próxima ação ou na própria etapa.",
+        "Etapas com cadeado são liberadas quando as anteriores terminam.",
+        "Etapas que não se aplicam ao seu perfil ficam em etapas puladas, no fim de cada fase."
+      ],
+      "faq": [
+        {
+          "q": "O que é cada fase",
+          "a": "São blocos da jornada, como preparar sua conta, preparar sua presença, escolher produtos, preparar o primeiro conteúdo, publicar e criar sua rotina."
+        },
+        {
+          "q": "Meu plano mudou",
+          "a": "Se você ajustou as respostas, o plano é recalculado e o que você já fez é mantido."
+        }
+      ],
+      "limitations": [
+        "As fases e etapas ainda estão sendo revisadas pela equipe."
+      ],
+      "watch": [
+        "src/components/plan/plan-view.tsx",
+        "src/demo/journey-catalog.ts"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-configurar-tiktok",
+      "title": "Como configurar a conta e o perfil do TikTok pela jornada",
+      "description": "A primeira fase do Meu Plano guia a preparação da conta e do perfil do TikTok, uma etapa por vez.",
+      "navigation": "Plano > fase Preparar sua conta",
+      "routes": [
+        "/meu-plano",
+        "/meu-plano/etapa/t-j-perfil-abrir"
+      ],
+      "availability": "todas",
+      "access": "Ter montado o plano.",
+      "steps": [
+        "Abra o Plano. A primeira fase é preparar sua conta.",
+        "A jornada pergunta se você já tem conta no TikTok. Se ainda não tem, mostra instalar o aplicativo e criar a conta. Se já tem, vai direto para o perfil.",
+        "Siga as etapas do perfil, que são abrir a edição do perfil, criar a foto de avatar, definir nome e usuário, escrever a bio e conferir o perfil.",
+        "Em cada etapa, toque em Concluí esta etapa quando terminar."
+      ],
+      "faq": [
+        {
+          "q": "Tem uma aula sobre configurar o perfil",
+          "a": "Por enquanto a orientação está nas etapas do Plano. Quando houver uma aula oficial sobre isso, ela aparece como aula de apoio na etapa."
+        }
+      ],
+      "limitations": [
+        "Os passos dentro do TikTok podem mudar com atualizações do aplicativo deles. A equipe ainda vai confirmar os detalhes de cada procedimento."
+      ],
+      "watch": [
+        "src/demo/journey-catalog.ts",
+        "src/components/plan/journey-step.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-microetapas",
+      "title": "Como concluir uma etapa do plano",
+      "description": "Cada etapa abre numa tela com a instrução, o print quando existir, o resultado esperado e a aula de apoio.",
+      "navigation": "Plano > tocar numa etapa",
+      "routes": [
+        "/meu-plano/etapa/t-j-perfil-abrir"
+      ],
+      "availability": "todas",
+      "access": "Ter montado o plano e a etapa estar liberada.",
+      "steps": [
+        "Leia a instrução e faça a ação.",
+        "Confira o Resultado esperado.",
+        "Toque em Concluí esta etapa.",
+        "Toque em Próxima etapa para seguir, ou em Mapa para voltar ao mapa na mesma posição.",
+        "Se marcou por engano, abra a etapa de novo e toque em Desfazer."
+      ],
+      "faq": [
+        {
+          "q": "Assistir à aula de apoio conclui a etapa",
+          "a": "Não. A aula de apoio ajuda, mas a etapa prática só é concluída quando você toca em Concluí esta etapa."
+        },
+        {
+          "q": "A etapa está bloqueada",
+          "a": "Ela mostra o que precisa ser feito antes, com o atalho para essas etapas."
+        },
+        {
+          "q": "Não tem print",
+          "a": "Alguns prints ainda estão sendo cadastrados pela equipe. A etapa mostra que o print está pendente."
+        }
+      ],
+      "limitations": [
+        "Os passos dentro do TikTok podem mudar com atualizações do aplicativo deles."
+      ],
+      "watch": [
+        "src/components/plan/journey-step.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-aulas",
+      "title": "Como localizar aulas",
+      "description": "Em Aulas ficam os módulos da Formação MVF, organizados em trilhos, com busca.",
+      "navigation": "Barra de baixo > Aulas",
+      "routes": [
+        "/aulas"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Role pelos trilhos e toque na capa de um módulo para ver as aulas.",
+        "Toque em Buscar, no topo, para procurar por tema ou módulo.",
+        "Em Recomendado para você ficam os módulos ligados ao seu plano."
+      ],
+      "faq": [
+        {
+          "q": "As aulas dependem do meu plano",
+          "a": "Não. A biblioteca completa fica sempre disponível, independentemente do plano."
+        }
+      ],
+      "limitations": [
+        "As aulas oficiais ainda estão sendo cadastradas no app. Hoje as alunas veem a área como Em breve."
+      ],
+      "watch": [
+        "src/components/aulas/catalog-view.tsx",
+        "src/components/aulas/catalog-parts.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-aulas-continuar",
+      "title": "Como continuar assistindo e marcar uma aula",
+      "description": "O app lembra a próxima aula e permite marcar como concluída.",
+      "navigation": "Aulas > Continuar assistindo",
+      "routes": [
+        "/aulas",
+        "/aulas/l-roteiro"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Em Aulas, toque em Continuar ou no bloco Continue assistindo.",
+        "Na aula, toque em Marcar como concluída quando terminar.",
+        "Se você veio de uma etapa do plano, o botão Voltar à etapa leva de volta."
+      ],
+      "faq": [
+        {
+          "q": "Marcar a aula conclui a etapa do plano",
+          "a": "Só se a etapa for a própria aula. Etapas práticas continuam precisando de Concluí esta etapa."
+        }
+      ],
+      "limitations": [
+        "Os vídeos das aulas ainda estão sendo adicionados ao app."
+      ],
+      "watch": [
+        "src/components/aulas/lesson-detail.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-estudio",
+      "title": "Como funciona o Estúdio IA",
+      "description": "O Estúdio tem três ferramentas que escrevem texto para você. Imagens e vídeos são feitos fora do app, no Google Flow.",
+      "navigation": "Barra de baixo > Estúdio",
+      "routes": [
+        "/estudio-ia"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Escolha Criar Personagem, Animar Personagem ou Roteiros para Gravar Aparecendo.",
+        "Para vídeo sem aparecer, use Criar Personagem e depois Animar Personagem.",
+        "Para gravar com o seu rosto, use Roteiros para Gravar Aparecendo.",
+        "Para referências, toque em Explorar vídeos virais."
+      ],
+      "faq": [
+        {
+          "q": "O app cria a imagem ou o vídeo",
+          "a": "Não. O Estúdio só escreve o texto. A imagem e o vídeo são feitos no Google Flow."
+        }
+      ],
+      "limitations": [
+        "Hoje as alunas veem o Estúdio como Em breve. Na demonstração, os textos vêm de um modelo local, sem IA."
+      ],
+      "watch": [
+        "src/components/estudio/studio-hub.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-estudio-personagem",
+      "title": "Como criar um personagem",
+      "description": "Criar Personagem monta um prompt para criar a imagem de um personagem no Google Flow.",
+      "navigation": "Estúdio > Criar Personagem",
+      "routes": [
+        "/estudio-ia/personagem"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Escolha o modo Básico ou Avançado. Surpreenda-me sugere uma combinação.",
+        "Preencha as características, como idade, aparência, cabelo, roupa e ambiente.",
+        "Toque em Gerar prompt.",
+        "Copie o prompt e cole no Google Flow para criar a imagem.",
+        "Guarde a ficha para usar depois no Animar Personagem."
+      ],
+      "faq": [
+        {
+          "q": "Posso usar uma foto de referência",
+          "a": "Sim, marque Tenho imagem de referência e anexe a foto direto no Google Flow. O app não recebe a imagem."
+        }
+      ],
+      "limitations": [],
+      "watch": [
+        "src/components/estudio/character-tool.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-estudio-animar",
+      "title": "Como animar um personagem",
+      "description": "Animar Personagem usa o personagem e a sua fala para gerar prompts de vídeo por cena, para colar no Google Flow.",
+      "navigation": "Estúdio > Animar Personagem",
+      "routes": [
+        "/estudio-ia/animar"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Escolha a ficha do personagem ou descreva ele.",
+        "Escreva ou escolha a fala.",
+        "Gere os prompts. A fala é dividida em cenas, sem mudar o texto aprovado.",
+        "Copie cada prompt e gere os vídeos no Google Flow."
+      ],
+      "faq": [
+        {
+          "q": "A fala vai ser alterada",
+          "a": "Não. O app só divide a fala em cenas, sem mudar as palavras."
+        }
+      ],
+      "limitations": [],
+      "watch": [
+        "src/components/estudio/animation-tool.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-estudio-roteiros",
+      "title": "Como gerar roteiros para gravar",
+      "description": "Roteiros para Gravar Aparecendo gera dez roteiros para você gravar com o seu próprio rosto.",
+      "navigation": "Estúdio > Roteiros para Gravar Aparecendo",
+      "routes": [
+        "/estudio-ia/roteiros"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Descreva o produto.",
+        "Gere os roteiros.",
+        "Escolha um, edite se quiser e copie.",
+        "Grave com o celular."
+      ],
+      "faq": [
+        {
+          "q": "Os roteiros inventam benefícios do produto",
+          "a": "Não devem. Eles só usam o que você descreveu. Revise antes de gravar."
+        }
+      ],
+      "limitations": [],
+      "watch": [
+        "src/components/estudio/recording-tool.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-videos-virais",
+      "title": "Como encontrar vídeos virais",
+      "description": "Uma curadoria de vídeos de referência para adaptar ideias, com filtros.",
+      "navigation": "Início > Ferramentas para criar > Vídeos Virais, ou Estúdio > Explorar vídeos virais",
+      "routes": [
+        "/videos-virais"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Use os filtros de tipo, país, categoria e ordem.",
+        "Toque num vídeo para ver os detalhes.",
+        "Toque em Salvar para guardar, ou em Usar no Estúdio IA para levar a ideia para o Estúdio."
+      ],
+      "faq": [
+        {
+          "q": "As métricas são reais",
+          "a": "Quando não há estimativa confiável, o app mostra Estimativa não disponível. Nada é inventado."
+        }
+      ],
+      "limitations": [
+        "Hoje as alunas veem esta área como Em breve. As referências da demonstração são exemplos."
+      ],
+      "watch": [
+        "src/components/virais/virals-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-produtos",
+      "title": "Como usar a área de Produtos",
+      "description": "Em Produtos você consulta os produtos e prepara conteúdo no Estúdio a partir deles.",
+      "navigation": "Barra de baixo > Produtos",
+      "routes": [
+        "/marketplace"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Use as abas Explorar, Salvos e Meus produtos.",
+        "Toque num produto para ver os detalhes.",
+        "Use Criar roteiro para levar o produto ao Estúdio."
+      ],
+      "faq": [
+        {
+          "q": "Qual é o preço ou a comissão",
+          "a": "Preço, comissão e afiliação só aparecem depois de confirmados pela equipe. Até lá, aparecem como A confirmar."
+        },
+        {
+          "q": "Colocar em Meus produtos me afilia",
+          "a": "Não. A afiliação acontece no próprio TikTok Shop."
+        }
+      ],
+      "limitations": [
+        "O catálogo oficial NUMI ainda está sendo preenchido. Hoje as alunas veem a área como Em breve."
+      ],
+      "watch": [
+        "src/components/marketplace/marketplace-view.tsx",
+        "src/components/marketplace/product-detail.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-produtos-salvar",
+      "title": "Como salvar produtos",
+      "description": "Você pode salvar produtos para ver depois e montar a sua lista em Meus produtos.",
+      "navigation": "Produtos > coração no card do produto",
+      "routes": [
+        "/marketplace"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Toque no coração do produto para salvar.",
+        "Veja os salvos na aba Salvos."
+      ],
+      "faq": [],
+      "limitations": [
+        "Na demonstração, os salvos somem ao recarregar a página."
+      ],
+      "watch": [
+        "src/components/marketplace/product-ui.tsx",
+        "src/components/marketplace/my-products.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-minhas-vendas",
+      "title": "Minhas vendas",
+      "description": "Área para acompanhar vendas e comissões a partir de fontes verificáveis.",
+      "navigation": "Produtos > Minhas vendas",
+      "routes": [
+        "/minhas-vendas"
+      ],
+      "availability": "todas",
+      "access": "Estar logada.",
+      "steps": [
+        "Abra Produtos e toque em Minhas vendas."
+      ],
+      "faq": [
+        {
+          "q": "Por que está vazio",
+          "a": "Ainda não há uma fonte de vendas conectada. Nenhum número é mostrado sem fonte verificável."
+        }
+      ],
+      "limitations": [
+        "Sem fonte de vendas conectada por enquanto."
+      ],
+      "watch": [
+        "src/components/extras/sales-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-tribo",
+      "title": "Como usar a Tribo",
+      "description": "A Tribo é a comunidade das alunas, com espaços como Boas-vindas, Avisos NUMI, Mural de conquistas, Dúvidas e dicas e Bastidores.",
+      "navigation": "Barra de baixo > Tribo",
+      "routes": [
+        "/comunidade"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada. Algumas salas são exclusivas de planos específicos.",
+      "steps": [
+        "Toque em Compartilhe algo ou num modelo, como Dúvida ou Conquista.",
+        "Escreva e toque em Publicar.",
+        "Use os espaços e a busca para filtrar.",
+        "Para denunciar algo, toque em Denunciar na publicação."
+      ],
+      "faq": [
+        {
+          "q": "As salas Elite+ e Icon estão bloqueadas",
+          "a": "O acesso a essas salas depende do seu plano e é verificado pelo sistema."
+        }
+      ],
+      "limitations": [
+        "Hoje as alunas veem a Tribo como Em breve. Na demonstração, publicações ficam só na sessão."
+      ],
+      "watch": [
+        "src/components/comunidade/community-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-desafios-recompensas",
+      "title": "Como funcionam desafios e recompensas",
+      "description": "Desafios dão pontos (XP) por ações claras. Recompensas podem ser trocadas por pontos.",
+      "navigation": "Perfil > Minha evolução > Desafios ou Recompensas",
+      "routes": [
+        "/desafios",
+        "/recompensas"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Em Desafios, toque em Participar e cumpra as ações.",
+        "Quando estiver pronto, toque em Resgatar para receber o XP.",
+        "Em Recompensas, escolha um item e toque em Resgatar."
+      ],
+      "faq": [
+        {
+          "q": "Os pontos valem dinheiro",
+          "a": "Não. Pontos não são dinheiro."
+        }
+      ],
+      "limitations": [
+        "As regras oficiais de pontos e recompensas ainda estão em definição. Hoje as alunas veem estas áreas como Em breve."
+      ],
+      "watch": [
+        "src/components/gamificacao/challenges-view.tsx",
+        "src/components/gamificacao/rewards-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-ranking-conquistas",
+      "title": "Como consultar ranking e conquistas",
+      "description": "Conquistas mostra seu nível, XP e selos. O Ranking mostra sua posição pelo XP.",
+      "navigation": "Perfil > Minha evolução > Ranking ou Conquistas",
+      "routes": [
+        "/ranking",
+        "/conquistas"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Abra o Perfil e toque em Conquistas ou Ranking."
+      ],
+      "faq": [
+        {
+          "q": "O ranking usa vendas",
+          "a": "Não. O ranking nunca usa vendas nem faturamento."
+        }
+      ],
+      "limitations": [
+        "Hoje as alunas veem estas áreas como Em breve."
+      ],
+      "watch": [
+        "src/components/gamificacao/ranking-view.tsx",
+        "src/components/conquistas/achievements-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-materiais",
+      "title": "Como encontrar materiais",
+      "description": "Arquivos de apoio, modelos e guias ficam em Materiais.",
+      "navigation": "Aulas > fim da página > Ver materiais",
+      "routes": [
+        "/materiais"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Abra Aulas, role até o fim e toque em Ver materiais.",
+        "Toque num material para ver os detalhes."
+      ],
+      "faq": [],
+      "limitations": [
+        "Os arquivos oficiais ainda estão sendo adicionados. Hoje as alunas veem a área como Em breve."
+      ],
+      "watch": [
+        "src/components/extras/materials-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-lives",
+      "title": "Como acessar as lives",
+      "description": "A agenda de lives e encontros com a equipe.",
+      "navigation": "Tribo > Lives e encontros",
+      "routes": [
+        "/lives"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Abra a Tribo e toque em Lives e encontros.",
+        "Veja Próximas, Anteriores e Minha agenda."
+      ],
+      "faq": [
+        {
+          "q": "Quando é a próxima live",
+          "a": "As datas e os links oficiais aparecem quando a equipe divulgar a agenda."
+        }
+      ],
+      "limitations": [
+        "Nenhuma data oficial foi divulgada ainda. Lembretes ainda não são enviados."
+      ],
+      "watch": [
+        "src/components/extras/lives-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-pedir-ajuda",
+      "title": "Como pedir ajuda",
+      "description": "A Central de ajuda tem respostas rápidas, perguntas frequentes e a conversa com a Nina.",
+      "navigation": "Perfil > Ajuda e informações > Central de ajuda",
+      "routes": [
+        "/suporte",
+        "/suporte/chat"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Abra Perfil e toque em Central de ajuda.",
+        "Busque a sua dúvida ou use os atalhos.",
+        "No fim da página, em Ainda precisa de ajuda, toque em Iniciar conversa para falar com a Nina."
+      ],
+      "faq": [
+        {
+          "q": "Como falo com uma pessoa da equipe",
+          "a": "Na conversa, toque em Falar com a equipe. O app mostra o canal oficial quando ele estiver configurado."
+        },
+        {
+          "q": "A Nina mostrou o botão Abrir aula",
+          "a": "Ao tocar, o atendimento é encerrado e guardado, e a aula abre. Se precisar de mais ajuda depois, é só iniciar uma nova conversa."
+        },
+        {
+          "q": "A conversa encerrou sozinha",
+          "a": "Quando você confirma que resolveu, por exemplo dizendo que deu certo, a Nina se despede e o atendimento é encerrado e guardado. Você pode baixar a conversa e iniciar outra quando quiser."
+        }
+      ],
+      "limitations": [
+        "Os canais oficiais de atendimento humano ainda serão divulgados pela equipe."
+      ],
+      "watch": [
+        "src/components/extras/support-view.tsx",
+        "src/components/suporte/chat-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-regras-faq",
+      "title": "Como acessar regras e perguntas frequentes",
+      "description": "Regras da comunidade e perguntas frequentes sobre plano, aulas, comunidade, pontos e conta.",
+      "navigation": "Perfil > Ajuda e informações > Perguntas frequentes ou Regras da plataforma",
+      "routes": [
+        "/regras-faq"
+      ],
+      "availability": "demonstracao",
+      "access": "Estar logada.",
+      "steps": [
+        "Abra o Perfil e toque em Perguntas frequentes, Regras da plataforma ou Orientações de acesso.",
+        "Use a busca e as seções para filtrar."
+      ],
+      "faq": [],
+      "limitations": [
+        "Os textos ainda estão em revisão pela equipe."
+      ],
+      "watch": [
+        "src/components/extras/rules-faq-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-perfil",
+      "title": "O que tem no Perfil",
+      "description": "O Perfil reúne a sua conta, a sua evolução e a ajuda.",
+      "navigation": "Barra de baixo > Perfil",
+      "routes": [
+        "/perfil"
+      ],
+      "availability": "todas",
+      "access": "Estar logada.",
+      "steps": [
+        "Em Minha evolução ficam nível, XP, Desafios, Ranking, Conquistas e Recompensas.",
+        "Em Ajuda e informações ficam a Central de ajuda, as Perguntas frequentes, as Regras e as Orientações de acesso.",
+        "Em Conta você vê suas respostas, ajusta o plano e sai da conta."
+      ],
+      "faq": [
+        {
+          "q": "Como saio da conta",
+          "a": "No Perfil, em Conta, toque em Sair da conta."
+        }
+      ],
+      "limitations": [
+        "Algumas áreas de evolução e ajuda ainda aparecem como Em breve para alunas."
+      ],
+      "watch": [
+        "src/components/extras/profile-view.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    },
+    {
+      "id": "app-notificacoes",
+      "title": "Notificações",
+      "description": "O sino no topo da tela mostra as notificações.",
+      "navigation": "Sino no topo da tela",
+      "routes": [
+        "/inicio"
+      ],
+      "availability": "todas",
+      "access": "Estar logada.",
+      "steps": [
+        "Toque no sino no topo da tela."
+      ],
+      "faq": [
+        {
+          "q": "Não chega notificação",
+          "a": "As notificações ainda não foram lançadas. Avisos de lives, comunidade e plano vão aparecer ali quando o recurso existir."
+        }
+      ],
+      "limitations": [
+        "Recurso ainda não lançado."
+      ],
+      "watch": [
+        "src/components/layout/notifications-button.tsx"
+      ],
+      "verifiedAt": "2026-11-26",
+      "status": "aprovado"
+    }
+  ]
+}
