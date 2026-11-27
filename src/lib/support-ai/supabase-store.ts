@@ -86,8 +86,23 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
     async start(_ownerId, ownerLabel, greeting) {
       const { data, error } = await user.rpc("support_start_conversation", { p_owner_label: ownerLabel, p_greeting: greeting });
       if (error || !data) throw new Error("support_start_failed");
-      const found = await load(String(data));
+      const id = String(data);
+      let found = await load(id);
       if (!found) throw new Error("support_start_failed");
+      // Com a migration 20261127150000 a função da aluna não grava mais a saudação (ela não pode
+      // forjar fala da assistente): o servidor grava. No banco antigo ela já veio na ordem 1.
+      if (found.messages.length === 0) {
+        const { data: g, error: eg } = await service.rpc("support_append_assistant_message", {
+          p_conversation: id,
+          p_content: greeting,
+          p_sources: [],
+          p_meta: { provider: "sistema" },
+          p_actions: [],
+        });
+        if (eg || !(g as { ok?: boolean } | null)?.ok) throw new Error("support_start_failed");
+        found = await load(id);
+        if (!found) throw new Error("support_start_failed");
+      }
       return found;
     },
 

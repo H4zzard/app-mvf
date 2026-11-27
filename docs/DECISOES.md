@@ -531,6 +531,18 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - **D147 · Sugestões de aula só com relevância.** Ids do modelo precisam ter vindo na busca da pergunta atual;
   sem eles, no máximo uma aula, com busca clara e título ligado à dúvida.
 
+- **D148 · Saudação só pelo servidor.** `support_start_conversation` não grava mais o texto vindo do cliente
+  como fala da assistente (dava para forjar “resposta da Nina” no histórico/TXT por chamada direta). A
+  migration 20261127150000 tira a gravação; o repositório grava a saudação pelo service role quando a
+  conversa vem vazia (funciona antes e depois da migration).
+- **D149 · `support-kb push` seletivo.** Só envia documentos novos ou com texto/status diferente do banco
+  (compara `text_hash`), aceita `--only` e mostra a prévia por documento e quem passaria a aprovado.
+  Reenviar tudo apagava e regravava os trechos das 74 aulas sem necessidade.
+- **D150 · Verificação do banco sempre somente leitura e testada.** `supabase/checks/nina_estado_somente_leitura.sql`
+  (um SELECT, testado em transação READ ONLY) e `npm run nina:db-check` (projeto por arquivo, sem rede,
+  ref mascarado, nunca chaves). Ordem de ativação em `docs/ATIVACAO_NINA.md`; retenção é proposta em
+  `docs/RETENCAO_ATENDIMENTOS.md` (nenhum prazo nem expurgo sem aprovação).
+
 ## Em aberto (não decidir sem o operador/expert)
 
 - Assistente MVF: autorizar a migration do suporte (portões A–E em `docs/SUPORTE_IA.md`), política de

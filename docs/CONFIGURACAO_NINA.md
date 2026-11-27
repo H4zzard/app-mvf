@@ -282,6 +282,9 @@ link, ela diz com transparência que os canais ainda serão divulgados e que nin
 
 ## 20. O que ainda depende de homologação e produção
 
+Passo a passo com os portões, os comandos exatos e o checklist de duas alunas + suporte:
+[`ATIVACAO_NINA.md`](ATIVACAO_NINA.md). Antes de tudo: `npm run nina:db-check -- --compare .env.homolog --expect-ref <ref da Vercel>`.
+
 1. Aplicar a migration `supabase/migrations/20261126120000_suporte_ia.sql` e, se o banco recebeu a versão
    anterior dela, também `20261127120000_nina_2_complemento.sql` (idempotente; pode colar no SQL Editor).
 2. Importar e aprovar a base do curso (seção 12).

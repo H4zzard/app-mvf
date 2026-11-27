@@ -312,6 +312,9 @@ O `npm run preflight` confere nomes e formato sem exibir valores.
 
 ## 15. Migração pendente e ativação (portões)
 
+> **Atualizado em 27/11/2026:** a ordem, os comandos e o checklist valem em [`ATIVACAO_NINA.md`](ATIVACAO_NINA.md)
+> (complemento → deploy → histórico privado → guia `app-pedir-ajuda`). Retenção: [`RETENCAO_ATENDIMENTOS.md`](RETENCAO_ATENDIMENTOS.md).
+
 O projeto Supabase atual serve o app publicado. **Nada abaixo foi executado.** Cada passo precisa de
 autorização explícita do operador.
 

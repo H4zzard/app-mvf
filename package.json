@@ -14,6 +14,7 @@
     "products": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/products.ts",
     "support-kb": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/support-knowledge.ts",
     "nina": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/nina.ts",
+    "nina:db-check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/nina-db-check.ts",
     "kiwify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/kiwify.ts",
     "admin:role": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/admin-role.ts",
     "access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/access.ts",

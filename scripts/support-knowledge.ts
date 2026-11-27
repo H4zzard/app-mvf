@@ -5,7 +5,8 @@
  *   npm run support-kb -- preview <pasta>              # prévia: novos, versões, duplicados, trechos
  *   npm run support-kb -- sql     <pasta> --out x.sql   # gera SQL de importação (NÃO executa)
  *   npm run support-kb -- scaffold <pasta>             # cria a estrutura de pastas e modelos (não sobrescreve)
- *   npm run support-kb -- push <pasta> [--app] [--execute]  # envia ao Supabase do .env carregado (prévia sem --execute); --app inclui os guias do app
+ *   npm run support-kb -- push <pasta> [--app] [--only id1,id2] [--execute]  # envia ao Supabase do .env carregado
+ *     (prévia sem --execute; só documentos novos ou com texto/status diferente; --app inclui os guias do app)
  *   npm run support-kb -- split <arquivo.md> <pasta> [--aprovado]  # divide um documento com várias “Aula:” em um arquivo por aula
  *
  * A pasta deve ficar FORA do repositório (materiais do curso são privados).
@@ -233,13 +234,39 @@ if (cmd === "push") {
   };
   // --app: também envia os guias do aplicativo (src/content/nina/aplicativo.json), com o status de lá.
   if (rest.includes("--app")) docs.push(...repoGuides().docs);
-  const existing = new Map<string, number>(((await (await api("support_knowledge_documents?select=id,version")).json()) as { id: string; version: number }[]).map((d) => [d.id, d.version]));
-  const todo = docs.filter((d) => !(existing.get(d.id)! > d.version));
-  const older = docs.length - todo.length;
+  // --only id1,id2: limita o envio a esses documentos (o resto do banco fica intocado).
+  const onlyArg = rest.find((a) => a.startsWith("--only="))?.slice(7) ?? (rest.includes("--only") ? rest[rest.indexOf("--only") + 1] : undefined);
+  const only = onlyArg ? new Set(onlyArg.split(",").map((s) => s.trim()).filter(Boolean)) : null;
+  if (only) {
+    const unknown = [...only].filter((id) => !docs.some((d) => d.id === id));
+    if (unknown.length) {
+      console.error(`✗ --only com id(s) que não existem nesta pasta${rest.includes("--app") ? "/guias" : " (faltou --app?)"}: ${unknown.join(", ")}`);
+      process.exit(1);
+    }
+  }
+  const scoped = only ? docs.filter((d) => only.has(d.id)) : docs;
+  // Só lê id, versão, hash e status (nada de conteúdo).
+  const existing = new Map(
+    ((await (await api("support_knowledge_documents?select=id,version,text_hash,status")).json()) as { id: string; version: number; text_hash: string; status: string }[]).map((d) => [d.id, d]),
+  );
+  // Envia só o que é NOVO ou MUDOU (texto ou status). Igual = intocado: os trechos das aulas não são apagados à toa.
+  const plan = scoped.map((d) => {
+    const cur = existing.get(d.id);
+    const action = !cur ? "novo" : cur.version > d.version ? "ignorado (versão do banco é mais nova)" : cur.text_hash === textHash(d.text) && cur.status === d.status ? "igual" : "atualizar";
+    return { d, cur, action };
+  });
+  const todo = plan.filter((p) => p.action === "novo" || p.action === "atualizar").map((p) => p.d);
   const host = new URL(url).host.split(".")[0];
-  console.log(`\nDestino: projeto Supabase ${host.slice(0, 4)}… · ${todo.length} documento(s) a enviar (${todo.filter((d) => existing.has(d.id)).length} atualização(ões))${older ? ` · ${older} ignorado(s): versão no banco é mais nova` : ""}.`);
+  const count = (a: string) => plan.filter((p) => p.action.startsWith(a)).length;
+  console.log(`\nDestino: projeto Supabase ${host.slice(0, 4)}… · ${scoped.length} documento(s) conferido(s): ${count("novo")} novo(s), ${count("atualizar")} a atualizar, ${count("igual")} igual(is), ${count("ignorado")} ignorado(s).`);
+  for (const p of plan.filter((x) => x.action !== "igual")) {
+    const st = p.cur && p.cur.status !== p.d.status ? ` · status ${p.cur.status} → ${p.d.status}` : ` · status ${p.d.status}`;
+    console.log(`  ${p.action.padEnd(10)} ${p.d.id}${st}`);
+  }
+  const newlyApproved = plan.filter((p) => p.d.status === "aprovado" && (!p.cur || p.cur.status !== "aprovado") && p.action !== "igual" && !p.action.startsWith("ignorado"));
+  if (newlyApproved.length) console.log(`! ${newlyApproved.length} documento(s) passariam a APROVADO (chegam às alunas): ${newlyApproved.map((p) => p.d.id).join(", ")}`);
   if (!execute) {
-    console.log("Prévia apenas. Para gravar, rode de novo com --execute.");
+    console.log("Prévia apenas (nada foi gravado). Para gravar, rode de novo com --execute.");
     process.exit(0);
   }
   let chunks = 0;

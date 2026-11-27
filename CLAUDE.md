@@ -149,6 +149,8 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - Encerramento automático só quando a mensagem INTEIRA é confirmação clara (`decideAutoClose`, D146).
 - Nina 2.0: persona em `persona.ts`; provedor explícito `MVF_SUPPORT_PROVIDER` (sem troca silenciosa); botão “Abrir aula”
   só com id validado pelo servidor e arquiva antes de navegar; encerramento automático só via `decideAutoClose`.
+- Ativação real: siga `docs/ATIVACAO_NINA.md` (ordem complemento → deploy → histórico privado). Verificar banco só com
+  `supabase/checks/nina_estado_somente_leitura.sql` / `npm run nina:db-check` (somente leitura). Saudação só pelo servidor (D148).
 - Guias do app em `src/content/nina/aplicativo.json`: mudou uma tela? atualize o guia e rode `npm run nina -- docs-stamp`.
   Setup para leigos: `docs/CONFIGURACAO_NINA.md`.
 
