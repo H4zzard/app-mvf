@@ -24,7 +24,8 @@ export default function Page() {
 
 async function Gate() {
   const status = await supportChatStatus();
-  if (status.available) return <ChatView demo={status.demo} providerLabel={status.providerLabel} />;
+  // Nada de provedor, modelo ou ambiente para a interface: só a decisão de disponibilidade.
+  if (status.available) return <ChatView />;
   // Desenvolvimento: DeepSeek escolhida sem chave → avisa (nunca usa o modelo local escondido).
   const missingKey = status.demo && status.reason === "missing_key";
   return (
@@ -35,7 +36,7 @@ async function Gate() {
       <h1 className="font-serif text-2xl font-semibold text-fg">Assistente MVF</h1>
       <p className="text-muted">
         {missingKey
-          ? "A conversa está configurada para usar a DeepSeek (MVF_SUPPORT_PROVIDER=deepseek), mas a chave DEEPSEEK_API_KEY não foi encontrada no servidor. Veja docs/CONFIGURACAO_NINA.md."
+          ? "Somente desenvolvimento: o provedor externo foi escolhido, mas a chave não foi encontrada no servidor. Veja docs/CONFIGURACAO_NINA.md."
           : "O atendimento por conversa ainda não foi ativado. Enquanto isso, use as respostas da Central de ajuda."}
       </p>
     </div>

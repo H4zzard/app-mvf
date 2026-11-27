@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowUp, BookOpen, CircleAlert, Download, LifeBuoy, LoaderCircle, MessageSquarePlus, PlayCircle, RotateCcw, ShieldCheck, X } from "lucide-react";
+import { ArrowLeft, ArrowUp, CircleAlert, LifeBuoy, LoaderCircle, MessageSquarePlus, PlayCircle, RotateCcw, ShieldCheck, X } from "lucide-react";
 import {
   closeConversationAction,
-  exportTranscriptAction,
-  listMyConversationsAction,
   openLessonAction,
   requestHandoffAction,
   retryReplyAction,
@@ -28,6 +26,8 @@ import { cn } from "@/lib/cn";
  *   então o campo de texto nunca fica escondido. A rolagem é só da lista.
  * - Desktop: painel central com largura de leitura.
  * Nada de segredo aqui: o navegador só chama Server Actions.
+ * Interface de atendimento: sem provedor, modelo, tokens, ambiente ou arquivos internos.
+ * A transcrição é arquivada pelo servidor e NÃO é oferecida para download à aluna.
  */
 
 /** Identidade da ABA no modo demo (some ao recarregar — sem persistência falsa). */
@@ -39,7 +39,7 @@ const ERROR_TEXT: Record<ChatError, string> = {
   forbidden: "Seu acesso não está ativo no momento.",
   unavailable: "O atendimento não está disponível agora. Tente mais tarde.",
   invalid_tab: "Recarregue a página para iniciar um atendimento.",
-  provider_not_configured: "A conversa está configurada para usar a DeepSeek, mas a chave não foi encontrada no servidor.",
+  provider_not_configured: "O atendimento não está disponível agora. Tente mais tarde.",
   lesson_unavailable: "Essa aula não está disponível para abrir agora.",
   invalid: "Escreva sua mensagem antes de enviar.",
   too_long: "Sua mensagem ficou longa demais. Tente resumir um pouco.",
@@ -52,7 +52,7 @@ const ERROR_TEXT: Record<ChatError, string> = {
   daily_limit: "Você chegou ao limite de mensagens de hoje. Volte amanhã ou use a Central de ajuda.",
   reply_failed: "Não consegui responder agora.",
   reply_timeout: "A resposta demorou demais.",
-  archive_failed: "Não foi possível arquivar o atendimento. Nada foi perdido. Tente de novo.",
+  archive_failed: "Não foi possível encerrar o atendimento agora. Nada foi perdido. Tente de novo.",
 };
 
 const timeOf = (iso: string) => new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Recife" });
@@ -76,14 +76,7 @@ function useViewportBox() {
 
 type Phase = "starting" | "ready" | "closing" | "closed" | "failed";
 
-const REASON_TEXT: Record<ClosedInfo["reason"], string> = {
-  manual: "Atendimento encerrado",
-  resolvido: "Que bom que resolveu! Atendimento encerrado",
-  abriu_aula: "Atendimento encerrado para abrir a aula",
-  inatividade: "Atendimento encerrado por inatividade",
-};
-
-export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel: string }) {
+export function ChatView() {
   const router = useRouter();
   const [opening, setOpening] = useState<string | null>(null);
   const [pendingClose, setPendingClose] = useState(false);
@@ -97,7 +90,6 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
   const [handoff, setHandoff] = useState<{ topic: string | null; label: string | null; state: "offer" | "sent"; contactUrl: string | null } | null>(null);
   const [confirmClose, setConfirmClose] = useState(false);
   const [closed, setClosed] = useState<ClosedInfo | null>(null);
-  const [history, setHistory] = useState<{ id: string; startedAt: string; closedAt: string | null; status: string }[]>([]);
   const scroller = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const stick = useRef(true);
@@ -207,8 +199,6 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
     setPhase("closed");
     setPendingClose(false);
     setHandoff(null);
-    const list = await listMyConversationsAction(tabId());
-    if (list.ok) setHistory(list.conversations.filter((c) => c.status === "closed"));
   }
 
   async function close() {
@@ -238,17 +228,6 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
     router.push(r.href);
   }
 
-  async function download(id: string) {
-    const r = await exportTranscriptAction(tabId(), id);
-    if (!r.ok) return setError({ code: r.error });
-    const url = URL.createObjectURL(new Blob([r.text], { type: "text/plain;charset=utf-8" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = r.fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
   const canType = phase === "ready" && !waiting;
   const remaining = maxChars - text.length;
 
@@ -264,9 +243,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
         </Link>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-base font-semibold text-fg">{ASSISTANT.name}</h1>
-          <p className="truncate text-xs text-muted">
-            {ASSISTANT.role} · atendimento automatizado{demo ? ` · demonstração (${providerLabel})` : ""}
-          </p>
+          <p className="truncate text-xs text-muted">Suporte MVF</p>
         </div>
         {phase === "ready" || phase === "closing" ? (
           <Button variant="secondary" size="sm" className="shrink-0 px-3" onClick={() => setConfirmClose(true)} disabled={phase !== "ready" || waiting} aria-haspopup="dialog">
@@ -281,10 +258,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
         <div ref={scroller} onScroll={onScroll} role="log" aria-live="polite" aria-label="Mensagens do atendimento" className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-4 sm:px-5">
           <p className="mx-auto flex max-w-md items-start gap-2 rounded-lg bg-surface px-3 py-2 text-xs text-muted">
             <ShieldCheck aria-hidden className="mt-0.5 size-3.5 shrink-0" />
-            <span>
-              Atendimento automatizado do MVF. As conversas podem ser guardadas para suporte e qualidade. Não envie senha, código, CPF ou cartão.
-              {demo ? ` Demonstração: respostas de ${providerLabel}, com base em revisão. A conversa existe só nesta aba.` : ""}
-            </span>
+            <span>A {ASSISTANT.name} é a assistente virtual do MVF. As conversas podem ser guardadas para suporte e qualidade. Não envie senha, código, CPF ou cartão.</span>
           </p>
 
           {phase === "starting" ? (
@@ -294,7 +268,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
           ) : null}
 
           {messages.map((m) => (
-            <Bubble key={m.id} m={m} demo={demo} onOpenLesson={phase === "ready" ? openLesson : undefined} opening={opening} />
+            <Bubble key={m.id} m={m} onOpenLesson={phase === "ready" ? openLesson : undefined} opening={opening} />
           ))}
 
           {waiting ? (
@@ -349,7 +323,7 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
                 ) : null}
                 {pendingClose ? (
                   <button type="button" onClick={close} className="mt-1.5 inline-flex min-h-10 items-center gap-1.5 font-semibold text-brand hover:underline">
-                    <RotateCcw aria-hidden className="size-4" /> Tentar arquivar de novo
+                    <RotateCcw aria-hidden className="size-4" /> Tentar encerrar de novo
                   </button>
                 ) : null}
                 {phase === "failed" ? (
@@ -365,35 +339,14 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
           ) : null}
 
           {closed ? (
-            <section aria-label="Atendimento encerrado" className="space-y-3 rounded-xl border border-line bg-card p-4 text-sm">
-              <p className="font-semibold text-fg">
-                {closed.persistent
-                  ? `${REASON_TEXT[closed.reason]} e arquivado às ${timeOf(closed.closedAt)}.`
-                  : `${REASON_TEXT[closed.reason]} às ${timeOf(closed.closedAt)}. Na demonstração, a transcrição fica só nesta aba.`}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" size="sm" onClick={() => conversationId && download(conversationId)}>
-                  <Download aria-hidden className="size-4" /> Baixar transcrição (.txt)
-                </Button>
-                <Button size="sm" onClick={start}>
-                  <MessageSquarePlus aria-hidden className="size-4" /> Iniciar novo atendimento
-                </Button>
-              </div>
-              {history.length > 1 ? (
-                <div className="border-t border-line pt-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-subtle">Atendimentos encerrados</p>
-                  <ul className="mt-1.5 space-y-1">
-                    {history.map((h) => (
-                      <li key={h.id}>
-                        <button type="button" onClick={() => download(h.id)} className="inline-flex min-h-10 items-center gap-1.5 text-brand hover:underline">
-                          <Download aria-hidden className="size-3.5" />
-                          {new Date(h.startedAt).toLocaleString("pt-BR", { timeZone: "America/Recife", dateStyle: "short", timeStyle: "short" })}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+            <section aria-labelledby="closed-title" className="mx-auto max-w-md space-y-3 rounded-xl border border-line bg-card p-4 text-center text-sm">
+              <h2 id="closed-title" className="font-semibold text-fg">
+                Atendimento encerrado
+              </h2>
+              <p className="text-muted">Quando precisar de ajuda novamente, estaremos por aqui. 💗</p>
+              <Button size="sm" onClick={start}>
+                <MessageSquarePlus aria-hidden className="size-4" /> Iniciar nova conversa
+              </Button>
             </section>
           ) : null}
         </div>
@@ -448,19 +401,11 @@ export function ChatView({ demo, providerLabel }: { demo: boolean; providerLabel
   );
 }
 
-function Bubble({ m, demo, onOpenLesson, opening }: { m: ClientMessage; demo: boolean; onOpenLesson?: (a: ChatAction) => void; opening: string | null }) {
+function Bubble({ m, onOpenLesson, opening }: { m: ClientMessage; onOpenLesson?: (a: ChatAction) => void; opening: string | null }) {
   if (m.sender === "system") {
     return <p className="mx-auto max-w-md text-center text-xs text-muted">{m.content}</p>;
   }
   const mine = m.sender === "student";
-  const via =
-    demo && !mine && m.meta
-      ? m.meta.provider === "deepseek"
-        ? `via DeepSeek · ${m.meta.model ?? ""}${m.meta.tokensIn !== undefined ? ` · ${m.meta.tokensIn}/${m.meta.tokensOut} tokens` : ""}`
-        : m.meta.provider === "local"
-          ? "modelo local (sem IA)"
-          : null
-      : null;
   return (
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
       <div className={cn("max-w-[85%] sm:max-w-[75%]")}>
@@ -492,20 +437,9 @@ function Bubble({ m, demo, onOpenLesson, opening }: { m: ClientMessage; demo: bo
             ))}
           </ul>
         ) : null}
-        {m.sources?.length ? (
-          <ul className="mt-1.5 flex flex-wrap gap-1.5" aria-label="Fontes usadas">
-            {m.sources.map((s) => (
-              <li key={s.docId} className="inline-flex min-h-8 items-center gap-1 rounded-md bg-surface px-2 text-xs text-muted">
-                <BookOpen aria-hidden className="size-3.5" />
-                {s.title}
-                {demo && s.draft ? " · em revisão" : ""}
-              </li>
-            ))}
-          </ul>
-        ) : null}
         <p className={cn("mt-1 text-[0.7rem] text-subtle", mine ? "text-right" : "text-left")}>
+          <span className="sr-only">{mine ? "Enviada às " : "Recebida às "}</span>
           {timeOf(m.createdAt)}
-          {via ? ` · ${via}` : ""}
         </p>
       </div>
     </div>
@@ -532,7 +466,7 @@ function ConfirmClose({ onCancel, onConfirm }: { onCancel: () => void; onConfirm
       <h2 id="close-title" className="text-lg font-semibold">
         Encerrar atendimento?
       </h2>
-      <p className="mt-2 text-sm text-muted">Depois de encerrar, não dá para enviar novas mensagens nesta conversa. Ela será arquivada e você poderá baixar a transcrição.</p>
+      <p className="mt-2 text-sm text-muted">Depois de encerrar, não dá para enviar novas mensagens nesta conversa. Se precisar, é só iniciar uma nova.</p>
       <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="secondary" onClick={onCancel}>
           Continuar conversando

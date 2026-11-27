@@ -10,36 +10,59 @@ import type { ChatAction, SupportConversation, SupportMessage } from "./types.ts
 
 /* ------------------------------ Encerramento automático ------------------------------ */
 
-const RESOLVED: RegExp[] = [
-  /\b(deu|ja deu) certo\b/,
-  /\b(consegui|conseguimos)( resolver| achar| encontrar| entrar| acessar| fazer)?\b/,
-  /\b(resolvi|resolveu|resolvido|ta resolvido|esta resolvido)\b/,
-  /\b(era|e) so isso\b/,
-  /\bso isso (mesmo|obrigad[ao])\b/,
-  /\bja (achei|encontrei|vi|entendi tudo)\b/,
-  /\bachei[,! ]+(valeu|obrigad[ao])\b/,
-  /\bfuncionou\b/,
+/**
+ * Confirmações aceitas. Cada padrão precisa ser praticamente a mensagem INTEIRA:
+ * depois de tirar o padrão e as palavras de cortesia, sobra no máximo uma palavra.
+ * Assim “é só isso que aparece pra mim” ou “consegui entrar mas não acho a aula” não encerram.
+ */
+const CONFIRMATIONS: { re: RegExp; reason: "resolvido" | "manual" }[] = [
+  { re: /\b(agora |ja |tudo )?deu (tudo )?certo\b/, reason: "resolvido" },
+  { re: /\b(agora |ja )?(consegui|conseguimos)( resolver| achar| encontrar| entrar| acessar| fazer)?\b/, reason: "resolvido" },
+  { re: /\b(ja |agora )?(resolvi|resolveu|resolvido|ta resolvido|esta resolvido|tudo resolvido)\b/, reason: "resolvido" },
+  { re: /\b(era|e) so isso( mesmo)?\b|\bso isso( mesmo)?\b/, reason: "resolvido" },
+  { re: /\b(agora |ja )?(achei|encontrei)( sim)?\b/, reason: "resolvido" },
+  { re: /\b(agora |ja )?funcionou( sim)?\b/, reason: "resolvido" },
+  { re: /\b(ta |esta )?tudo certo( agora)?\b/, reason: "resolvido" },
+  { re: /\bpode (encerrar|finalizar|fechar)( o atendimento| a conversa)?\b/, reason: "manual" },
 ];
-const NEGATION = /\b(nao|nem|ainda nao|nunca)\s+(\w+\s+){0,2}(deu|consegui|resolvi|resolveu|funcionou|achei|encontrei)\b/;
 
-export type AutoCloseDecision = { close: true; reason: "resolvido" } | { close: false; why: "not_explicit" | "negated" | "question" | "handoff_pending" | "too_early" };
+/** Palavras que não mudam o sentido de uma confirmação (cortesia, interjeições). */
+const COURTESY = new Set(
+  "obrigada obrigado obg obgd brigada brigado valeu vlw muito muita mt mto nina sim ah ahh ai ufa oba eba perfeito perfeita otimo otima show maravilha top beleza blz bom boa amei demais querida flor linda gracas deus a e ok okay oi aqui entao viu ta isso mesmo tb tambem ajuda pela pelo sua seu".split(" "),
+);
+
+/** Qualquer sinal de que ainda há problema ou dúvida bloqueia o encerramento. */
+const BLOCKERS =
+  /\b(nao|nem|nunca|ainda|mas|porem|entretanto|so que|parcial|parte|quase|metade|erro|errado|problema|travou|trava|continua|sumiu|nada|ninguem|duvida|talvez|acho que|vou tentar|tentando|depois|como|onde|qual|quando|por que|porque)\b/;
+
+export type AutoCloseDecision =
+  | { close: true; reason: "resolvido" | "manual" }
+  | { close: false; why: "not_explicit" | "negated" | "question" | "handoff_pending" | "too_early" };
 
 /**
- * Encerrar sozinho? Só se a aluna confirmou que resolveu, sem pergunta nova,
- * sem negação e sem assunto da equipe pendente. “ok”, “obrigada” ou “valeu”
- * sozinhos NÃO encerram (podem ser só um aceno no meio da explicação).
+ * Encerrar sozinho? Só se a mensagem inteira for uma confirmação clara (“Deu certo, obrigada!”,
+ * “Agora achei”, “Pode encerrar”), sem pergunta, sem negação ou ressalva em nenhum ponto, e sem
+ * assunto da equipe pendente. “ok”, “obrigada”, “vou tentar” ou “não” NUNCA encerram.
+ * Quem decide é o servidor; uma resposta do modelo nunca encerra o atendimento.
  */
 export function decideAutoClose(text: string, conversation: Pick<SupportConversation, "handoffRequestedAt">, history: SupportMessage[]): AutoCloseDecision {
-  const t = normalize(text).replace(/\s+/g, " ").trim();
+  const t = normalize(text).replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
   if (history.filter((m) => m.sender === "student").length < 1) return { close: false, why: "too_early" };
   if (/\?/.test(text)) return { close: false, why: "question" };
-  if (NEGATION.test(t)) return { close: false, why: "negated" };
-  if (!RESOLVED.some((re) => re.test(t))) return { close: false, why: "not_explicit" };
+  if (!t || t.split(" ").length > 12) return { close: false, why: "not_explicit" };
+  if (BLOCKERS.test(t)) return { close: false, why: "negated" };
+  const hit = CONFIRMATIONS.find(({ re }) => {
+    const m = re.exec(t);
+    if (!m) return false;
+    const rest = `${t.slice(0, m.index)} ${t.slice(m.index + m[0].length)}`.split(" ").filter((w) => w && !COURTESY.has(w));
+    return rest.length <= 1;
+  });
+  if (!hit) return { close: false, why: "not_explicit" };
   const recentStudent = history.filter((m) => m.sender === "student").slice(-4);
   if (conversation.handoffRequestedAt || recentStudent.some((m) => detectHandoff(m.content)) || detectHandoff(text)) {
     return { close: false, why: "handoff_pending" };
   }
-  return { close: true, reason: "resolvido" };
+  return { close: true, reason: hit.reason };
 }
 
 /* ------------------------------ Botões de aula ------------------------------ */
@@ -83,11 +106,28 @@ export interface LessonInfo {
   href: string;
 }
 
+const STOP = new Set(
+  "aula aulas como para pra pro por com sem uma umas uns que seu sua meu minha dos das nos nas pelo pela mais muito voce aqui onde qual quais esta este essa esse isso fazer faz tem ter ver vou ela ele the and nao sim tudo acho cade".split(" "),
+);
+const stems = (s: string) =>
+  normalize(s)
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length >= 3 && !STOP.has(w))
+    .map((w) => w.slice(0, 5));
+
+/** O título da aula tem pelo menos um termo forte em comum com a dúvida da aluna? */
+export function titleMatches(title: string, studentText: string): boolean {
+  const asked = new Set(stems(studentText));
+  return stems(title).some((w) => asked.has(w));
+}
+
 /**
- * Monta os botões “Abrir aula”:
- *  1. ids sugeridos pelo modelo, se existirem e forem permitidos (máx. 3);
- *  2. senão, se a aluna procura aula, as aulas dos trechos recuperados —
- *     uma só quando a primeira é claramente a melhor; até 3 quando estão próximas.
+ * Monta os botões “Abrir aula” (o servidor decide; nada de chip aleatório):
+ *  1. ids sugeridos pelo modelo, só se vieram nos trechos recuperados PARA ESTA PERGUNTA
+ *     e forem permitidos (máx. 3);
+ *  2. sem sugestão do modelo, no máximo UMA aula, e só se a aluna procura aula, a primeira
+ *     é claramente a melhor e o título dela tem termo em comum com a dúvida.
  * `resolve` valida existência, disponibilidade e permissão (servidor).
  */
 export function buildLessonActions(input: {
@@ -100,19 +140,20 @@ export function buildLessonActions(input: {
     const info = input.resolve(lessonId);
     return info ? { type: "open_lesson", lessonId, title: info.title, moduleTitle: info.moduleTitle, href: info.href } : null;
   };
-  const fromModel = input.modelLessonIds.map(toAction).filter((a): a is ChatAction => a !== null).slice(0, 3);
+  const retrievedIds = new Set(input.retrieved.map((r) => r.doc.lessonId).filter(Boolean));
+  const fromModel = input.modelLessonIds
+    .filter((id) => retrievedIds.has(id))
+    .map(toAction)
+    .filter((a): a is ChatAction => a !== null)
+    .slice(0, 3);
   if (fromModel.length) return fromModel;
   if (!wantsLesson(input.studentText)) return [];
   const lessons = input.retrieved.filter((r) => r.doc.lessonId);
-  if (!lessons.length) return [];
   const [first, second] = lessons;
-  const pool = second && second.score >= first.score * 0.62 ? lessons.slice(0, 3) : [first];
-  const out: ChatAction[] = [];
-  for (const r of pool) {
-    const a = toAction(r.doc.lessonId!);
-    if (a && !out.some((x) => x.lessonId === a.lessonId)) out.push(a);
-  }
-  return out;
+  // Empate entre aulas diferentes = correspondência fraca: melhor não sugerir nenhuma.
+  if (!first || (second && second.doc.lessonId !== first.doc.lessonId && second.score >= first.score * 0.62)) return [];
+  const a = toAction(first.doc.lessonId!);
+  return a && titleMatches(a.title, input.studentText) ? [a] : [];
 }
 
 /** O id pedido para abrir foi realmente oferecido nesta conversa? (impede abrir aula arbitrária pelo chat). */

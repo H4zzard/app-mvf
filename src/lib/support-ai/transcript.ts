@@ -56,8 +56,10 @@ export function buildTranscript(conv: SupportConversation, messages: SupportMess
     `Aluna: ${conv.ownerLabel}`,
     `Início: ${formatRecife(conv.startedAt)}`,
     `Encerramento: ${formatRecife(closedAt)}`,
-    `Fuso horário: ${TRANSCRIPT_TIME_ZONE}`,
-    ...(conv.handoffRequestedAt ? [`Encaminhamento solicitado: ${formatRecife(conv.handoffRequestedAt)}${conv.handoffTopic ? ` (${conv.handoffTopic})` : ""}`] : []),
+    `Fuso horário: ${TRANSCRIPT_TIME_ZONE} (registros guardados em UTC)`,
+    conv.handoffRequestedAt
+      ? `Encaminhamento humano: solicitado em ${formatRecife(conv.handoffRequestedAt)}${conv.handoffTopic ? ` (${conv.handoffTopic})` : ""}`
+      : "Encaminhamento humano: não solicitado",
     `Mensagens: ${ordered.length}`,
     "",
   ];
@@ -72,7 +74,7 @@ export function buildTranscript(conv: SupportConversation, messages: SupportMess
   return `${lines.join("\n")}\n`;
 }
 
-/** Nome de arquivo seguro para o download. */
+/** Nome de arquivo seguro para a exportação da EQUIPE (a aluna não baixa o TXT). */
 export function transcriptFileName(conv: Pick<SupportConversation, "id" | "startedAt">): string {
   const d = formatRecife(conv.startedAt).slice(0, 10).split("/").reverse().join("-");
   return `atendimento-mvf-${d}-${conv.id.slice(0, 8)}.txt`;

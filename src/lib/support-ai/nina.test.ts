@@ -85,15 +85,20 @@ describe("botões “Abrir aula” (validação do servidor)", () => {
     const r = extractLessonMarkers("Achei! Deixei o botão aqui embaixo.\n[[aula:l-roteiro]]\n[[aula:l-inventada]] [[abrir:https://x.com]]");
     assert.equal(r.text, "Achei! Deixei o botão aqui embaixo.");
     assert.deepEqual(r.lessonIds, ["l-roteiro", "l-inventada"]);
-    const actions = buildLessonActions({ modelLessonIds: r.lessonIds, retrieved: [], studentText: "x", resolve });
+    const actions = buildLessonActions({ modelLessonIds: r.lessonIds, retrieved: [doc("l-roteiro", 5)], studentText: "x", resolve });
     assert.deepEqual(actions.map((a) => a.lessonId), ["l-roteiro"]);
+    // id existente, mas fora dos trechos desta pergunta: não vira botão (nada de chip aleatório)
+    assert.deepEqual(buildLessonActions({ modelLessonIds: ["l-flow"], retrieved: [doc("l-roteiro", 5)], studentText: "x", resolve }), []);
     assert.equal(actions[0].href, "/aulas/l-roteiro", "rota montada pelo servidor");
   });
 
-  test("sem sugestão do modelo: usa a busca só se a aluna procura aula; uma quando é clara, até 3 quando próximas", () => {
+  test("sem sugestão do modelo: no máximo uma aula, só se a aluna procura aula, a busca é clara e o título combina", () => {
     assert.deepEqual(buildLessonActions({ modelLessonIds: [], retrieved: [doc("l-roteiro", 5)], studentText: "como faço um roteiro bom", resolve }), []);
     assert.deepEqual(buildLessonActions({ modelLessonIds: [], retrieved: [doc("l-roteiro", 5), doc("l-flow", 1)], studentText: "qual aula de roteiro?", resolve }).map((a) => a.lessonId), ["l-roteiro"]);
-    assert.deepEqual(buildLessonActions({ modelLessonIds: [], retrieved: [doc("l-roteiro", 5), doc("l-flow", 4.5), doc("l-narracao", 4), doc("l-x", 4)], studentText: "onde tem aula disso", resolve }).map((a) => a.lessonId), ["l-roteiro", "l-flow", "l-narracao"]);
+    // empate entre aulas diferentes = correspondência fraca → nenhuma sugestão
+    assert.deepEqual(buildLessonActions({ modelLessonIds: [], retrieved: [doc("l-roteiro", 5), doc("l-flow", 4.5), doc("l-narracao", 4)], studentText: "onde tem aula de roteiro", resolve }), []);
+    // aula clara na busca, mas o título não tem nada a ver com a dúvida → nenhuma sugestão
+    assert.deepEqual(buildLessonActions({ modelLessonIds: [], retrieved: [doc("l-flow", 5)], studentText: "qual aula fala de bio do perfil?", resolve }), []);
     assert.ok(wantsLesson("Não tô achando a aula que ensina isso"));
     assert.ok(!wantsLesson("como salvo um produto"));
   });
@@ -125,8 +130,8 @@ describe("encerramentos usam o mesmo mecanismo e registram o motivo", () => {
     const b = await s.close("ana", id, "manual");
     assert.ok(a.ok && b.ok && b.value.alreadyClosed && a.value.transcript === b.value.transcript);
     assert.equal(a.value.conversation.closeReason, "abriu_aula");
-    assert.match(a.value.transcript, /\] SISTEMA\nA aluna abriu a aula “Roteiro”\./);
-    assert.match(a.value.transcript, /Motivo: Encerrado ao abrir uma aula\n$/);
+    assert.match(a.value.transcript ?? "", /\] SISTEMA\nA aluna abriu a aula “Roteiro”\./);
+    assert.match(a.value.transcript ?? "", /Motivo: Encerrado ao abrir uma aula\n$/);
     assert.ok(!(await s.appendSystem("ana", id, "depois")).ok, "nada entra depois de encerrar");
   });
 });

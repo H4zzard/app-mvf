@@ -51,8 +51,8 @@ describe("suporte: abertura e isolamento", () => {
     const idAna = await start(ana);
     await send(ana, idAna, "Não consigo entrar na minha conta");
     await asUser(db, bia, async (tx) => {
-      assert.equal((await tx.query("select * from public.support_conversations where id = $1", [idAna])).rows.length, 0);
-      assert.equal((await tx.query("select * from public.support_messages where conversation_id = $1", [idAna])).rows.length, 0);
+      assert.equal((await tx.query("select id, status from public.support_conversations where id = $1", [idAna])).rows.length, 0);
+      assert.equal((await tx.query("select id, content from public.support_messages where conversation_id = $1", [idAna])).rows.length, 0);
     });
     assert.equal((await send(bia, idAna, "intrusa")).error, "not_found");
   });
@@ -119,9 +119,12 @@ describe("suporte: encerramento e TXT", () => {
     assert.equal(ok.ok, true);
     const again = (await db.query<{ r: J }>("select public.support_finish_close($1, $2, now(), 3) as r", [id, "outro texto qualquer que não deve entrar"])).rows[0].r;
     assert.equal(again.already_closed, true);
-    const row = await asUser(db, ana, async (tx) => (await tx.query<{ status: string; transcript: string }>("select status, transcript from public.support_conversations where id = $1", [id])).rows[0]);
+    // O TXT fica no banco (campo TEXT protegido); a aluna vê só o status, nunca o texto.
+    const row = (await db.query<{ status: string; transcript: string }>("select status, transcript from public.support_conversations where id = $1", [id])).rows[0];
     assert.equal(row.status, "closed");
     assert.match(row.transcript, /^ATENDIMENTO MVF/);
+    const mine = await asUser(db, ana, async (tx) => (await tx.query<{ status: string }>("select status from public.support_conversations where id = $1", [id])).rows[0]);
+    assert.equal(mine.status, "closed");
     assert.equal((await rpc(ana, "select public.support_begin_close($1) as r", [id])).status, "closed");
   });
 
@@ -194,6 +197,46 @@ describe("suporte: equipe", () => {
   });
 });
 
+describe("suporte: histórico privado (TXT e metadados só para servidor e equipe)", () => {
+  test("a aluna lê só as colunas do chat: nada de TXT, resumo, fontes ou metadados técnicos", async () => {
+    const id = await start(ana);
+    await send(ana, id, "Pergunta");
+    await asService((q) => q.query(`select public.support_append_assistant_message($1, 'Resposta', '[{"docId":"d"}]', '{"provider":"deepseek","model":"m","tokensIn":10}')`, [id]));
+    const ok = await asUser(db, ana, async (tx) => (await tx.query("select id, status, close_reason, message_count from public.support_conversations where id = $1", [id])).rows);
+    assert.equal(ok.length, 1);
+    const msgs = await asUser(db, ana, async (tx) => (await tx.query("select seq, sender, content, actions, created_at from public.support_messages where conversation_id = $1 order by seq", [id])).rows);
+    assert.equal(msgs.length, 3);
+    for (const sql of [
+      "select transcript from public.support_conversations",
+      "select summary from public.support_conversations",
+      "select * from public.support_conversations",
+      "select meta from public.support_messages",
+      "select sources from public.support_messages",
+      "select * from public.support_messages",
+    ]) {
+      assert.match(await expectError(asUser(db, ana, (tx) => tx.query(sql))), /permission denied/, sql);
+    }
+  });
+
+  test("exportação do TXT: equipe exporta com registro; aluna, moderação e conversa aberta não", async () => {
+    const id = await start(ana);
+    await send(ana, id, "Pergunta privada");
+    assert.equal((await rpc(staff, "select public.support_admin_export($1) as r", [id])).error, "not_closed");
+    await rpc(ana, "select public.support_begin_close($1) as r", [id]);
+    await db.query("select public.support_finish_close($1, $2, now(), 2)", [id, "ATENDIMENTO MVF\nPergunta privada\nFIM DO ATENDIMENTO"]);
+    const before = (await db.query<{ n: number }>("select count(*)::int as n from public.admin_audit_log where action = 'support.export'")).rows[0].n;
+    const exp = await rpc(staff, "select public.support_admin_export($1) as r", [id]);
+    assert.equal(exp.ok, true);
+    assert.match(String(exp.transcript), /Pergunta privada/);
+    const after = (await db.query<{ n: number }>("select count(*)::int as n from public.admin_audit_log where action = 'support.export'")).rows[0].n;
+    assert.equal(after, before + 1, "acesso registrado");
+    assert.match(await expectError(asUser(db, ana, (tx) => tx.query("select public.support_admin_export($1)", [id]))), /forbidden/, "nem a própria aluna exporta");
+    assert.match(await expectError(asUser(db, bia, (tx) => tx.query("select public.support_admin_export($1)", [id]))), /forbidden/);
+    assert.match(await expectError(asUser(db, mod, (tx) => tx.query("select public.support_admin_export($1)", [id]))), /forbidden/);
+    assert.match(await expectError(asAnon(db, (tx) => tx.query("select public.support_admin_export($1)", [id]))), /permission denied/);
+  });
+});
+
 describe("suporte: Nina 2.0 (motivo de encerramento, eventos e botões)", () => {
   test("motivo registrado; aluna não consegue gravar “resolvido”; o primeiro motivo vale", async () => {
     const id = await start(ana);
@@ -234,16 +277,24 @@ describe("suporte: upgrade de banco com a versão anterior da migration", () => 
     const stub = readFileSync(join(import.meta.dirname, "pg-harness.ts"), "utf8").match(/const SUPABASE_STUB = `([\s\S]*?)`;/)![1];
     const old = new PGlite();
     await old.exec(stub);
-    for (const f of readdirSync(dir).filter((x) => x.endsWith(".sql")).sort()) {
-      const sql = f === "20261126120000_suporte_ia.sql" ? readFileSync(join(import.meta.dirname, "fixtures", "suporte_ia_v1.sql"), "utf8") : readFileSync(join(dir, f), "utf8");
-      if (f === "20261127120000_nina_2_complemento.sql") continue;
-      await old.exec(sql);
+    const files = readdirSync(dir).filter((x) => x.endsWith(".sql")).sort();
+    const complementAt = files.indexOf("20261127120000_nina_2_complemento.sql");
+    for (const f of files.slice(0, complementAt)) {
+      await old.exec(f === "20261126120000_suporte_ia.sql" ? readFileSync(join(import.meta.dirname, "fixtures", "suporte_ia_v1.sql"), "utf8") : readFileSync(join(dir, f), "utf8"));
     }
     // Banco antigo: falta a coluna nova.
     await assert.rejects(old.query("select close_reason from public.support_conversations limit 0"));
-    const complement = readFileSync(join(dir, "20261127120000_nina_2_complemento.sql"), "utf8");
+    const complement = readFileSync(join(dir, files[complementAt]), "utf8");
     await old.exec(complement);
     await old.exec(complement); // idempotente
+    for (const f of files.slice(complementAt + 1)) {
+      const sql = readFileSync(join(dir, f), "utf8");
+      await old.exec(sql);
+      await old.exec(sql); // idempotente
+    }
+    const columnGrants = async (db: PGlite) =>
+      (await db.query<{ g: string }>("select table_name || '.' || column_name || ':' || grantee || ':' || privilege_type as g from information_schema.column_privileges where table_schema = 'public' and table_name like 'support_%' and grantee in ('anon', 'authenticated') order by 1")).rows.map((r) => r.g);
+    assert.deepEqual(await columnGrants(old), await columnGrants(fresh), "mesmas colunas liberadas para a aluna");
     const shape = async (db: PGlite) => ({
       cols: (await db.query<{ c: string }>("select table_name || '.' || column_name as c from information_schema.columns where table_schema = 'public' and table_name like 'support_%' order by 1")).rows.map((r) => r.c),
       fns: (await db.query<{ f: string }>("select p.oid::regprocedure::text as f from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'support_%' order by 1")).rows.map((r) => r.f),

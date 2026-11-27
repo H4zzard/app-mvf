@@ -13,18 +13,19 @@ import { generateReply } from "@/lib/support-ai/engine";
 import { HANDOFF_LABEL, detectHandoff, type HandoffTopic } from "@/lib/support-ai/escalation";
 import { FAREWELLS, GREETINGS } from "@/lib/support-ai/persona";
 import { getSupportRuntime, rateLimited } from "@/lib/support-ai/server";
-import { transcriptFileName } from "@/lib/support-ai/transcript";
-import type { ChatAction, CloseReason, MessageMeta, SourceRef, SupportMessage } from "@/lib/support-ai/types";
+import type { ChatAction, CloseReason, SupportMessage } from "@/lib/support-ai/types";
 
+/**
+ * O que o navegador recebe de cada mensagem: conteúdo, remetente, horário e ações úteis.
+ * Nunca provedor, modelo, tokens, latência, fontes internas ou transcrição.
+ */
 export interface ClientMessage {
   id: string;
   sender: "student" | "assistant" | "system";
   content: string;
   createdAt: string;
   seq: number;
-  sources?: SourceRef[];
   actions?: ChatAction[];
-  meta?: MessageMeta;
 }
 
 export type ChatError =
@@ -47,10 +48,8 @@ export type ChatError =
   | "archive_failed"
   | "lesson_unavailable";
 
+/** Só o status do encerramento volta para a interface (sem TXT, arquivo ou identificadores internos). */
 export interface ClosedInfo {
-  closedAt: string;
-  fileName: string;
-  persistent: boolean;
   reason: CloseReason;
 }
 
@@ -60,9 +59,7 @@ const toClient = (m: SupportMessage): ClientMessage => ({
   content: m.content,
   createdAt: m.createdAt,
   seq: m.seq,
-  ...(m.sources ? { sources: m.sources } : {}),
-  ...(m.actions ? { actions: m.actions } : {}),
-  ...(m.meta ? { meta: m.meta } : {}),
+  ...(m.actions?.length ? { actions: m.actions.map(({ type, lessonId, title, moduleTitle, href }) => ({ type, lessonId, title, moduleTitle, href })) } : {}),
 });
 
 type Runtime = Extract<Awaited<ReturnType<typeof getSupportRuntime>>, { ok: true }>["runtime"];
@@ -71,20 +68,22 @@ const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.le
 
 async function closeWith(runtime: Runtime, conversationId: string, reason: CloseReason): Promise<{ ok: true; closed: ClosedInfo } | { ok: false; error: ChatError }> {
   const r = await runtime.store.close(runtime.ownerId, conversationId, reason);
-  if (!r.ok) return { ok: false, error: r.error === "archive_failed" ? "archive_failed" : "not_found" };
-  return {
-    ok: true,
-    closed: {
-      closedAt: r.value.conversation.closedAt!,
-      fileName: transcriptFileName(r.value.conversation),
-      persistent: runtime.store.persistent,
-      reason: r.value.conversation.closeReason ?? reason,
-    },
-  };
+  if (!r.ok) {
+    // Fica em "closing" (sem novas mensagens) e pode ser repetido; nada é dado como salvo.
+    console.warn(`[nina] encerramento pendente: arquivamento falhou (motivo=${reason})`);
+    return { ok: false, error: r.error === "archive_failed" ? "archive_failed" : "not_found" };
+  }
+  // Diagnóstico interno (sem conteúdo): deixa claro quando o TXT NÃO foi para o Supabase.
+  console.info(
+    r.value.persisted
+      ? `[nina] atendimento encerrado · TXT gravado no Supabase · motivo=${r.value.conversation.closeReason ?? reason}${r.value.alreadyClosed ? " · já estava encerrado" : ""}`
+      : `[nina] atendimento encerrado · TXT só em memória (NÃO persistido no Supabase) · motivo=${r.value.conversation.closeReason ?? reason}`,
+  );
+  return { ok: true, closed: { reason: r.value.conversation.closeReason ?? reason } };
 }
 
 export async function startConversationAction(tabId: string | null): Promise<
-  | { ok: true; conversationId: string; messages: ClientMessage[]; providerLabel: string; providerKind: "deepseek" | "local"; demo: boolean; maxChars: number }
+  | { ok: true; conversationId: string; messages: ClientMessage[]; maxChars: number }
   | { ok: false; error: ChatError }
 > {
   const rt = await getSupportRuntime(tabId);
@@ -97,9 +96,6 @@ export async function startConversationAction(tabId: string | null): Promise<
       ok: true,
       conversationId: conversation.id,
       messages: messages.map(toClient),
-      providerLabel: runtime.providerLabel,
-      providerKind: runtime.engine.provider.kind,
-      demo: runtime.demo,
       maxChars: runtime.config.maxMessageChars,
     };
   } catch {
@@ -223,23 +219,13 @@ export async function openLessonAction(
   return { ok: true, href: lesson.href, closed: done.closed };
 }
 
-export async function closeConversationAction(tabId: string | null, conversationId: string): Promise<({ ok: true; alreadyClosed?: boolean } & ClosedInfo) | { ok: false; error: ChatError }> {
+export async function closeConversationAction(tabId: string | null, conversationId: string): Promise<({ ok: true } & ClosedInfo) | { ok: false; error: ChatError }> {
   const rt = await getSupportRuntime(tabId);
   if (!rt.ok) return { ok: false, error: rt.error };
   const done = await closeWith(rt.runtime, conversationId, "manual");
   return done.ok ? { ok: true, ...done.closed } : done;
 }
 
-export async function exportTranscriptAction(tabId: string | null, conversationId: string): Promise<{ ok: true; fileName: string; text: string } | { ok: false; error: ChatError }> {
-  const rt = await getSupportRuntime(tabId);
-  if (!rt.ok) return { ok: false, error: rt.error };
-  const r = await rt.runtime.store.exportTranscript(rt.runtime.ownerId, conversationId);
-  if (!r.ok) return { ok: false, error: r.error === "closed" ? "closed" : "not_found" };
-  return { ok: true, fileName: transcriptFileName(r.value.conversation), text: r.value.text };
-}
-
-export async function listMyConversationsAction(tabId: string | null) {
-  const rt = await getSupportRuntime(tabId);
-  if (!rt.ok) return { ok: false as const, error: rt.error };
-  return { ok: true as const, conversations: await rt.runtime.store.listMine(rt.runtime.ownerId) };
-}
+// Não existe ação de download/listagem de transcrições para a aluna. O TXT fica no banco e só a
+// equipe autorizada exporta (src/lib/support-ai/admin.ts). Pedidos de acesso aos próprios dados
+// seguem o procedimento administrativo da política de privacidade (docs/SUPORTE_IA.md).

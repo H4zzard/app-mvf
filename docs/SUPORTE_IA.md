@@ -198,11 +198,11 @@ npm run support-kb -- sql     ~/MVF-base --out ~/mvf-base.sql   # gera SQL (NÃO
 5. **Idempotência:**
    - repetir o encerramento devolve o mesmo TXT;
    - pedidos simultâneos compartilham o mesmo trabalho (memória) ou ficam em fila no lock da linha (banco).
-6. **Falha:** a conversa fica `closing`, a interface diz que o arquivamento falhou e permite tentar de novo.
-   Nunca diz "salvo" sem ter salvo.
-7. **Depois de encerrar:**
-   - baixar `.txt` (só da própria aluna, e só atendimentos encerrados);
-   - iniciar um novo atendimento.
+6. **Falha:** a conversa fica `closing` (sem novas mensagens), a interface diz que não foi possível encerrar
+   e permite tentar de novo. Nunca diz "salvo" sem ter salvo. O Supabase só confirma depois de ler do banco
+   que o TXT foi gravado (`transcript_generated_at`).
+7. **Depois de encerrar:** a interface mostra só "Atendimento encerrado", a mensagem de retorno e
+   **Iniciar nova conversa**. A aluna não baixa o TXT (D145); só a equipe exporta (seção 17.1).
 
 O TXT fica no banco (campo `transcript`), sem precisar de Storage. O histórico estruturado continua em
 `support_messages`.
@@ -327,7 +327,7 @@ autorização explícita do operador.
 3. **Portão C, chave da DeepSeek:** criar a chave com limite de gasto e configurar no ambiente de
    **homologação**: `DEEPSEEK_API_KEY`, `MVF_SUPPORT_STORE=supabase` e `MVF_SUPPORT_AI_ENABLED=true`.
 4. **Portão D, teste em homologação:**
-   - abrir, conversar, encerrar e baixar o TXT;
+   - abrir, conversar e encerrar; conferir o TXT pela exportação da equipe;
    - testar o isolamento entre duas contas;
    - testar a equipe (support) com o registro em `admin_audit_log`;
    - conferir o custo no painel da DeepSeek.
@@ -369,8 +369,8 @@ autorização explícita do operador.
 - **Provedor explícito:** `MVF_SUPPORT_PROVIDER=local|deepseek`. Com `deepseek` sem chave, o chat avisa e
   nunca troca para o modelo local.
 - **Prova de origem da resposta:**
-  - cada resposta grava `meta` (provedor, modelo e tokens);
-  - a demo mostra "via DeepSeek · modelo · tokens";
+  - cada resposta grava `meta` (provedor, modelo e tokens) no banco, legível só pelo servidor e pela equipe;
+  - a interface da aluna não mostra nada disso (D144);
   - o servidor registra `[nina] provedor=… status=… tokens=…`, sem conteúdo.
 - **Base do app:**
   - 27 guias estruturados em `src/content/nina/aplicativo.json`, cada um com rota, caminho, disponibilidade
@@ -405,4 +405,30 @@ autorização explícita do operador.
     encerramento e ausência de informação, com escrita formal e com gírias);
   - eles rodam no `npm test` com o modelo local e, com a DeepSeek real, via `npm run nina -- eval --yes`
     (pago, só com autorização).
+
+## 17.1 Interface limpa e histórico privado (27/11/2026)
+
+- **Interface da aluna:** cabeçalho "Nina / Suporte MVF"; natureza virtual informada uma vez, no aviso do topo.
+  Cada mensagem mostra conteúdo, remetente, horário e, quando houver, o botão "Abrir aula". Nada de provedor,
+  modelo, tokens, custo, ambiente, fontes internas ou arquivo.
+- **Dados que vão ao navegador:** `ClientMessage` = id, remetente, conteúdo, horário, seq e ações validadas.
+  `ClosedInfo` = só o motivo. Sem `meta`, `sources`, `providerLabel`, `fileName` ou TXT.
+- **Leitura da aluna no banco:** por coluna (migration `20261127150000_nina_historico_privado.sql`).
+  `support_conversations`: id, user_id, owner_label, status, origin, category, handoff_*, started_at,
+  closed_at, close_reason, message_count. `support_messages`: id, conversation_id, seq, sender, content,
+  actions, created_at. `transcript`, `summary`, `meta` e `sources` dão "permission denied" para ela.
+- **TXT:** gerado e gravado pelo servidor ao encerrar (manual com confirmação, conclusão clara, abrir aula,
+  futura inatividade). Campo `support_conversations.transcript`. Contém ID, aluna, abertura, encerramento,
+  fuso (UTC guardado, Recife exibido), encaminhamento humano (sim/não), cada mensagem com remetente e horário,
+  status e motivo.
+- **Equipe (`support:history` = admin/support):** `support_admin_list`, `support_admin_get` e
+  `support_admin_export` (nova), todas conferindo o papel no banco e registrando em `admin_audit_log`.
+  Exportação: `GET /api/admin/suporte/<id>/transcricao` (401/403/404/409, sem cache).
+- **Direito de acesso aos próprios dados (LGPD):** a aluna pede pelo canal oficial; a equipe confirma a
+  identidade, exporta pelo procedimento acima (fica registrado) e entrega por canal seguro. Exclusão e
+  retenção seguem `retention_until` e a política de privacidade (pendente de definição do operador).
+- **Encerramento automático:** `decideAutoClose` exige que a mensagem inteira seja uma confirmação clara;
+  qualquer negação, ressalva, pergunta ou dúvida bloqueia. A resposta do modelo nunca encerra.
+- **Sugestões de aula:** só ids que vieram na busca da pergunta atual; sem sugestão do modelo, no máximo uma
+  aula, com busca clara e título relacionado à dúvida. As fontes não aparecem mais como chips.
 

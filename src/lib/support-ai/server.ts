@@ -13,7 +13,7 @@ import "server-only";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { getViewer } from "@/lib/auth/viewer";
-import { can } from "@/lib/auth/permissions";
+import { adminRequestStatus, can } from "@/lib/auth/permissions";
 import { readConfig } from "@/lib/config/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -27,6 +27,7 @@ import { createMemoryRetriever, type Retriever, type RetrievedChunk } from "./re
 import { createMemoryStore, type Limits, type SupportStore } from "./store";
 import { createSupabaseStore } from "./supabase-store";
 import { SUMMARY_PROMPT, SYSTEM_PROMPT } from "./system-prompt";
+import { transcriptFileName } from "./transcript";
 import type { KnowledgeDocument } from "./types";
 
 export type RuntimeError = "unauthenticated" | "forbidden" | "unavailable" | "invalid_tab" | "provider_not_configured";
@@ -232,4 +233,24 @@ export async function getConversationForStaff(conversationId: string) {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.rpc("support_admin_get", { p_conversation: conversationId });
   return error || !data ? { ok: false as const, error: "not_found" as const } : { ok: true as const, data };
+}
+
+/**
+ * Exportação do TXT pela equipe (admin/support · support:history). Três barreiras:
+ * permissão do app aqui, papel conferido na função SQL `support_admin_export` e registro
+ * do acesso em admin_audit_log. A aluna não tem caminho equivalente.
+ */
+export async function exportTranscriptForStaff(conversationId: string): Promise<
+  { ok: true; fileName: string; text: string } | { ok: false; error: "unauthenticated" | "forbidden" | "not_found" | "not_closed" | "unavailable" }
+> {
+  const viewer = await getViewer();
+  const status = adminRequestStatus(viewer, "support:history");
+  if (status !== 200) return { ok: false, error: status === 401 ? "unauthenticated" : "forbidden" };
+  if (!/^[0-9a-f-]{36}$/i.test(conversationId)) return { ok: false, error: "not_found" };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("support_admin_export", { p_conversation: conversationId });
+  if (error) return { ok: false, error: error.code === "42501" ? "forbidden" : "unavailable" };
+  const r = data as { ok: boolean; error?: string; id?: string; started_at?: string; transcript?: string } | null;
+  if (!r?.ok || !r.transcript || !r.id || !r.started_at) return { ok: false, error: r?.error === "not_closed" ? "not_closed" : "not_found" };
+  return { ok: true, fileName: transcriptFileName({ id: r.id, startedAt: new Date(r.started_at).toISOString() }), text: r.transcript };
 }

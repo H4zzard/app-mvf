@@ -1,7 +1,8 @@
 import "server-only";
 /**
  * Repositório REAL do suporte (Supabase). Só é usado com MVF_SUPPORT_STORE=supabase,
- * DEPOIS da migration 20261126120000_suporte_ia.sql aplicada com autorização.
+ * DEPOIS das migrations do suporte (20261126120000, 20261127120000 e 20261127150000).
+ * A aluna NUNCA recebe a transcrição: o TXT é gravado pelo servidor e só a equipe exporta (admin.ts).
  *
  * - Operações da aluna: cliente com a sessão dela (RLS + funções que checam acesso ativo).
  * - Respostas do assistente, resumo e arquivamento do TXT: cliente de serviço (servidor),
@@ -56,12 +57,27 @@ function toMessage(r: Row): SupportMessage {
 
 const asError = (e: unknown): StoreResult<never> => ({ ok: false, error: (["not_found", "closed", "busy", "conversation_limit", "daily_limit"].includes(String(e)) ? e : "not_found") as never });
 
+/** Colunas que a ALUNA pode ler (migration 20261127150000). Nunca `select *` com a sessão dela. */
+const STUDENT_CONVERSATION_COLUMNS = "id, user_id, owner_label, status, origin, category, handoff_requested_at, handoff_topic, started_at, closed_at, close_reason, message_count";
+const STUDENT_MESSAGE_COLUMNS = "id, conversation_id, seq, sender, content, actions, created_at";
+/** Campos internos lidos só pelo servidor, depois de a sessão da aluna provar que a conversa é dela. */
+const INTERNAL_CONVERSATION_COLUMNS = "summary, summary_up_to_seq, pending_since, transcript_generated_at, retention_until";
+
 export function createSupabaseStore(user: SupabaseClient, service: SupabaseClient): SupportStore {
   async function load(id: string) {
-    const { data: c } = await user.from("support_conversations").select("*").eq("id", id).maybeSingle();
+    // 1) Dona: a sessão da aluna (RLS) precisa enxergar a conversa.
+    const { data: c } = await user.from("support_conversations").select(STUDENT_CONVERSATION_COLUMNS).eq("id", id).maybeSingle();
     if (!c) return null;
-    const { data: ms } = await user.from("support_messages").select("*").eq("conversation_id", id).order("seq");
-    return { conversation: toConversation(c), messages: (ms ?? []).map(toMessage) };
+    // 2) Memória interna do atendimento (resumo, pendência): servidor. O TXT nunca é carregado aqui.
+    const { data: internal } = await service.from("support_conversations").select(INTERNAL_CONVERSATION_COLUMNS).eq("id", id).single();
+    const { data: ms } = await user.from("support_messages").select(STUDENT_MESSAGE_COLUMNS).eq("conversation_id", id).order("seq");
+    return { conversation: toConversation({ ...(internal ?? {}), ...c, transcript: null }), messages: (ms ?? []).map(toMessage) };
+  }
+
+  /** Confirma no banco que o TXT foi gravado (sem trazer o texto). */
+  async function archived(id: string) {
+    const { data } = await service.from("support_conversations").select("status, transcript_generated_at").eq("id", id).single();
+    return Boolean(data && data.status === "closed" && data.transcript_generated_at);
   }
 
   return {
@@ -85,7 +101,7 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
       if (error) return { ok: false, error: "not_found" };
       const r = data as { ok: boolean; error?: string; seq?: number };
       if (!r.ok) return asError(r.error);
-      const { data: m } = await user.from("support_messages").select("*").eq("conversation_id", id).eq("seq", r.seq!).single();
+      const { data: m } = await user.from("support_messages").select(STUDENT_MESSAGE_COLUMNS).eq("conversation_id", id).eq("seq", r.seq!).single();
       return { ok: true, value: toMessage(m as Row) };
     },
 
@@ -139,8 +155,8 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
       if (!begin.ok) return asError(begin.error);
       const found = await load(id);
       if (!found) return { ok: false, error: "not_found" };
-      if (begin.status === "closed" && found.conversation.transcript) {
-        return { ok: true, value: { conversation: found.conversation, transcript: found.conversation.transcript, alreadyClosed: true } };
+      if (begin.status === "closed" && (await archived(id))) {
+        return { ok: true, value: { conversation: found.conversation, alreadyClosed: true, persisted: true } };
       }
       const closedAt = new Date().toISOString();
       let transcript: string;
@@ -156,9 +172,10 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
         p_message_count: found.messages.length,
       });
       if (e2 || !(fin as { ok: boolean }).ok) return { ok: false, error: "archive_failed" };
+      // Só confirma o encerramento depois de ler do banco que o TXT foi gravado.
       const after = await load(id);
-      if (!after?.conversation.transcript) return { ok: false, error: "archive_failed" };
-      return { ok: true, value: { conversation: after.conversation, transcript: after.conversation.transcript, alreadyClosed: Boolean((fin as { already_closed?: boolean }).already_closed) } };
+      if (!after || !(await archived(id))) return { ok: false, error: "archive_failed" };
+      return { ok: true, value: { conversation: after.conversation, alreadyClosed: Boolean((fin as { already_closed?: boolean }).already_closed), persisted: true } };
     },
 
     async listMine(): Promise<ConversationSummary[]> {
@@ -177,11 +194,5 @@ export function createSupabaseStore(user: SupabaseClient, service: SupabaseClien
       }));
     },
 
-    async exportTranscript(_ownerId, id) {
-      const found = await load(id);
-      if (!found) return { ok: false, error: "not_found" };
-      if (found.conversation.status !== "closed" || !found.conversation.transcript) return { ok: false, error: "closed" };
-      return { ok: true, value: { text: found.conversation.transcript, conversation: found.conversation } };
-    },
   };
 }

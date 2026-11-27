@@ -757,7 +757,7 @@
         },
         {
           "q": "A conversa encerrou sozinha",
-          "a": "Quando você confirma que resolveu, por exemplo dizendo que deu certo, a Nina se despede e o atendimento é encerrado e guardado. Você pode baixar a conversa e iniciar outra quando quiser."
+          "a": "Quando você confirma que resolveu, por exemplo dizendo que deu certo, a Nina se despede e o atendimento é encerrado. Se ainda precisar de ajuda, é só tocar em Iniciar nova conversa."
         }
       ],
       "limitations": [

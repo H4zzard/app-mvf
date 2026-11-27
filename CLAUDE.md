@@ -142,6 +142,11 @@ APIs (ex.: `error.tsx` recebe `retry`, `LayoutProps`/`PageProps` são globais ge
 - Banco publicado recebeu a versão anterior da `20261126120000`; o complemento `20261127120000_nina_2_complemento.sql`
   precisa estar aplicado antes de ligar o chat real. Base do curso: `modulos/` (fora do Git) → `support-kb split|push` (D141).
 - Busca do banco: OR de lexemas (D142). Sem botão validado, `dropButtonClaims` tira frases que prometem botão.
+- Interface da aluna SEM dado técnico (provedor, modelo, tokens, ambiente, fontes) e SEM download de TXT (D144/D145):
+  não devolver `meta`/`sources`/TXT ao navegador; sessão da aluna nunca usa `select *` no suporte.
+  TXT só para a equipe (`support_admin_export`, rota `/api/admin/suporte/<id>/transcricao`). Migration
+  `20261127150000_nina_historico_privado.sql` é PROPOSTA local (não aplicada).
+- Encerramento automático só quando a mensagem INTEIRA é confirmação clara (`decideAutoClose`, D146).
 - Nina 2.0: persona em `persona.ts`; provedor explícito `MVF_SUPPORT_PROVIDER` (sem troca silenciosa); botão “Abrir aula”
   só com id validado pelo servidor e arquiva antes de navegar; encerramento automático só via `decideAutoClose`.
 - Guias do app em `src/content/nina/aplicativo.json`: mudou uma tela? atualize o guia e rode `npm run nina -- docs-stamp`.

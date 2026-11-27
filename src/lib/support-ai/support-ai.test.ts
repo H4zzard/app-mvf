@@ -262,24 +262,24 @@ describe("repositório em memória", () => {
     assert.ok(!d.ok && d.error === "daily_limit");
   });
 
-  test("encerramento: bloqueia mensagens, é idempotente mesmo com pedidos simultâneos, e só exporta encerrado", async () => {
+  test("encerramento: bloqueia mensagens, é idempotente mesmo com pedidos simultâneos e não exporta para a aluna", async () => {
     const s = createMemoryStore();
     const id = (await s.start("ana", "Ana", "Oi")).conversation.id;
     await s.appendStudent("ana", id, "Pergunta", LIMITS);
     await s.appendAssistant(id, "Resposta");
-    assert.ok(!(await s.exportTranscript("ana", id)).ok);
+    assert.equal("exportTranscript" in s, false, "não existe exportação do TXT pela aluna");
     const [a, b] = await Promise.all([s.close("ana", id), s.close("ana", id)]);
     assert.ok(a.ok && b.ok);
     assert.equal(a.value.transcript, b.value.transcript);
     const again = await s.close("ana", id);
     assert.ok(again.ok && again.value.alreadyClosed && again.value.transcript === a.value.transcript);
+    assert.equal(again.value.persisted, false, "memória nunca finge persistência permanente");
     const blocked = await s.appendStudent("ana", id, "depois", LIMITS);
     assert.ok(!blocked.ok && blocked.error === "closed");
     assert.ok(!(await s.appendAssistant(id, "depois")).ok);
-    const exp = await s.exportTranscript("ana", id);
-    assert.ok(exp.ok && exp.value.text.includes("Pergunta") && exp.value.text.includes("Resposta"));
-    assert.ok(!(await s.exportTranscript("bia", id)).ok, "outra aluna não baixa");
-    assert.ok(!(await s.close("bia", id)).ok);
+    const saved = s._dump().conversations.find((c) => c.id === id)!;
+    assert.ok(saved.transcript!.includes("Pergunta") && saved.transcript!.includes("Resposta"));
+    assert.ok(!(await s.close("bia", id)).ok, "outra aluna não encerra nem recebe nada");
   });
 
   test("falha de arquivamento: não marca como encerrado nem salvo; tentar de novo funciona", async () => {
@@ -469,7 +469,7 @@ describe("segurança", () => {
     const a = readFileSync("src/app/(app)/suporte/chat/actions.ts", "utf8");
     assert.ok(a.startsWith('"use server"'));
     const exported = [...a.matchAll(/export async function (\w+)/g)].map((m) => m[1]);
-    assert.ok(exported.length >= 7);
+    assert.ok(exported.length >= 6);
     for (const fn of exported) {
       const body = a.slice(a.indexOf(`export async function ${fn}`), a.indexOf("\n}\n", a.indexOf(`export async function ${fn}`)));
       assert.match(body, /getSupportRuntime\(/, `${fn} precisa reautorizar`);

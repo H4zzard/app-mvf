@@ -84,9 +84,8 @@ Abra **http://localhost:3000**, vá em **Perfil > Central de ajuda**, role até 
 
 São três provas:
 
-1. **No chat:** o cabeçalho mostra “demonstração (DeepSeek (deepseek-flash))”, e embaixo de cada
-   resposta aparece “via DeepSeek · deepseek-flash · 812/96 tokens”. Com o modelo local, aparece
-   “modelo local (sem IA)”.
+1. **No chat:** nada. Desde 27/11/2026 a interface da aluna não mostra provedor, modelo, tokens nem
+   ambiente (D144). A origem fica só no servidor.
 2. **No Terminal do servidor:** a cada resposta surge uma linha como
    `[nina] provedor=deepseek modelo=deepseek-flash status=ok ms=1840 tokens=812/96`. Ela nunca mostra
    o texto da conversa nem a chave.
@@ -244,8 +243,11 @@ exemplo, “Qual aula ensina a criar personagem com IA?”, e toque em **Abrir a
 
 No chat, faça uma pergunta e depois responda “Deu certo, obrigada!”.
 
-- **Encerra:** a Nina se despede e o atendimento é encerrado e arquivado (motivo “Resolvido”).
-- **Não encerra:** “ok”, “obrigada” sozinho, “ainda não deu certo” ou perguntas.
+- **Encerra:** a mensagem inteira precisa ser uma confirmação clara: “Deu certo, obrigada!”, “Consegui
+  resolver”, “Agora achei”, “Era só isso”, “Funcionou!” ou “Pode encerrar”.
+- **Não encerra:** “não”, “ainda não consegui”, “não achei”, “não entendi”, “continua dando erro”,
+  “vou tentar”, “ok”, “obrigada” sozinho, perguntas e frases com ressalva (“consegui entrar mas não acho
+  a aula”, “é só isso que aparece”).
 - **Abrir aula** também encerra e arquiva, com o motivo “Encerrado ao abrir uma aula”.
 
 Rode as perguntas de referência na DeepSeek real (várias chamadas, poucos centavos):
@@ -256,13 +258,16 @@ npm run nina -- eval --yes
 
 ## 18. Onde consultar o TXT
 
-- **Desenvolvimento:** depois de encerrar, toque em **Baixar transcrição (.txt)** no chat. Fica só na
-  memória da aba e some ao recarregar ou reiniciar o servidor.
+A aluna **não** baixa o TXT (D145). O servidor gera e grava sozinho quando o atendimento termina.
+
+- **Desenvolvimento (memória):** o TXT é gerado, mas **não** vai para o Supabase. O Terminal mostra
+  `[nina] atendimento encerrado · TXT só em memória (NÃO persistido no Supabase)`.
 - **Produção (depois da ativação):**
-  - no banco, tabela `support_conversations`, coluna `transcript`;
-  - a aluna baixa o próprio TXT;
-  - a equipe (admin/support) consulta pelas funções `support_admin_list` e `support_admin_get`, com
-    registro de acesso.
+  - no banco, tabela `support_conversations`, coluna `transcript` (TEXT protegido; a aluna não lê essa
+    coluna, migration `20261127150000_nina_historico_privado.sql`);
+  - a equipe (admin/support, permissão `support:history`) lista e lê pelas funções `support_admin_list`
+    e `support_admin_get`, e exporta o TXT em `GET /api/admin/suporte/<id>/transcricao`, estando logada.
+    Cada acesso fica em `admin_audit_log` (`support.list`, `support.read`, `support.export`).
 
 ## 19. Canal humano
 

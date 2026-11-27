@@ -21,7 +21,7 @@ export async function ChatEntry() {
             <h2 id="chat-entry-title" className="text-lg font-semibold text-on-wine">
               Ainda precisa de ajuda?
             </h2>
-            <p className="mt-1 text-sm text-on-wine-muted">Converse com o Assistente MVF e receba orientações sobre as aulas, ferramentas e sua jornada.</p>
+            <p className="mt-1 text-sm text-on-wine-muted">Converse com a Nina, a assistente virtual do MVF, e receba orientações sobre as aulas, ferramentas e sua jornada.</p>
           </div>
         </div>
         <ButtonLink href="/suporte/chat" variant="inverse" size="lg" className="shrink-0 self-start sm:self-center">

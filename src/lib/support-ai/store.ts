@@ -34,8 +34,14 @@ export interface Limits {
 
 export interface CloseOutcome {
   conversation: SupportConversation;
-  transcript: string;
   alreadyClosed: boolean;
+  /**
+   * TXT confirmado no armazenamento permanente (Supabase)? Na memória é SEMPRE false:
+   * o TXT existe só enquanto o servidor de desenvolvimento estiver ligado.
+   */
+  persisted: boolean;
+  /** Texto gerado — só no repositório em memória (testes/diagnóstico). O real nunca devolve o TXT. */
+  transcript?: string;
 }
 
 export interface ConversationSummary {
@@ -62,8 +68,7 @@ export interface SupportStore {
   /** Mesmo mecanismo para manual, resolução automática e abertura de aula; o motivo é registrado. */
   close(ownerId: string, conversationId: string, reason?: CloseReason): Promise<StoreResult<CloseOutcome>>;
   listMine(ownerId: string): Promise<ConversationSummary[]>;
-  /** Só atendimentos ENCERRADOS têm TXT. */
-  exportTranscript(ownerId: string, conversationId: string): Promise<StoreResult<{ text: string; conversation: SupportConversation }>>;
+  // Não há exportação do TXT para a aluna: só a equipe exporta (support-ai/admin.ts + support_admin_export).
 }
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -204,7 +209,7 @@ export function createMemoryStore(opts: {
     async close(ownerId: string, id: string, reason: CloseReason = "manual"): Promise<StoreResult<CloseOutcome>> {
       const c = own(ownerId, id);
       if (!c) return { ok: false, error: "not_found" };
-      if (c.status === "closed" && c.transcript) return { ok: true, value: { conversation: { ...c }, transcript: c.transcript, alreadyClosed: true } };
+      if (c.status === "closed" && c.transcript) return { ok: true, value: { conversation: { ...c }, transcript: c.transcript, alreadyClosed: true, persisted: false } };
       // Pedidos simultâneos de encerramento compartilham o MESMO trabalho (idempotência).
       const inflight = closing.get(id);
       if (inflight) return inflight;
@@ -224,7 +229,7 @@ export function createMemoryStore(opts: {
         c.closedAt = closedAt;
         c.transcript = transcript;
         c.transcriptGeneratedAt = closedAt;
-        return { ok: true, value: { conversation: { ...c }, transcript, alreadyClosed: false } };
+        return { ok: true, value: { conversation: { ...c }, transcript, alreadyClosed: false, persisted: false } };
       })();
       closing.set(id, job);
       try {
@@ -246,13 +251,6 @@ export function createMemoryStore(opts: {
           messageCount: messages.get(c.id)?.length ?? 0,
           handoffRequested: c.handoffRequestedAt !== null,
         }));
-    },
-
-    async exportTranscript(ownerId: string, id: string): Promise<StoreResult<{ text: string; conversation: SupportConversation }>> {
-      const c = own(ownerId, id);
-      if (!c) return { ok: false, error: "not_found" };
-      if (c.status !== "closed" || !c.transcript) return { ok: false, error: "closed" };
-      return { ok: true, value: { text: c.transcript, conversation: { ...c } } };
     },
 
     _dump() {

@@ -518,6 +518,18 @@ reabria/fechava). Indicador de dev do Next movido para a direita (cobria a sideb
 - **D143 · Migration complementar `20261127120000_nina_2_complemento.sql`.** O banco publicado recebeu a versão
   anterior da `20261126120000`. O complemento é idempotente (colunas, funções novas, troca de assinaturas e busca)
   e um teste garante que “versão antiga + complemento” fica idêntico a um banco novo.
+- **D144 · Interface da Nina sem dado técnico.** Cabeçalho “Nina / Suporte MVF”; sem provedor, modelo, tokens,
+  ambiente ou fontes. A prova de origem fica no servidor (log `[nina]` e `meta` no banco). O navegador nem
+  recebe esses campos (`ClientMessage`/`ClosedInfo` enxutos).
+- **D145 · TXT privado.** A aluna não baixa a transcrição: saem o botão, as ações `exportTranscriptAction` e
+  `listMyConversationsAction` e o método do repositório. No banco, leitura da aluna por coluna (migration
+  `20261127150000`, proposta local). Exportação só pela equipe (`support_admin_export` + rota
+  `/api/admin/suporte/<id>/transcricao`), com auditoria. Acesso aos próprios dados: procedimento administrativo.
+- **D146 · Encerramento automático por mensagem inteira.** Causa do bug: o classificador achava “é só isso”,
+  “consegui” ou “funcionou” em qualquer ponto da frase (“não, é só isso que aparece”). Agora a confirmação
+  precisa ser praticamente a mensagem inteira, e negação/ressalva/pergunta em qualquer ponto bloqueia.
+- **D147 · Sugestões de aula só com relevância.** Ids do modelo precisam ter vindo na busca da pergunta atual;
+  sem eles, no máximo uma aula, com busca clara e título ligado à dúvida.
 
 ## Em aberto (não decidir sem o operador/expert)
 
