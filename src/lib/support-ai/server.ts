@@ -189,6 +189,15 @@ export async function getSupportRuntime(tabId: string | null): Promise<{ ok: tru
   };
 }
 
+const HINTS: Record<string, string> = {
+  disabled: "MVF_SUPPORT_AI_ENABLED não está como true neste deploy (mudou na Vercel? faça Redeploy)",
+  no_store: "MVF_SUPPORT_STORE precisa ser supabase",
+  local_provider: "MVF_SUPPORT_PROVIDER precisa ser deepseek",
+  missing_key: "DEEPSEEK_API_KEY ausente (ou DEEPSEEK_BASE_URL sem https://)",
+  no_service_role: "SUPABASE_SERVICE_ROLE_KEY ausente no servidor",
+};
+const unavailableHint = (reason: string | undefined) => (reason && HINTS[reason]) || "configuração incompleta";
+
 /** O chat aparece para esta sessão? (decisão no servidor, para a página). */
 export async function supportChatStatus(): Promise<{ available: boolean; demo: boolean; providerLabel: string; providerKind: "deepseek" | "local"; reason?: string }> {
   const viewer = await getViewer();
@@ -202,7 +211,10 @@ export async function supportChatStatus(): Promise<{ available: boolean; demo: b
   }
   if (viewer.kind !== "member") return { available: false, demo: false, providerLabel, providerKind };
   const a = chatAvailability(config, "member");
-  const ok = a.available && Boolean(readConfig().serviceRoleKey);
+  const hasService = Boolean(readConfig().serviceRoleKey);
+  const ok = a.available && hasService;
+  // Diagnóstico para quem opera (logs da Vercel): só o NOME do que falta, nunca valores.
+  if (!ok) console.warn(`[nina] chat indisponível para conta real: ${unavailableHint(a.reason ?? (hasService ? undefined : "no_service_role"))}`);
   return { available: ok, demo: false, providerLabel, providerKind, ...(a.reason ? { reason: a.reason } : {}) };
 }
 

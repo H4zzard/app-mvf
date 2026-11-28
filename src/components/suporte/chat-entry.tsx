@@ -3,7 +3,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { supportChatStatus } from "@/lib/support-ai/server";
 
 /**
- * “Ainda precisa de ajuda?” — fim da Central de ajuda. Decisão no SERVIDOR:
+ * “Fale com a Nina” — topo da Central de ajuda. Decisão no SERVIDOR:
  * só aparece quando o atendimento por conversa está disponível para a sessão
  * (sem botão que leva a algo desligado).
  */
@@ -11,7 +11,7 @@ export async function ChatEntry() {
   const status = await supportChatStatus();
   if (!status.available) return null;
   return (
-    <section aria-labelledby="chat-entry-title" className="mx-auto mt-8 max-w-[1320px] rounded-2xl bg-wine-deep p-5 text-on-wine shadow-raised sm:p-7">
+    <section aria-labelledby="chat-entry-title" className="mx-auto mb-6 max-w-[1320px] rounded-2xl bg-wine-deep p-5 text-on-wine shadow-raised sm:p-7">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-lg bg-wine-soft text-on-wine">
@@ -19,7 +19,7 @@ export async function ChatEntry() {
           </span>
           <div>
             <h2 id="chat-entry-title" className="text-lg font-semibold text-on-wine">
-              Ainda precisa de ajuda?
+              Fale com a Nina
             </h2>
             <p className="mt-1 text-sm text-on-wine-muted">Converse com a Nina, a assistente virtual do MVF, e receba orientações sobre as aulas, ferramentas e sua jornada.</p>
           </div>

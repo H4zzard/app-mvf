@@ -44,7 +44,7 @@ Central de ajuda ──► /suporte/chat (tela cheia, modo foco: sem barra/later
 
 ## 2. Fluxo de atendimento
 
-1. **Abertura:** a Central de ajuda mostra "Ainda precisa de ajuda?" só quando o chat está disponível; "Iniciar conversa" leva a `/suporte/chat`.
+1. **Abertura:** a Central de ajuda mostra "Fale com a Nina" no topo só quando o chat está disponível; "Iniciar conversa" leva a `/suporte/chat`.
 2. **Início:** o servidor autoriza a sessão e cria o atendimento, com a saudação do assistente como mensagem 1.
 3. **Cada mensagem da aluna:**
    - validação de tamanho (1000 caracteres);

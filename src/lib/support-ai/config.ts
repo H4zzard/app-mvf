@@ -35,7 +35,13 @@ export interface SupportConfig {
   retentionDays: number | null;
 }
 
-const clean = (v: string | undefined) => (v && v.trim() ? v.trim() : null);
+/** Tira espaços e aspas coladas por engano no painel (ex.: `"sk-…"` ou ` true `). */
+const clean = (v: string | undefined) => {
+  const t = (v ?? "").trim().replace(/^(['"])(.*)\1$/, "$2").trim();
+  return t ? t : null;
+};
+/** Valor de escolha (flag/opção): sem espaços, aspas nem diferença de maiúsculas. */
+const word = (v: string | undefined) => clean(v)?.toLowerCase() ?? null;
 
 function int(v: string | undefined, def: number, min: number, max: number): number {
   const n = Number.parseInt(clean(v) ?? "", 10);
@@ -54,9 +60,9 @@ export function readSupportConfig(env: Env = process.env): SupportConfig {
   const apiKey = clean(env.DEEPSEEK_API_KEY);
   const baseUrl = (clean(env.DEEPSEEK_BASE_URL) ?? DEEPSEEK_DEFAULT_BASE_URL).replace(/\/$/, "");
   return {
-    enabled: env.MVF_SUPPORT_AI_ENABLED === "true",
-    store: env.MVF_SUPPORT_STORE === "supabase" ? "supabase" : "memory",
-    provider: env.MVF_SUPPORT_PROVIDER === "deepseek" ? "deepseek" : "local",
+    enabled: ["true", "1", "sim", "yes", "on"].includes(word(env.MVF_SUPPORT_AI_ENABLED) ?? ""),
+    store: word(env.MVF_SUPPORT_STORE) === "supabase" ? "supabase" : "memory",
+    provider: word(env.MVF_SUPPORT_PROVIDER) === "deepseek" ? "deepseek" : "local",
     // Só aceita HTTPS (evita mandar a chave em texto claro por engano).
     deepseek: apiKey && baseUrl.startsWith("https://") ? { apiKey, model: clean(env.DEEPSEEK_MODEL) ?? DEEPSEEK_DEFAULT_MODEL, baseUrl } : null,
     maxMessagesPerConversation: int(env.MVF_SUPPORT_MAX_MESSAGES, 30, 1, 200),

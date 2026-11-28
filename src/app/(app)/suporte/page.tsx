@@ -10,13 +10,14 @@ export const metadata: Metadata = { title: "Suporte" };
 export default function Page() {
   return (
     <>
-      <DemoModule featureId="suporte">
-        <SupportView />
-      </DemoModule>
-      {/* Assistente MVF: só aparece se o atendimento estiver disponível (decisão no servidor). */}
+      {/* Assistente MVF primeiro: para a aluna real a Central ainda é “Em breve”, e o convite
+          ficava escondido no fim da página. Só aparece se o atendimento estiver disponível (servidor). */}
       <Suspense fallback={null}>
         <ChatEntry />
       </Suspense>
+      <DemoModule featureId="suporte">
+        <SupportView />
+      </DemoModule>
     </>
   );
 }
